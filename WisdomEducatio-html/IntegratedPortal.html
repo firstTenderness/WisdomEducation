@@ -36,7 +36,297 @@
             overflow-x: hidden;
         }
 
-        /* 导航栏样式 */
+        /* 登录相关样式 */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .auth-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .auth-container {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 450px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .auth-modal.active .auth-container {
+            transform: translateY(0);
+        }
+
+        .auth-tabs {
+            display: flex;
+            background-color: var(--light-gray);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            background-color: var(--white);
+            border-bottom: 3px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .auth-content {
+            padding: 30px;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .auth-form h3 {
+            margin-bottom: 20px;
+            color: var(--dark-gray);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-error {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        .auth-btn:hover {
+            background-color: #27ae60;
+        }
+
+        .auth-divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+            color: #888;
+        }
+
+        .auth-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 45%;
+            height: 1px;
+            background-color: var(--medium-gray);
+        }
+
+        .auth-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 0;
+            width: 45%;
+            height: 1px;
+            background-color: var(--medium-gray);
+        }
+
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .social-wechat {
+            background-color: #09bb07;
+        }
+
+        .social-qq {
+            background-color: #12b7f5;
+        }
+
+        .social-weibo {
+            background-color: #e6162d;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .auth-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .close-auth {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            color: #888;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        /* 用户菜单样式 */
+        .user-menu {
+            position: relative;
+        }
+
+        .user-btn {
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            transition: background-color 0.3s;
+        }
+
+        .user-btn:hover {
+            background-color: rgba(46, 204, 113, 0.1);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: var(--dark-gray);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            border-radius: var(--border-radius);
+            min-width: 200px;
+            padding: 10px 0;
+            z-index: 100;
+            display: none;
+            margin-top: 10px;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--dark-gray);
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--light-gray);
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background-color: var(--medium-gray);
+            margin: 8px 0;
+        }
+
+        /* 导航栏样式更新 */
         header {
             position: fixed;
             top: 0;
@@ -73,10 +363,11 @@
         .nav-menu {
             display: flex;
             list-style: none;
+            align-items: center;
         }
 
         .nav-menu li {
-            margin-left: 30px;
+            margin-left: 20px;
         }
 
         .nav-menu a {
@@ -105,6 +396,21 @@
             width: 100%;
             height: 2px;
             background-color: var(--primary-color);
+        }
+
+        .login-btn {
+            padding: 8px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .login-btn:hover {
+            background-color: #27ae60;
         }
 
         .mobile-menu-btn {
@@ -150,6 +456,182 @@
             width: 80px;
             height: 4px;
             background-color: var(--primary-color);
+        }
+
+        /* 个人中心部分 */
+        #profile {
+            background-color: var(--light-gray);
+        }
+
+        .profile-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .profile-sidebar {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            height: fit-content;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 0 auto 15px;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-role {
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+
+        .profile-stat {
+            text-align: center;
+        }
+
+        .profile-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .profile-stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .profile-menu {
+            list-style: none;
+        }
+
+        .profile-menu li {
+            margin-bottom: 10px;
+        }
+
+        .profile-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--dark-gray);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            transition: background-color 0.3s;
+        }
+
+        .profile-menu a:hover,
+        .profile-menu a.active {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--primary-color);
+        }
+
+        .profile-menu i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .profile-content {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .profile-tab {
+            display: none;
+        }
+
+        .profile-tab.active {
+            display: block;
+        }
+
+        .profile-tab h3 {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .profile-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(46, 204, 113, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            margin-right: 15px;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .activity-time {
+            font-size: 0.9rem;
+            color: #888;
         }
 
         /* 首页部分 */
@@ -650,6 +1132,10 @@
             .section-title {
                 font-size: 2.2rem;
             }
+
+            .profile-container {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 768px) {
@@ -705,6 +1191,10 @@
                 margin-left: 0;
                 padding-left: 60px;
             }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 576px) {
@@ -725,11 +1215,133 @@
             .hero-subtitle {
                 font-size: 1.2rem;
             }
+
+            .auth-content {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 
 <body>
+    <!-- 登录/注册模态框 -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-container">
+            <button class="close-auth" id="closeAuth">&times;</button>
+
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">登录</div>
+                <div class="auth-tab" data-tab="register">注册</div>
+            </div>
+
+            <div class="auth-content">
+                <!-- 登录表单 -->
+                <form class="auth-form active" id="loginForm" data-form="login">
+                    <h3>欢迎回来</h3>
+
+                    <div class="form-group">
+                        <label class="form-label" for="loginEmail">邮箱</label>
+                        <input type="email" class="form-control" id="loginEmail" placeholder="请输入邮箱" required>
+                        <div class="form-error" id="loginEmailError">请输入有效的邮箱地址</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="loginPassword">密码</label>
+                        <input type="password" class="form-control" id="loginPassword" placeholder="请输入密码" required>
+                        <div class="form-error" id="loginPasswordError">密码不能为空</div>
+                    </div>
+
+                    <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                        <label style="display: flex; align-items: center;">
+                            <input type="checkbox" id="rememberMe" style="margin-right: 8px;">
+                            <span>记住我</span>
+                        </label>
+                        <a href="#"
+                            style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem;">忘记密码？</a>
+                    </div>
+
+                    <button type="submit" class="auth-btn">登录</button>
+
+                    <div class="auth-divider">或使用以下方式登录</div>
+
+                    <div class="social-login">
+                        <div class="social-btn social-wechat">
+                            <i class="fab fa-weixin"></i>
+                        </div>
+                        <div class="social-btn social-qq">
+                            <i class="fab fa-qq"></i>
+                        </div>
+                        <div class="social-btn social-weibo">
+                            <i class="fab fa-weibo"></i>
+                        </div>
+                    </div>
+
+                    <div class="auth-footer">
+                        还没有账号？ <a href="#" id="switchToRegister">立即注册</a>
+                    </div>
+                </form>
+
+                <!-- 注册表单 -->
+                <form class="auth-form" id="registerForm" data-form="register">
+                    <h3>创建新账户</h3>
+
+                    <div class="form-group">
+                        <label class="form-label" for="registerName">姓名</label>
+                        <input type="text" class="form-control" id="registerName" placeholder="请输入姓名" required>
+                        <div class="form-error" id="registerNameError">姓名不能为空</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="registerEmail">邮箱</label>
+                        <input type="email" class="form-control" id="registerEmail" placeholder="请输入邮箱" required>
+                        <div class="form-error" id="registerEmailError">请输入有效的邮箱地址</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="registerPassword">密码</label>
+                        <input type="password" class="form-control" id="registerPassword" placeholder="请输入密码（至少6位）"
+                            required>
+                        <div class="form-error" id="registerPasswordError">密码至少需要6位</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="registerConfirmPassword">确认密码</label>
+                        <input type="password" class="form-control" id="registerConfirmPassword" placeholder="请再次输入密码"
+                            required>
+                        <div class="form-error" id="registerConfirmPasswordError">两次输入的密码不一致</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="registerRole">角色</label>
+                        <select class="form-control" id="registerRole" required>
+                            <option value="">请选择角色</option>
+                            <option value="teacher">教师</option>
+                            <option value="volunteer">志愿者</option>
+                            <option value="donor">捐赠者</option>
+                            <option value="student">学生</option>
+                            <option value="other">其他</option>
+                        </select>
+                        <div class="form-error" id="registerRoleError">请选择角色</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: flex-start;">
+                            <input type="checkbox" id="agreeTerms" style="margin-right: 8px; margin-top: 3px;" required>
+                            <span>我已阅读并同意 <a href="#" style="color: var(--primary-color);">服务条款</a> 和 <a href="#"
+                                    style="color: var(--primary-color);">隐私政策</a></span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="auth-btn">注册</button>
+
+                    <div class="auth-footer">
+                        已有账号？ <a href="#" id="switchToLogin">立即登录</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- 导航栏 -->
     <header>
         <div class="nav-container">
@@ -750,8 +1362,39 @@
                 <li><a href="#donation">帮扶捐赠</a></li>
                 <li><a href="#volunteer">支教志愿</a></li>
                 <li><a href="#interaction">互动交流</a></li>
+                <li><a href="#profile">个人中心</a></li>
                 <li><a href="#about">关于我们</a></li>
                 <li><a href="#data">数据指标</a></li>
+                <li id="authNavItem">
+                    <!-- 用户未登录时显示登录按钮 -->
+                    <button class="login-btn" id="loginBtn">登录/注册</button>
+
+                    <!-- 用户登录后显示用户菜单 -->
+                    <div class="user-menu" id="userMenu" style="display: none;">
+                        <button class="user-btn" id="userBtn">
+                            <div class="user-avatar" id="userAvatar">U</div>
+                            <span class="user-name" id="userName">用户</span>
+                        </button>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="#profile" class="dropdown-item">
+                                <i class="fas fa-user-circle"></i> 个人中心
+                            </a>
+                            <a href="#donation" class="dropdown-item">
+                                <i class="fas fa-donate"></i> 我的捐赠
+                            </a>
+                            <a href="#volunteer" class="dropdown-item">
+                                <i class="fas fa-hands-helping"></i> 我的申请
+                            </a>
+                            <a href="#resources" class="dropdown-item">
+                                <i class="fas fa-bookmark"></i> 我的收藏
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item" id="logoutBtn">
+                                <i class="fas fa-sign-out-alt"></i> 退出登录
+                            </a>
+                        </div>
+                    </div>
+                </li>
             </ul>
         </div>
     </header>
@@ -869,7 +1512,7 @@
                 </div>
 
                 <div class="card" data-category="info">
-                    <img src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w-800&q=80"
+                    <img src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
                         alt="数字化教室" class="card-img">
                     <div class="card-content">
                         <h3 class="card-title">数字化教室全覆盖</h3>
@@ -904,6 +1547,264 @@
             </div>
         </section>
 
+        <!-- 个人中心 -->
+        <section id="profile" class="section">
+            <h2 class="section-title">个人中心</h2>
+            <p id="profileSubtitle">请先登录以查看个人中心</p>
+
+            <div class="profile-container" id="profileContainer" style="display: none;">
+                <div class="profile-sidebar">
+                    <div class="profile-header">
+                        <div class="profile-avatar-large" id="profileAvatarLarge">U</div>
+                        <div class="profile-name" id="profileName">用户名</div>
+                        <div class="profile-role" id="profileRole">角色</div>
+                        <div class="profile-stats">
+                            <div class="profile-stat">
+                                <div class="profile-stat-value">3</div>
+                                <div class="profile-stat-label">捐赠次数</div>
+                            </div>
+                            <div class="profile-stat">
+                                <div class="profile-stat-value">12</div>
+                                <div class="profile-stat-label">资源下载</div>
+                            </div>
+                            <div class="profile-stat">
+                                <div class="profile-stat-value">5</div>
+                                <div class="profile-stat-label">志愿服务</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul class="profile-menu">
+                        <li>
+                            <a href="#" class="profile-menu-item active" data-tab="profile-info">
+                                <i class="fas fa-user"></i> 个人信息
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="profile-menu-item" data-tab="donation-history">
+                                <i class="fas fa-donate"></i> 捐赠记录
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="profile-menu-item" data-tab="volunteer-activity">
+                                <i class="fas fa-hands-helping"></i> 志愿活动
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="profile-menu-item" data-tab="resource-favorites">
+                                <i class="fas fa-bookmark"></i> 我的收藏
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="profile-menu-item" data-tab="account-settings">
+                                <i class="fas fa-cog"></i> 账户设置
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="profile-content">
+                    <!-- 个人信息 -->
+                    <div class="profile-tab active" id="profile-info">
+                        <h3>个人信息</h3>
+                        <form id="profileForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="profileNameInput">姓名</label>
+                                    <input type="text" class="form-control" id="profileNameInput" value="张明" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="profileEmail">邮箱</label>
+                                    <input type="email" class="form-control" id="profileEmail"
+                                        value="zhangming@example.com" readonly>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="profilePhone">手机号</label>
+                                    <input type="tel" class="form-control" id="profilePhone" value="13800138000">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="profileRoleSelect">角色</label>
+                                    <select class="form-control" id="profileRoleSelect">
+                                        <option value="teacher">教师</option>
+                                        <option value="volunteer">志愿者</option>
+                                        <option value="donor" selected>捐赠者</option>
+                                        <option value="student">学生</option>
+                                        <option value="other">其他</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="profileLocation">所在地</label>
+                                <input type="text" class="form-control" id="profileLocation" value="北京市">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="profileBio">个人简介</label>
+                                <textarea class="form-control" id="profileBio"
+                                    rows="4">我是一名关注乡村教育发展的捐赠者，希望为改善乡村教育条件贡献自己的一份力量。</textarea>
+                            </div>
+
+                            <div class="profile-actions">
+                                <button type="button" class="btn btn-primary" id="saveProfileBtn">保存更改</button>
+                                <button type="button" class="btn btn-outline"
+                                    style="border-color: #ccc; color: #333;">取消</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- 捐赠记录 -->
+                    <div class="profile-tab" id="donation-history">
+                        <h3>捐赠记录</h3>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-hand-holding-heart"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">捐赠"一个鸡蛋"营养计划</div>
+                                    <div class="activity-text">捐赠金额：200元</div>
+                                    <div class="activity-time">2023年8月15日</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-school"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">捐赠贵州山区课桌椅项目</div>
+                                    <div class="activity-text">捐赠金额：500元</div>
+                                    <div class="activity-time">2023年6月20日</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">捐赠"书香校园"图书角项目</div>
+                                    <div class="activity-text">捐赠金额：300元</div>
+                                    <div class="activity-time">2023年4月10日</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 志愿活动 -->
+                    <div class="profile-tab" id="volunteer-activity">
+                        <h3>志愿活动</h3>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">申请远程教学志愿者</div>
+                                    <div class="activity-text">状态：审核通过</div>
+                                    <div class="activity-time">2023年9月1日</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-campground"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">报名暑期夏令营志愿者</div>
+                                    <div class="activity-text">状态：待审核</div>
+                                    <div class="activity-time">2023年7月15日</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 我的收藏 -->
+                    <div class="profile-tab" id="resource-favorites">
+                        <h3>我的收藏</h3>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-calculator"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">小学数学趣味课程</div>
+                                    <div class="activity-text">收藏时间：2023年8月10日</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-flask"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">初中物理实验课件</div>
+                                    <div class="activity-text">收藏时间：2023年7月25日</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-book-reader"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">小学语文阅读教案</div>
+                                    <div class="activity-text">收藏时间：2023年6月18日</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 账户设置 -->
+                    <div class="profile-tab" id="account-settings">
+                        <h3>账户设置</h3>
+                        <form id="accountSettingsForm">
+                            <div class="form-group">
+                                <label class="form-label" for="currentPassword">当前密码</label>
+                                <input type="password" class="form-control" id="currentPassword">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="newPassword">新密码</label>
+                                <input type="password" class="form-control" id="newPassword">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="confirmNewPassword">确认新密码</label>
+                                <input type="password" class="form-control" id="confirmNewPassword">
+                            </div>
+
+                            <div class="form-group">
+                                <label style="display: flex; align-items: center;">
+                                    <input type="checkbox" id="emailNotifications" checked style="margin-right: 8px;">
+                                    <span>接收邮件通知</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label style="display: flex; align-items: center;">
+                                    <input type="checkbox" id="smsNotifications" checked style="margin-right: 8px;">
+                                    <span>接收短信通知</span>
+                                </label>
+                            </div>
+
+                            <div class="profile-actions">
+                                <button type="button" class="btn btn-primary" id="saveSettingsBtn">保存设置</button>
+                                <button type="button" class="btn btn-outline"
+                                    style="border-color: #ccc; color: #333;">取消</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loginPrompt" style="text-align: center; margin-top: 50px;">
+                <p style="font-size: 1.2rem; margin-bottom: 20px;">登录后即可查看个人中心，管理您的捐赠记录、志愿活动和收藏资源</p>
+                <button class="btn btn-primary" id="loginFromProfile">
+                    <i class="fas fa-sign-in-alt"></i> 立即登录
+                </button>
+            </div>
+        </section>
+
         <!-- 资源中心 -->
         <section id="resources" class="section">
             <h2 class="section-title">资源中心</h2>
@@ -931,7 +1832,8 @@
                             <button class="btn btn-primary" style="padding: 8px 16px;">
                                 <i class="fas fa-download"></i> 下载
                             </button>
-                            <button class="btn btn-outline" style="padding: 8px 16px; border-color: #ccc; color: #333;">
+                            <button class="btn btn-outline favorite-btn"
+                                style="padding: 8px 16px; border-color: #ccc; color: #333;" data-resource="小学数学趣味课程">
                                 <i class="far fa-star"></i> 收藏
                             </button>
                         </div>
@@ -946,7 +1848,8 @@
                             <button class="btn btn-primary" style="padding: 8px 16px;">
                                 <i class="fas fa-download"></i> 下载
                             </button>
-                            <button class="btn btn-outline" style="padding: 8px 16px; border-color: #ccc; color: #333;">
+                            <button class="btn btn-outline favorite-btn"
+                                style="padding: 8px 16px; border-color: #ccc; color: #333;" data-resource="初中物理实验课件">
                                 <i class="far fa-star"></i> 收藏
                             </button>
                         </div>
@@ -961,7 +1864,8 @@
                             <button class="btn btn-primary" style="padding: 8px 16px;">
                                 <i class="fas fa-download"></i> 下载
                             </button>
-                            <button class="btn btn-outline" style="padding: 8px 16px; border-color: #ccc; color: #333;">
+                            <button class="btn btn-outline favorite-btn"
+                                style="padding: 8px 16px; border-color: #ccc; color: #333;" data-resource="小学语文阅读教案">
                                 <i class="far fa-star"></i> 收藏
                             </button>
                         </div>
@@ -976,7 +1880,8 @@
                             <button class="btn btn-primary" style="padding: 8px 16px;">
                                 <i class="fas fa-download"></i> 下载
                             </button>
-                            <button class="btn btn-outline" style="padding: 8px 16px; border-color: #ccc; color: #333;">
+                            <button class="btn btn-outline favorite-btn"
+                                style="padding: 8px 16px; border-color: #ccc; color: #333;" data-resource="乡村教师信息化培训">
                                 <i class="far fa-star"></i> 收藏
                             </button>
                         </div>
@@ -1405,9 +2310,9 @@
                 <ul class="footer-links">
                     <li><a href="#volunteer">支教志愿</a></li>
                     <li><a href="#interaction">互动交流</a></li>
+                    <li><a href="#profile">个人中心</a></li>
                     <li><a href="#about">关于我们</a></li>
                     <li><a href="#data">数据指标</a></li>
-                    <li><a href="#">常见问题</a></li>
                 </ul>
             </div>
 
@@ -1432,6 +2337,547 @@
     </div>
 
     <script>
+        // 用户认证系统
+        const authSystem = {
+            // 检查用户是否已登录
+            isLoggedIn: function () {
+                return localStorage.getItem('userLoggedIn') === 'true';
+            },
+
+            // 获取当前用户信息
+            getCurrentUser: function () {
+                const userData = localStorage.getItem('currentUser');
+                return userData ? JSON.parse(userData) : null;
+            },
+
+            // 保存用户信息
+            saveUser: function (userData) {
+                localStorage.setItem('currentUser', JSON.stringify(userData));
+                localStorage.setItem('userLoggedIn', 'true');
+            },
+
+            // 用户登出
+            logout: function () {
+                localStorage.removeItem('currentUser');
+                localStorage.setItem('userLoggedIn', 'false');
+            },
+
+            // 注册新用户
+            register: function (userData) {
+                // 在实际应用中，这里应该发送到服务器
+                // 这里我们只保存到本地存储
+                this.saveUser(userData);
+                return true;
+            },
+
+            // 用户登录
+            login: function (email, password) {
+                // 在实际应用中，这里应该发送到服务器验证
+                // 这里我们模拟一个用户
+                const users = [
+                    {
+                        id: 1,
+                        name: "张明",
+                        email: "user@example.com",
+                        password: "password123",
+                        role: "donor",
+                        phone: "13800138000",
+                        location: "北京市",
+                        bio: "我是一名关注乡村教育发展的捐赠者，希望为改善乡村教育条件贡献自己的一份力量。"
+                    }
+                ];
+
+                const user = users.find(u => u.email === email && u.password === password);
+
+                if (user) {
+                    // 移除密码后保存用户信息
+                    const { password, ...userData } = user;
+                    this.saveUser(userData);
+                    return { success: true, user: userData };
+                }
+
+                return { success: false, message: "邮箱或密码不正确" };
+            }
+        };
+
+        // DOM元素
+        const authModal = document.getElementById('authModal');
+        const loginBtn = document.getElementById('loginBtn');
+        const closeAuth = document.getElementById('closeAuth');
+        const authTabs = document.querySelectorAll('.auth-tab');
+        const authForms = document.querySelectorAll('.auth-form');
+        const switchToRegister = document.getElementById('switchToRegister');
+        const switchToLogin = document.getElementById('switchToLogin');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const userMenu = document.getElementById('userMenu');
+        const userBtn = document.getElementById('userBtn');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+        const loginFromProfile = document.getElementById('loginFromProfile');
+        const profileContainer = document.getElementById('profileContainer');
+        const profileSubtitle = document.getElementById('profileSubtitle');
+        const loginPrompt = document.getElementById('loginPrompt');
+        const profileAvatarLarge = document.getElementById('profileAvatarLarge');
+        const profileName = document.getElementById('profileName');
+        const profileRole = document.getElementById('profileRole');
+        const profileNameInput = document.getElementById('profileNameInput');
+        const profileEmail = document.getElementById('profileEmail');
+        const profileRoleSelect = document.getElementById('profileRoleSelect');
+        const saveProfileBtn = document.getElementById('saveProfileBtn');
+        const favoriteButtons = document.querySelectorAll('.favorite-btn');
+
+        // 初始化用户界面
+        function initUserUI() {
+            if (authSystem.isLoggedIn()) {
+                // 用户已登录
+                const user = authSystem.getCurrentUser();
+
+                // 更新导航栏
+                loginBtn.style.display = 'none';
+                userMenu.style.display = 'block';
+
+                // 更新用户信息
+                if (user) {
+                    userAvatar.textContent = user.name.charAt(0);
+                    userName.textContent = user.name;
+
+                    // 更新个人中心
+                    updateProfileUI(user);
+                }
+            } else {
+                // 用户未登录
+                loginBtn.style.display = 'block';
+                userMenu.style.display = 'none';
+
+                // 隐藏个人中心内容，显示登录提示
+                profileContainer.style.display = 'none';
+                loginPrompt.style.display = 'block';
+                profileSubtitle.textContent = '请先登录以查看个人中心';
+            }
+        }
+
+        // 更新个人中心UI
+        function updateProfileUI(user) {
+            profileContainer.style.display = 'grid';
+            loginPrompt.style.display = 'none';
+            profileSubtitle.textContent = '欢迎回来，' + user.name;
+
+            // 更新头像和名称
+            profileAvatarLarge.textContent = user.name.charAt(0);
+            profileName.textContent = user.name;
+            profileRole.textContent = getRoleName(user.role);
+
+            // 更新表单数据
+            profileNameInput.value = user.name;
+            profileEmail.value = user.email;
+            profileRoleSelect.value = user.role;
+
+            // 如果用户有其他信息，也更新
+            if (user.phone) {
+                document.getElementById('profilePhone').value = user.phone;
+            }
+            if (user.location) {
+                document.getElementById('profileLocation').value = user.location;
+            }
+            if (user.bio) {
+                document.getElementById('profileBio').value = user.bio;
+            }
+        }
+
+        // 获取角色名称
+        function getRoleName(roleKey) {
+            const roles = {
+                teacher: '教师',
+                volunteer: '志愿者',
+                donor: '捐赠者',
+                student: '学生',
+                other: '其他'
+            };
+            return roles[roleKey] || '用户';
+        }
+
+        // 打开登录模态框
+        function openAuthModal(activeTab = 'login') {
+            authModal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // 防止背景滚动
+
+            // 激活指定标签页
+            switchAuthTab(activeTab);
+        }
+
+        // 关闭登录模态框
+        function closeAuthModal() {
+            authModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+
+            // 重置表单
+            loginForm.reset();
+            registerForm.reset();
+            clearFormErrors();
+        }
+
+        // 切换认证标签页
+        function switchAuthTab(tabName) {
+            // 更新标签页
+            authTabs.forEach(tab => {
+                if (tab.dataset.tab === tabName) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            // 更新表单显示
+            authForms.forEach(form => {
+                if (form.dataset.form === tabName) {
+                    form.classList.add('active');
+                } else {
+                    form.classList.remove('active');
+                }
+            });
+
+            // 重置表单错误
+            clearFormErrors();
+        }
+
+        // 清除表单错误
+        function clearFormErrors() {
+            const errorElements = document.querySelectorAll('.form-error');
+            errorElements.forEach(error => {
+                error.style.display = 'none';
+            });
+        }
+
+        // 显示表单错误
+        function showFormError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        // 验证邮箱格式
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // 登录表单提交
+        loginForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // 验证输入
+            let isValid = true;
+            clearFormErrors();
+
+            if (!email || !isValidEmail(email)) {
+                showFormError('loginEmailError', '请输入有效的邮箱地址');
+                isValid = false;
+            }
+
+            if (!password) {
+                showFormError('loginPasswordError', '密码不能为空');
+                isValid = false;
+            }
+
+            if (isValid) {
+                // 模拟登录请求
+                const result = authSystem.login(email, password);
+
+                if (result.success) {
+                    // 登录成功
+                    closeAuthModal();
+                    initUserUI();
+
+                    // 显示成功消息
+                    showNotification('登录成功！欢迎回来，' + result.user.name, 'success');
+                } else {
+                    // 登录失败
+                    showFormError('loginPasswordError', result.message || '邮箱或密码不正确');
+                }
+            }
+        });
+
+        // 注册表单提交
+        registerForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            const role = document.getElementById('registerRole').value;
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+
+            // 验证输入
+            let isValid = true;
+            clearFormErrors();
+
+            if (!name) {
+                showFormError('registerNameError', '姓名不能为空');
+                isValid = false;
+            }
+
+            if (!email || !isValidEmail(email)) {
+                showFormError('registerEmailError', '请输入有效的邮箱地址');
+                isValid = false;
+            }
+
+            if (!password || password.length < 6) {
+                showFormError('registerPasswordError', '密码至少需要6位');
+                isValid = false;
+            }
+
+            if (password !== confirmPassword) {
+                showFormError('registerConfirmPasswordError', '两次输入的密码不一致');
+                isValid = false;
+            }
+
+            if (!role) {
+                showFormError('registerRoleError', '请选择角色');
+                isValid = false;
+            }
+
+            if (!agreeTerms) {
+                alert('请同意服务条款和隐私政策');
+                isValid = false;
+            }
+
+            if (isValid) {
+                // 创建用户对象
+                const userData = {
+                    id: Date.now(),
+                    name: name,
+                    email: email,
+                    password: password,
+                    role: role,
+                    phone: '',
+                    location: '',
+                    bio: ''
+                };
+
+                // 注册用户
+                authSystem.register(userData);
+
+                // 注册成功
+                closeAuthModal();
+                initUserUI();
+
+                // 显示成功消息
+                showNotification('注册成功！欢迎加入振兴乡村教育平台', 'success');
+
+                // 自动切换到登录状态
+                const result = authSystem.login(email, password);
+                if (result.success) {
+                    initUserUI();
+                }
+            }
+        });
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background-color: ${type === 'success' ? '#2ecc71' : '#e74c3c'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 2001;
+                transition: transform 0.3s ease;
+                transform: translateX(120%);
+                max-width: 300px;
+            `;
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            // 显示通知
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+
+            // 3秒后隐藏并移除通知
+            setTimeout(() => {
+                notification.style.transform = 'translateX(120%)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // 保存个人资料
+        saveProfileBtn.addEventListener('click', function () {
+            if (!authSystem.isLoggedIn()) {
+                showNotification('请先登录', 'error');
+                return;
+            }
+
+            const user = authSystem.getCurrentUser();
+            if (!user) return;
+
+            // 更新用户信息
+            user.name = document.getElementById('profileNameInput').value;
+            user.role = document.getElementById('profileRoleSelect').value;
+            user.phone = document.getElementById('profilePhone').value;
+            user.location = document.getElementById('profileLocation').value;
+            user.bio = document.getElementById('profileBio').value;
+
+            // 保存更新
+            authSystem.saveUser(user);
+
+            // 更新UI
+            initUserUI();
+
+            // 显示成功消息
+            showNotification('个人资料已保存', 'success');
+        });
+
+        // 收藏按钮点击事件
+        favoriteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                if (!authSystem.isLoggedIn()) {
+                    showNotification('请先登录以收藏资源', 'error');
+                    openAuthModal('login');
+                    return;
+                }
+
+                const resourceName = this.getAttribute('data-resource');
+                const icon = this.querySelector('i');
+
+                if (icon.classList.contains('far')) {
+                    // 添加到收藏
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    this.style.borderColor = 'var(--primary-color)';
+                    this.style.color = 'var(--primary-color)';
+                    showNotification('已收藏: ' + resourceName, 'success');
+                } else {
+                    // 取消收藏
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    this.style.borderColor = '#ccc';
+                    this.style.color = '#333';
+                    showNotification('已取消收藏: ' + resourceName, 'info');
+                }
+            });
+        });
+
+        // 个人中心菜单切换
+        const profileMenuItems = document.querySelectorAll('.profile-menu-item');
+        const profileTabs = document.querySelectorAll('.profile-tab');
+
+        profileMenuItems.forEach(item => {
+            item.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                // 更新活动菜单项
+                profileMenuItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+
+                // 显示对应的标签页
+                const tabId = this.getAttribute('data-tab');
+                profileTabs.forEach(tab => {
+                    if (tab.id === tabId) {
+                        tab.classList.add('active');
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+            });
+        });
+
+        // 事件监听器
+        loginBtn.addEventListener('click', () => openAuthModal('login'));
+        closeAuth.addEventListener('click', closeAuthModal);
+        loginFromProfile.addEventListener('click', () => openAuthModal('login'));
+
+        // 切换登录/注册标签页
+        switchToRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchAuthTab('register');
+        });
+
+        switchToLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchAuthTab('login');
+        });
+
+        // 标签页点击事件
+        authTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                switchAuthTab(tab.dataset.tab);
+            });
+        });
+
+        // 用户菜单
+        userBtn.addEventListener('click', () => {
+            dropdownMenu.classList.toggle('active');
+        });
+
+        // 点击其他地方关闭下拉菜单
+        document.addEventListener('click', (e) => {
+            if (!userMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('active');
+            }
+        });
+
+        // 退出登录
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            authSystem.logout();
+            initUserUI();
+            showNotification('已退出登录', 'info');
+            dropdownMenu.classList.remove('active');
+
+            // 滚动到首页
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // 点击模态框外部关闭
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) {
+                closeAuthModal();
+            }
+        });
+
+        // 页面加载时初始化用户界面
+        document.addEventListener('DOMContentLoaded', () => {
+            initUserUI();
+
+            // 启动数据看板计数器
+            setTimeout(() => {
+                animateCounter('stat1', 1256);
+                animateCounter('stat2', 3589);
+                animateCounter('stat3', 2860);
+                animateCounter('stat4', 5234);
+            }, 500);
+
+            // 初始化轮播组件
+            initCarousel();
+
+            // 初始化筛选器
+            initFilters();
+
+            // 初始化图表
+            initChart();
+
+            // 初始化导航栏和滚动
+            initNavigation();
+        });
+
         // 导航栏交互
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const navMenu = document.getElementById('navMenu');
@@ -1452,6 +2898,9 @@
             link.addEventListener('click', () => {
                 navMenu.classList.remove('active');
                 mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+
+                // 如果是用户菜单中的链接，关闭下拉菜单
+                dropdownMenu.classList.remove('active');
             });
         });
 
@@ -1507,26 +2956,6 @@
                 element.textContent = Math.floor(currentValue).toLocaleString();
             }, 16);
         }
-
-        // 页面加载后启动计数器
-        document.addEventListener('DOMContentLoaded', () => {
-            // 启动数据看板计数器
-            setTimeout(() => {
-                animateCounter('stat1', 1256);
-                animateCounter('stat2', 3589);
-                animateCounter('stat3', 2860);
-                animateCounter('stat4', 5234);
-            }, 500);
-
-            // 初始化轮播组件
-            initCarousel();
-
-            // 初始化筛选器
-            initFilters();
-
-            // 初始化图表
-            initChart();
-        });
 
         // 轮播组件功能
         function initCarousel() {
@@ -1661,51 +3090,54 @@
             new Chart(ctx, config);
         }
 
-        // 表单验证
-        const demandForm = document.getElementById('demandForm');
-        if (demandForm) {
-            demandForm.addEventListener('submit', function (e) {
-                e.preventDefault();
+        // 初始化导航
+        function initNavigation() {
+            // 表单验证
+            const demandForm = document.getElementById('demandForm');
+            if (demandForm) {
+                demandForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
 
-                // 简单表单验证
-                const inputs = this.querySelectorAll('input, select, textarea');
-                let isValid = true;
+                    // 简单表单验证
+                    const inputs = this.querySelectorAll('input, select, textarea');
+                    let isValid = true;
 
-                inputs.forEach(input => {
-                    if (input.hasAttribute('required') && !input.value.trim()) {
-                        isValid = false;
-                        input.style.borderColor = 'red';
+                    inputs.forEach(input => {
+                        if (input.hasAttribute('required') && !input.value.trim()) {
+                            isValid = false;
+                            input.style.borderColor = 'red';
+                        } else {
+                            input.style.borderColor = '#e0e0e0';
+                        }
+                    });
+
+                    if (isValid) {
+                        alert('需求提交成功！我们会在3个工作日内与您联系。');
+                        this.reset();
                     } else {
-                        input.style.borderColor = '#e0e0e0';
+                        alert('请填写所有必填字段！');
                     }
                 });
+            }
 
-                if (isValid) {
-                    alert('需求提交成功！我们会在3个工作日内与您联系。');
-                    this.reset();
-                } else {
-                    alert('请填写所有必填字段！');
-                }
+            // 捐赠金额按钮交互
+            const amountBtns = document.querySelectorAll('.amount-btn');
+            amountBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    amountBtns.forEach(b => b.style.backgroundColor = '');
+                    amountBtns.forEach(b => b.style.color = '');
+
+                    btn.style.backgroundColor = 'var(--primary-color)';
+                    btn.style.color = 'white';
+
+                    // 更新自定义金额输入框
+                    const customAmount = document.querySelector('input[placeholder="自定义金额"]');
+                    if (customAmount) {
+                        customAmount.value = parseInt(btn.textContent);
+                    }
+                });
             });
         }
-
-        // 捐赠金额按钮交互
-        const amountBtns = document.querySelectorAll('.amount-btn');
-        amountBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                amountBtns.forEach(b => b.style.backgroundColor = '');
-                amountBtns.forEach(b => b.style.color = '');
-
-                btn.style.backgroundColor = 'var(--primary-color)';
-                btn.style.color = 'white';
-
-                // 更新自定义金额输入框
-                const customAmount = document.querySelector('input[placeholder="自定义金额"]');
-                if (customAmount) {
-                    customAmount.value = parseInt(btn.textContent);
-                }
-            });
-        });
     </script>
 </body>
 
