@@ -519,19 +519,20 @@
             await new Promise(resolve => setTimeout(resolve, 1000));
             // 模拟响应（后续替换为真实Fetch请求）
             // 真实接口示例：
-            // const res = await fetch('/api/login', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ username, password })
-            // });
-            // const data = await res.json();
+            const res = await fetch(
+              '/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
             
             // 模拟成功/失败
-            if (username && password) {
+         /*    if (username && password) {
                 return { code: 200, msg: '登录成功', data: { token: 'fake_token_123456', userInfo: { name: username } } };
             } else {
                 return { code: 400, msg: '用户名或密码不能为空' };
-            }
+            } */
         }
 
         // 数据筛选接口
