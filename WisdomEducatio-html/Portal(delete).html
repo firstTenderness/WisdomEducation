@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>振兴乡村教育 - 综合服务平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<!-- html
+预览
+html
+预览 -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">振兴乡村教育</a>
+
+        <!-- 汉堡菜单按钮 -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <i class="bi bi-list"></i>
+        </button>
+
+        <!-- 主要菜单（居中） -->
+        <div class="collapse navbar-collapse justify-content-center" id="mainNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link active" href="index.html">首页</a></li>
+
+                <!-- 政策与资讯 -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">政策与资讯</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">政策文件</a></li>
+                        <li><a class="dropdown-item" href="#">通知公告</a></li>
+                        <li><a class="dropdown-item" href="#">新闻动态</a></li>
+                        <li><a class="dropdown-item" href="#">数据发布/年报</a></li>
+                    </ul>
+                </li>
+
+                <!-- 成果展示 -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">成果展示</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">典型案例</a></li>
+                        <li><a class="dropdown-item" href="#">项目成果</a></li>
+                        <li><a class="dropdown-item" href="#">数据可视化</a></li>
+                    </ul>
+                </li>
+
+                <!-- 资源中心 -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">资源中心</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">课程资源</a></li>
+                        <li><a class="dropdown-item" href="#">教师培训</a></li>
+                        <li><a class="dropdown-item" href="#">教研资源</a></li>
+                        <li><a class="dropdown-item" href="#">数字校园工具</a></li>
+                    </ul>
+                </li>
+
+                <!-- 帮扶与捐赠 -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">帮扶与捐赠</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">需求大厅</a></li>
+                        <li><a class="dropdown-item" href="#">项目对接</a></li>
+                        <li><a class="dropdown-item" href="#">捐赠通道</a></li>
+                        <li><a class="dropdown-item" href="#">捐赠公示</a></li>
+                    </ul>
+                </li>
+
+                <!-- 支教与志愿 -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">支教与志愿</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">支教招募</a></li>
+                        <li><a class="dropdown-item" href="#">志愿者报名</a></li>
+                        <li><a class="dropdown-item" href="#">支教故事</a></li>
+                    </ul>
+                </li>
+
+                <!-- 互动交流 -->
+                <li class="nav-item"><a class="nav-link" href="#">互动交流</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">关于我们</a></li>
+            </ul>
+        </div>
+
+        <!-- 右侧辅助入口 -->
+        <div class="nav-aux d-flex align-items-center gap-3 ms-auto">
+            <div class="search-box position-relative">
+                <i class="bi bi-search text-muted"></i>
+                <input type="text" class="form-control search-input" placeholder="搜索资源/政策" style="padding-left: 32px;">
+            </div>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="loginBtn">登录/注册</button>
+            <a href="#" class="text-dark" title="无障碍入口"><i class="bi bi-universal-access"></i></a>
+        </div>
+    </div>
+</nav>
+
+<!-- 首屏Hero区 -->
+<section
+    style="margin-top: 80px; background: url('images/hero-bg.jpg') center center no-repeat; background-size: cover; padding: 6rem 0; position: relative;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8" style="position: relative; z-index: 2;">
+                <h1 class="text-white" style="font-size: 2.8rem; font-weight: 700; margin-bottom: 1.5rem;">振兴乡村教育 •
+                    共享优质资源</h1>
+                <p class="text-white-90" style="font-size: 1.2rem; margin-bottom: 2.5rem; max-width: 600px;">
+                    政策、资源、帮扶、成果一站式平台</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <button class="btn btn-secondary btn-lg" id="donateBtn">我要捐赠/帮扶</button>
+                    <button class="btn btn-secondary btn-lg" id="volunteerBtn">我要支教</button>
+                    <button class="btn btn-outline-white btn-lg" id="resourceBtn">资源中心</button>
+                    <button class="btn btn-outline-white btn-lg" id="demandPublishBtn">学校需求发布</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4);">
+    </div>
+</section>
+
+<!-- 数据看板区 -->
+<section style="background-color: var(--light-gray); padding: 4rem 0;">
+    <div class="container">
+        <h2 class="section-title">核心成果数据</h2>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="d-flex gap-3">
+                    <select class="form-select" id="areaSelect">
+                        <option value="all">全国</option>
+                        <option value="beijing">北京市</option>
+                        <option value="hebei">河北省</option>
+                    </select>
+                    <select class="form-select" id="yearSelect">
+                        <option value="2024">2024年</option>
+                        <option value="2023">2023年</option>
+                        <option value="2022">2022年</option>
+                    </select>
+                    <button class="btn btn-primary" id="dataFilterBtn">查询</button>
+                </div>
+            </div>
+        </div>
+        <!-- 数据卡片 -->
+        <div class="row gap-4">
+            <div class="col-md-2 col-sm-4">
+                <div class="card p-4 text-center">
+                    <p class="text-gray-500 mb-1">覆盖学校数</p>
+                    <h3 class="text-primary font-bold" id="schoolCount" style="font-size: 1.8rem;">1,234 <span
+                            class="text-sm">所</span></h3>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-4">
+                <div class="card p-4 text-center">
+                    <p class="text-gray-500 mb-1">受益学生数</p>
+                    <h3 class="text-primary font-bold" id="studentCount" style="font-size: 1.8rem;">56,789 <span
+                            class="text-sm">人</span></h3>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-4">
+                <div class="card p-4 text-center">
+                    <p class="text-gray-500 mb-1">教师培训人次</p>
+                    <h3 class="text-primary font-bold" id="teacherCount" style="font-size: 1.8rem;">8,910 <span
+                            class="text-sm">次</span></h3>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-4">
+                <div class="card p-4 text-center">
+                    <p class="text-gray-500 mb-1">捐赠总额</p>
+                    <h3 class="text-primary font-bold" id="donateCount" style="font-size: 1.8rem;">9,876 <span
+                            class="text-sm">万元</span></h3>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-4">
+                <div class="card p-4 text-center">
+                    <p class="text-gray-500 mb-1">信息化投入</p>
+                    <h3 class="text-primary font-bold" id="itCount" style="font-size: 1.8rem;">3,456 <span
+                            class="text-sm">万元</span></h3>
+                </div>
+            </div>
+        </div>
+        <!-- 可视化图表（占位） -->
+        <div class="card mt-5 p-4">
+            <h5 class="card-title">成果趋势图</h5>
+            <div
+                style="height: 300px; background-color: #f8f9fa; border-radius: var(--border-radius); display: flex; align-items: center; justify-content: center;">
+                <p class="text-gray-500">折线图/柱状图占位（后期接入ECharts）</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 典型案例区 -->
+<section style="padding: 4rem 0;">
+    <div class="container">
+        <h2 class="section-title">典型案例</h2>
+
+        <!-- 分类按钮 -->
+        <div class="d-flex gap-2 mb-4" id="caseFilterBtns">
+            <button class="btn btn-outline-primary active" data-type="all">全部</button>
+            <button class="btn btn-outline-primary" data-type="school">学校案例</button>
+            <button class="btn btn-outline-primary" data-type="teacher">教师案例</button>
+            <button class="btn btn-outline-primary" data-type="student">学生案例</button>
+            <button class="btn btn-outline-primary" data-type="project">项目案例</button>
+        </div>
+
+        <!-- 轮播式案例展示 -->
+        <div id="caseCarousel" class="carousel slide multi-item-carousel" data-bs-ride="carousel">
+            <div class="carousel-inner">
+
+                <!-- 第一组：3个案例 -->
+                <div class="carousel-item active">
+                    <!-- 学校案例 -->
+                    <div class="col-md-4 case-item" data-type="school">
+                        <div class="card h-100">
+                            <img src="images/case1.jpg" class="card-img-top" alt="乡村学校信息化改造"
+                                style="height: 200px; object-fit: cover; border-radius: var(--border-radius) var(--border-radius) 0 0;">
+                            <div class="card-body">
+                                <span class="badge bg-secondary">学校案例</span>
+                                <h5 class="card-title mt-2">某乡村小学信息化教室建设</h5>
+                                <p class="card-text text-gray-600" style="font-size: 0.9rem;">投入50万元，搭建2间多媒体教室...</p>
+                                <a href="#" class="btn btn-sm btn-primary caseDetailLink" data-id="case1">查看详情</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 教师案例 -->
+                    <div class="col-md-4 case-item" data-type="teacher">
+                        <div class="card h-100">
+                            <img src="images/case1.jpg" class="card-img-top" alt="乡村教师培训"
+                                style="height: 200px; object-fit: cover; border-radius: var(--border-radius) var(--border-radius) 0 0;">
+                            <div class="card-body">
+                                <span class="badge bg-secondary">教师案例</span>
+                                <h5 class="card-title mt-2">乡村教师线上研修计划</h5>
+                                <p class="card-text text-gray-600" style="font-size: 0.9rem;">120名乡村教师参与...</p>
+                                <a href="#" class="btn btn-sm btn-primary caseDetailLink" data-id="case2">查看详情</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 项目案例 -->
+                    <div class="col-md-4 case-item" data-type="project">
+                        <div class="card h-100">
+                            <img src="images/case1.jpg" class="card-img-top" alt="阅读空间建设"
+                                style="height: 200px; object-fit: cover; border-radius: var(--border-radius) var(--border-radius) 0 0;">
+                            <div class="card-body">
+                                <span class="badge bg-secondary">项目案例</span>
+                                <h5 class="card-title mt-2">乡村学校阅读空间捐赠项目</h5>
+                                <p class="card-text text-gray-600" style="font-size: 0.9rem;">捐赠图书2万册...</p>
+                                <a href="#" class="btn btn-sm btn-primary caseDetailLink" data-id="case3">查看详情</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第二组：剩下的3个案例 -->
+                <div class="carousel-item">
+                    <!-- 学生案例 -->
+                    <div class="col-md-4 case-item" data-type="student">
+                        <div class="card h-100">
+                            <img src="images/case1.jpg" class="card-img-top" alt="学生数字素养提升"
+                                style="height: 200px; object-fit: cover; border-radius: var(--border-radius) var(--border-radius) 0 0;">
+                            <div class="card-body">
+                                <span class="badge bg-secondary">学生案例</span>
+                                <h5 class="card-title mt-2">乡村学生数字素养提升行动</h5>
+                                <p class="card-text text-gray-600" style="font-size: 0.9rem;">通过编程课激发兴趣...</p>
+                                <a href="#" class="btn btn-sm btn-primary caseDetailLink" data-id="case4">查看详情</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 学校案例2 -->
+                    <div class="col-md-4 case-item" data-type="school">
+                        <div class="card h-100">
+                            <img src="images/case1.jpg" class="card-img-top" alt="智慧校园试点"
+                                style="height: 200px; object-fit: cover; border-radius: var(--border-radius) var(--border-radius) 0 0;">
+                            <div class="card-body">
+                                <span class="badge bg-secondary">学校案例</span>
+                                <h5 class="card-title mt-2">智慧校园试点工程</h5>
+                                <p class="card-text text-gray-600" style="font-size: 0.9rem;">部署智能考勤、安防系统...</p>
+                                <a href="#" class="btn btn-sm btn-primary caseDetailLink" data-id="case5">查看详情</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 教师案例2 -->
+                    <div class="col-md-4 case-item" data-type="teacher">
+                        <div class="card h-100">
+                            <img src="images/case1.jpg" class="card-img-top" alt="远程教研平台"
+                                style="height: 200px; object-fit: cover; border-radius: var(--border-radius) var(--border-radius) 0 0;">
+                            <div class="card-body">
+                                <span class="badge bg-secondary">教师案例</span>
+                                <h5 class="card-title mt-2">跨区域远程教研平台落地</h5>
+                                <p class="card-text text-gray-600" style="font-size: 0.9rem;">连接10所城市名校...</p>
+                                <a href="#" class="btn btn-sm btn-primary caseDetailLink" data-id="case6">查看详情</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 左右控制按钮 -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#caseCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#caseCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- 需求大厅区 -->
+<section style="background-color: var(--light-gray); padding: 4rem 0;">
+    <div class="container">
+        <h2 class="section-title">紧急需求大厅</h2>
+        <div class="row gap-4">
+            <div class="col-md-6">
+                <div class="card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="card-title mb-0">某乡村中学电脑设备补充</h5>
+                        <span class="badge bg-danger">紧急</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-2">需求：30台教学电脑 | 预算：15万元 | 截止日期：2024-12-31</p>
+                    <div class="progress mb-3" style="height: 8px;">
+                        <div class="progress-bar bg-secondary" role="progressbar" style="width: 60%;" aria-valuenow="60"
+                            aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-sm text-gray-500">已认领：18台</span>
+                        <button class="btn btn-sm btn-secondary demandClaimBtn" data-demand-id="demand1">认领需求</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="card-title mb-0">乡村小学图书角建设</h5>
+                        <span class="badge bg-danger">紧急</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-2">需求：5000册儿童图书 | 预算：5万元 | 截止日期：2024-11-30</p>
+                    <div class="progress mb-3" style="height: 8px;">
+                        <div class="progress-bar bg-secondary" role="progressbar" style="width: 35%;" aria-valuenow="35"
+                            aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-sm text-gray-500">已认领：1750册</span>
+                        <button class="btn btn-sm btn-secondary demandDonateBtn" data-demand-id="demand2">捐赠图书</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <button class="btn btn-outline-primary" id="moreDemandBtn">查看更多需求</button>
+        </div>
+    </div>
+</section>
+
+<!-- 底部Footer -->
+<footer style="background-color: #333; color: #fff; padding: 4rem 0 2rem;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h5 style="font-size: 1.2rem; margin-bottom: 1.5rem;">联系我们</h5>
+                <p class="mb-1"><i class="bi bi-telephone me-2"></i> 咨询电话：400-123-4567</p>
+                <p class="mb-1"><i class="bi bi-envelope me-2"></i> 邮箱：service@xiangcunjiaoyu.com</p>
+                <p class="mb-3"><i class="bi bi-map-marker me-2"></i> 地址：北京市XX区XX路XX号</p>
+                <div
+                    style="width: 100%; height: 150px; background-color: #444; border-radius: var(--border-radius); display: flex; align-items: center; justify-content: center;">
+                    <span class="text-gray-400">地图占位</span>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5 style="font-size: 1.2rem; margin-bottom: 1.5rem;">快速导航</h5>
+                <div class="row">
+                    <div class="col-6">
+                        <ul class="list-unstyled">
+                            <li><a href="#" class="text-gray-400">首页</a></li>
+                            <li><a href="#" class="text-gray-400">政策与资讯</a></li>
+                            <li><a href="#" class="text-gray-400">成果展示</a></li>
+                            <li><a href="#" class="text-gray-400">资源中心</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-6">
+                        <ul class="list-unstyled">
+                            <li><a href="#" class="text-gray-400">帮扶与捐赠</a></li>
+                            <li><a href="#" class="text-gray-400">支教与志愿</a></li>
+                            <li><a href="#" class="text-gray-400">互动交流</a></li>
+                            <li><a href="#" class="text-gray-400">关于我们</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5 style="font-size: 1.2rem; margin-bottom: 1.5rem;">合作伙伴</h5>
+                <div class="d-flex flex-wrap gap-3">
+                    <div
+                        style="width: 80px; height: 40px; background-color: #444; border-radius: var(--border-radius); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.8rem;">
+                        企业LOGO1</div>
+                    <div
+                        style="width: 80px; height: 40px; background-color: #444; border-radius: var(--border-radius); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.8rem;">
+                        公益LOGO1</div>
+                    <div
+                        style="width: 80px; height: 40px; background-color: #444; border-radius: var(--border-radius); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.8rem;">
+                        企业LOGO2</div>
+                    <div
+                        style="width: 80px; height: 40px; background-color: #444; border-radius: var(--border-radius); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.8rem;">
+                        公益LOGO2</div>
+                </div>
+            </div>
+        </div>
+        <div
+            style="border-top: 1px solid #444; margin-top: 2rem; padding-top: 2rem; text-align: center; font-size: 0.9rem; color: #999;">
+            <p>ICP备案号：京ICP备12345678号-1 © 2024 振兴乡村教育平台 版权所有</p>
+        </div>
+    </div>
+</footer>
+
+<!-- 登录弹窗 -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: var(--border-radius);">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalLabel" style="color: var(--primary);">用户登录</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label for="username" class="form-label text-gray-700">用户名/手机号</label>
+                        <input type="text" class="form-control" id="username" placeholder="请输入用户名或手机号" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label text-gray-700">密码</label>
+                        <input type="password" class="form-control" id="password" placeholder="请输入密码" required>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                            <label class="form-check-label text-gray-600" for="rememberMe">
+                                记住我
+                            </label>
+                        </div>
+                        <a href="#" class="text-primary text-sm" id="forgetPwdBtn">忘记密码？</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" id="submitLoginBtn">登录</button>
+                    <div class="text-center mt-3 text-gray-600">
+                        还没有账号？<a href="#" class="text-secondary" id="registerBtn">立即注册</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 提示框（全局） -->
+<div class="toast" id="toast"></div>
+
+<!-- 引入Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ========== 通用工具函数 ==========
+    // 显示提示框
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `toast toast-${type}`;
+        toast.classList.add('toast-show');
+
+        setTimeout(() => {
+            toast.classList.remove('toast-show');
+        }, 3000);
+    }
+
+    // 设置按钮加载状态
+    function setBtnLoading(btn, isLoading = true) {
+        if (isLoading) {
+            btn.classList.add('btn-loading');
+            btn.disabled = true;
+        } else {
+            btn.classList.remove('btn-loading');
+            btn.disabled = false;
+        }
+    }
+
+    // ========== 接口请求模拟（后续替换为真实接口） ==========
+    // 登录接口
+    async function login(username, password) {
+        // 模拟接口延迟
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        // 模拟响应（后续替换为真实Fetch请求）
+        // 真实接口示例：
+        const res = await fetch(
+            '/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        // 模拟成功/失败
+        /*    if (username && password) {
+               return { code: 200, msg: '登录成功', data: { token: 'fake_token_123456', userInfo: { name: username } } };
+           } else {
+               return { code: 400, msg: '用户名或密码不能为空' };
+           } */
+    }
+
+    // 数据筛选接口
+    async function fetchData(area, year) {
+        await new Promise(resolve => setTimeout(resolve, 800));
+        // 模拟不同筛选条件的返回数据
+        const mockData = {
+            all: {
+                2024: { school: 1234, student: 56789, teacher: 8910, donate: 9876, it: 3456 },
+                2023: { school: 1120, student: 52300, teacher: 7800, donate: 8760, it: 3100 },
+                2022: { school: 980, student: 48900, teacher: 6500, donate: 7650, it: 2800 }
+            },
+            beijing: {
+                2024: { school: 120, student: 8900, teacher: 1200, donate: 1500, it: 800 },
+                2023: { school: 100, student: 8200, teacher: 1000, donate: 1200, it: 700 },
+                2022: { school: 80, student: 7500, teacher: 900, donate: 1000, it: 600 }
+            },
+            hebei: {
+                2024: { school: 350, student: 15600, teacher: 2300, donate: 2800, it: 1200 },
+                2023: { school: 320, student: 14800, teacher: 2100, donate: 2500, it: 1100 },
+                2022: { school: 290, student: 13900, teacher: 1900, donate: 2200, it: 1000 }
+            }
+        };
+        return { code: 200, data: mockData[area][year] };
+    }
+
+    // 需求认领接口
+    async function claimDemand(demandId) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return { code: 200, msg: `需求${demandId}认领成功，请尽快完成对接` };
+    }
+
+    // 需求捐赠接口
+    async function donateDemand(demandId) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return { code: 200, msg: `需求${demandId}捐赠申请提交成功，工作人员将尽快联系你` };
+    }
+
+    // ========== 按钮事件绑定 ==========
+    document.addEventListener('DOMContentLoaded', function () {
+        // 1. 登录表单提交
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const submitBtn = document.getElementById('submitLoginBtn');
+
+            setBtnLoading(submitBtn);
+            const res = await login(username, password);
+            setBtnLoading(submitBtn, false);
+
+            if (res.code === 200) {
+                showToast(res.msg);
+                // 登录成功后关闭弹窗，跳转到个人中心
+                const modal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+                modal.hide();
+                // 真实场景：存储token到localStorage，跳转到个人中心
+                localStorage.setItem('token', res.data.token);
+                window.location.href = 'personal-center.html';
+            } else {
+                showToast(res.msg, 'error');
+            }
+        });
+
+        // 2. 忘记密码按钮
+        document.getElementById('forgetPwdBtn').addEventListener('click', function (e) {
+            e.preventDefault();
+            showToast('跳转到忘记密码页面', 'success');
+            // 真实场景：window.location.href = 'forget-pwd.html';
+        });
+
+        // 3. 注册按钮
+        document.getElementById('registerBtn').addEventListener('click', function (e) {
+            e.preventDefault();
+            showToast('跳转到注册页面', 'success');
+            // 真实场景：window.location.href = 'register.html';
+        });
+
+        // 4. 数据筛选按钮
+        document.getElementById('dataFilterBtn').addEventListener('click', async function () {
+            const area = document.getElementById('areaSelect').value;
+            const year = document.getElementById('yearSelect').value;
+            const btn = this;
+
+            setBtnLoading(btn);
+            const res = await fetchData(area, year);
+            setBtnLoading(btn, false);
+
+            if (res.code === 200) {
+                // 更新数据卡片
+                document.getElementById('schoolCount').innerHTML = `${res.data.school.toLocaleString()} <span class="text-sm">所</span>`;
+                document.getElementById('studentCount').innerHTML = `${res.data.student.toLocaleString()} <span class="text-sm">人</span>`;
+                document.getElementById('teacherCount').innerHTML = `${res.data.teacher.toLocaleString()} <span class="text-sm">次</span>`;
+                document.getElementById('donateCount').innerHTML = `${res.data.donate.toLocaleString()} <span class="text-sm">万元</span>`;
+                document.getElementById('itCount').innerHTML = `${res.data.it.toLocaleString()} <span class="text-sm">万元</span>`;
+                showToast('数据更新成功');
+            }
+        });
+
+        // 5. 案例筛选按钮
+        const caseFilterBtns = document.querySelectorAll('#caseFilterBtns .btn');
+        caseFilterBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                // 切换激活状态
+                caseFilterBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const type = this.getAttribute('data-type');
+                showToast(`筛选${type === 'all' ? '全部' : type}案例`);
+                // 真实场景：调用案例筛选接口，更新案例列表
+            });
+        });
+
+        // 6. 案例详情按钮
+        const caseDetailBtns = document.querySelectorAll('.caseDetailBtn');
+        caseDetailBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const caseId = this.getAttribute('data-id');
+                showToast(`查看案例${caseId}详情`);
+                // 真实场景：跳转到案例详情页
+                window.location.href = `case-detail.html?id=${caseId}`;
+            });
+        });
+
+        // 7. 需求认领按钮
+        const demandClaimBtns = document.querySelectorAll('.demandClaimBtn');
+        demandClaimBtns.forEach(btn => {
+            btn.addEventListener('click', async function () {
+                const demandId = this.getAttribute('data-demand-id');
+                setBtnLoading(this);
+                const res = await claimDemand(demandId);
+                setBtnLoading(this, false);
+                showToast(res.msg, res.code === 200 ? 'success' : 'error');
+            });
+        });
+
+        // 8. 需求捐赠按钮
+        const demandDonateBtns = document.querySelectorAll('.demandDonateBtn');
+        demandDonateBtns.forEach(btn => {
+            btn.addEventListener('click', async function () {
+                const demandId = this.getAttribute('data-demand-id');
+                setBtnLoading(this);
+                const res = await donateDemand(demandId);
+                setBtnLoading(this, false);
+                showToast(res.msg, res.code === 200 ? 'success' : 'error');
+            });
+        });
+
+        // 9. 查看更多需求按钮
+        document.getElementById('moreDemandBtn').addEventListener('click', function () {
+            showToast('跳转到需求大厅页面');
+            window.location.href = 'demand-hall.html';
+        });
+
+        // 10. Hero区核心按钮
+        // 捐赠/帮扶
+        document.getElementById('donateBtn').addEventListener('click', function () {
+            showToast('跳转到帮扶与捐赠页面');
+            window.location.href = 'donate.html';
+        });
+        // 支教
+        document.getElementById('volunteerBtn').addEventListener('click', function () {
+            showToast('跳转到支教与志愿页面');
+            window.location.href = 'volunteer.html';
+        });
+        // 资源中心
+        document.getElementById('resourceBtn').addEventListener('click', function () {
+            showToast('跳转到资源中心页面');
+            window.location.href = 'resource.html';
+        });
+        // 需求发布
+        document.getElementById('demandPublishBtn').addEventListener('click', function () {
+            showToast('跳转到需求发布页面');
+            window.location.href = 'demand-publish.html';
+        });
+
+        // 11. 搜索功能（回车/点击）
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                search();
+            }
+        });
+
+        function search() {
+            const keyword = searchInput.value.trim();
+            if (!keyword) {
+                showToast('请输入搜索关键词', 'error');
+                return;
+            }
+            showToast(`搜索：${keyword}`);
+            // 真实场景：跳转到搜索结果页
+            window.location.href = `search.html?keyword=${encodeURIComponent(keyword)}`;
+        }
+    });
+</script>
+
+<!-- 案例详情模态框 -->
+<div class="modal fade" id="caseDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="caseDetailTitle">案例详情</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="caseDetailContent">
+                加载中...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 点击“查看详情”弹出模态框
+    document.querySelectorAll('.caseDetailLink').forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const id = this.dataset.id;
+
+            // 这里根据 id 设置标题和内容（你可以按需扩展）
+            let title = '', content = '';
+            switch (id) {
+                case 'case1':
+                    title = '某乡村小学信息化教室建设';
+                    content = '<p>投入50万元，搭建2间多媒体教室，配备交互式电子白板、学生平板及高速网络，显著提升教学效率。</p>';
+                    break;
+                case 'case2':
+                    title = '乡村教师线上研修计划';
+                    content = '<p>120名乡村教师参与为期3个月的线上培训，涵盖信息技术与学科融合、课堂管理等内容。</p>';
+                    break;
+                case 'case3':
+                    title = '乡村学校阅读空间捐赠项目';
+                    content = '<p>联合多家公益机构，捐赠图书2万册，打造温馨阅读角，覆盖5所偏远学校。</p>';
+                    break;
+                case 'case4':
+                    title = '乡村学生数字素养提升行动';
+                    content = '<p>通过趣味编程课、数字创作营，激发学生对科技的兴趣，培养计算思维。</p>';
+                    break;
+                case 'case5':
+                    title = '智慧校园试点工程';
+                    content = '<p>部署智能考勤、安防监控、能耗管理系统，实现校园管理数字化升级。</p>';
+                    break;
+                case 'case6':
+                    title = '跨区域远程教研平台落地';
+                    content = '<p>连接10所城市名校与20所乡村学校，开展常态化远程集体备课与示范课。</p>';
+                    break;
+                default:
+                    title = '案例详情';
+                    content = '<p>详细内容正在完善中...</p>';
+            }
+
+            document.getElementById('caseDetailTitle').textContent = title;
+            document.getElementById('caseDetailContent').innerHTML = content;
+
+            // 显示模态框
+            const modal = new bootstrap.Modal(document.getElementById('caseDetailModal'));
+            modal.show();
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const filterBtns = document.querySelectorAll('#caseFilterBtns button');
+        const originalCaseItems = Array.from(document.querySelectorAll('.case-item')).map(el => el.cloneNode(true));
+        const carouselInner = document.querySelector('#caseCarousel .carousel-inner');
+
+        // 将原始案例按类型分组
+        const casesByType = {
+            all: originalCaseItems,
+            school: originalCaseItems.filter(el => el.dataset.type === 'school'),
+            teacher: originalCaseItems.filter(el => el.dataset.type === 'teacher'),
+            student: originalCaseItems.filter(el => el.dataset.type === 'student'),
+            project: originalCaseItems.filter(el => el.dataset.type === 'project')
+        };
+
+        // 每3个案例组成一个 carousel-item
+        function buildCarouselItems(cases) {
+            const items = [];
+            for (let i = 0; i < cases.length; i += 3) {
+                const group = cases.slice(i, i + 3);
+                const carouselItem = document.createElement('div');
+                carouselItem.className = 'carousel-item';
+                if (items.length === 0) carouselItem.classList.add('active');
+
+                // 包裹每个案例到 col-md-4
+                group.forEach(caseEl => {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-4';
+                    col.appendChild(caseEl);
+                    carouselItem.appendChild(col);
+                });
+
+                items.push(carouselItem);
+            }
+            return items;
+        }
+
+        // 渲染轮播
+        function renderCarousel(type) {
+            // 清空
+            carouselInner.innerHTML = '';
+
+            const casesToShow = casesByType[type] || casesByType.all;
+            if (casesToShow.length === 0) {
+                // 显示“暂无数据”
+                const emptyItem = document.createElement('div');
+                emptyItem.className = 'carousel-item active';
+                emptyItem.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted">暂无符合条件的案例</p>
+                </div>
+            `;
+                carouselInner.appendChild(emptyItem);
+            } else {
+                const newItems = buildCarouselItems(casesToShow);
+                newItems.forEach(item => carouselInner.appendChild(item));
+            }
+
+            // 重新初始化轮播（防止控制按钮失效）
+            const carousel = document.getElementById('caseCarousel');
+            const bsCarousel = bootstrap.Carousel.getInstance(carousel);
+            if (bsCarousel) {
+                bsCarousel.dispose();
+            }
+            new bootstrap.Carousel(carousel, {
+                interval: false // 不自动播放
+            });
+        }
+
+        // 绑定按钮
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const type = this.dataset.type;
+                renderCarousel(type);
+            });
+        });
+
+        // 初始化
+        renderCarousel('all');
+    });
+</script>
+
+</body>
+
+</html>
