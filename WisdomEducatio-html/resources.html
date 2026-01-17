@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>资源中心 - 振兴乡村教育</title>
+    <link rel="stylesheet" href="styles.css" /> <!-- 引入你的样式 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+
+<body>
+    <!-- 导航栏（可复用） -->
+    <nav class="navbar">
+        <div class="logo">振兴乡村教育</div>
+        <ul class="nav-links">
+            <li><a href="/">首页</a></li>
+            <li><a href="/policy">政策资讯</a></li>
+            <li><a href="/achievements">成果展示</a></li>
+            <li><a href="/resources" class="active">资源中心</a></li>
+            <li><a href="/donate">帮扶捐赠</a></li>
+            <li><a href="/volunteer">支教志愿</a></li>
+            <li><a href="/interaction">互动交流</a></li>
+            <li><a href="/profile">个人中心</a></li>
+            <li><a href="/about">关于我们</a></li>
+            <li><a href="/data">数据指标</a></li>
+            <li><button class="login-btn">登录/注册</button></li>
+        </ul>
+    </nav>
+
+    <!-- 主体内容 -->
+    <main class="container">
+        <h2>教学资源库</h2>
+        <p>精选优质课程、教案、课件，助力乡村教师提升教学质量。</p>
+
+        <div class="card-container">
+            <!-- 示例资源卡1 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>小学数学趣味课程</h3>
+                    <p>包含1-6年级数学趣味教学视频和互动练习，适合乡村学校使用。</p>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary">下载</button>
+                    <button class="btn btn-outline">收藏</button>
+                </div>
+            </div>
+
+            <!-- 示例资源卡2 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>初中物理实验课件</h3>
+                    <p>涵盖初中物理核心实验的课件包，包含动画演示和实验指导。</p>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary">下载</button>
+                    <button class="btn btn-outline">收藏</button>
+                </div>
+            </div>
+
+            <!-- 示例资源卡3 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>小学语文阅读教案</h3>
+                    <p>针对乡村学生特点设计的阅读教学教案，包含详细教学步骤和活动设计。</p>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary">下载</button>
+                    <button class="btn btn-outline">收藏</button>
+                </div>
+            </div>
+
+            <!-- 示例资源卡4（带视频占位） -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>乡村教师信息化培训</h3>
+                    <p>包含8个模块的信息化教学培训课程，帮助教师掌握现代教育技术。</p>
+                </div>
+                <div class="card-media">
+                    <img src="https://via.placeholder.com/300x200?text=视频预览" alt="视频缩略图"
+                        style="width: 100%; height: auto; border-radius: 8px;" />
+                    <div class="play-icon" title="点击播放视频">
+                        <i class="fas fa-play"></i>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary">下载</button>
+                    <button class="btn btn-outline">收藏</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const playIcons = document.querySelectorAll('.play-icon');
+            playIcons.forEach(icon => {
+                icon.addEventListener('click', function () {
+                    alert('视频功能正在开发中！\n未来将支持在线观看教学视频。');
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
