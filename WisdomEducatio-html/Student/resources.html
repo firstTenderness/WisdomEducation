@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>资源库 - 智慧教育 AI 辅导平台</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI', 微软雅黑, sans-serif;
+            margin: 0;
+            background: #f5f7fa;
+        }
+
+        .header {
+            background: #1a73e8;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav {
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 2rem;
+        }
+
+        .nav a {
+            margin-right: 1.5rem;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .nav a.active {
+            color: #1a73e8;
+            border-bottom: 2px solid #1a73e8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn {
+            display: inline-block;
+            background: #1a73e8;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 0.8rem;
+        }
+
+        .btn:hover {
+            background: #0d5bb8;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: #eee;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #1a73e8;
+            width: 65%;
+        }
+
+        .subject-card {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .subject-name {
+            font-weight: 500;
+        }
+
+        .subject-score {
+            color: #34a853;
+            font-size: 1.1rem;
+        }
+
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .resource-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1.2rem;
+            text-align: center;
+        }
+
+        .resource-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .resource-title {
+            margin: 0.8rem 0;
+            font-weight: 500;
+        }
+
+        .download-btn {
+            background: #f57c00;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>慧学澄明教育 AI 辅导平台</h1>
+        <div>
+            <span>张小明（学生）</span> |
+            <a href="/logout" style="color:white">退出</a>
+        </div>
+    </div>
+
+    <div class="nav">
+        <a href="/WisdomEducatio-html/Student/Student.html">首页</a>
+        <a href="/WisdomEducatio-html/Student/diagnose.html">学情诊断</a>
+        <a href="/WisdomEducatio-html/Student/study.html">我的学习</a>
+        <a href="/WisdomEducatio-html/Student/homework.html">作业中心</a>
+        <a href="/student/resources" class="active">资源库</a>
+        <a href="/WisdomEducatio-html/Student/profile.html">个人中心</a>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>📘 教学资源库</h2>
+            <p>精选优质教学资源，支持离线学习</p>
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <img src="https://via.placeholder.com/250x150?text=数学微课" alt="数学微课" />
+                    <div class="resource-title">小学数学趣味课程 V1</div>
+                    <a href="/api/resources/download/math-fun-v1" class="btn download-btn">下载</a>
+                </div>
+                <div class="resource-card">
+                    <img src="https://via.placeholder.com/250x150?text=英语听力" alt="英语听力" />
+                    <div class="resource-title">英语听力训练包</div>
+                    <a href="/api/resources/download/english-audio" class="btn download-btn">下载</a>
+                </div>
+                <div class="resource-card">
+                    <img src="https://via.placeholder.com/250x150?text=语文阅读" alt="语文阅读" />
+                    <div class="resource-title">经典古诗文赏析</div>
+                    <a href="/api/resources/download/classics" class="btn download-btn">下载</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📁 离线资源包</h2>
+            <p>一键打包常用资源，可在无网络环境下学习</p>
+            <a href="/api/resources/offline-pack" class="btn">下载离线包</a>
+        </div>
+    </div>
+
+</body>
+
+</html>

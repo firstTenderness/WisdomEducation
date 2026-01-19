@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>作业中心 - 智慧教育 AI 辅导平台</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI', 微软雅黑, sans-serif;
+            margin: 0;
+            background: #f5f7fa;
+        }
+
+        .header {
+            background: #1a73e8;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav {
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 2rem;
+        }
+
+        .nav a {
+            margin-right: 1.5rem;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .nav a.active {
+            color: #1a73e8;
+            border-bottom: 2px solid #1a73e8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn {
+            display: inline-block;
+            background: #1a73e8;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 0.8rem;
+        }
+
+        .btn:hover {
+            background: #0d5bb8;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: #eee;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #1a73e8;
+            width: 65%;
+        }
+
+        .subject-card {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .subject-name {
+            font-weight: 500;
+        }
+
+        .subject-score {
+            color: #34a853;
+            font-size: 1.1rem;
+        }
+
+        .homework-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .homework-header {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .homework-title {
+            font-weight: 500;
+        }
+
+        .homework-status {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .homework-content {
+            margin: 0.8rem 0;
+        }
+
+        .submit-btn {
+            background: #34a853;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>慧学澄明教育 AI 辅导平台</h1>
+        <div>
+            <span>张小明（学生）</span> |
+            <a href="/logout" style="color:white">退出</a>
+        </div>
+    </div>
+
+    <div class="nav">
+        <a href="/WisdomEducatio-html/Student/Student.html">首页</a>
+        <a href="/WisdomEducatio-html/Student/diagnose.html">学情诊断</a>
+        <a href="/WisdomEducatio-html/Student/study.html">我的学习</a>
+        <a href="/student/homework" class="active">作业中心</a>
+        <a href="/WisdomEducatio-html/Student/resources.html">资源库</a>
+        <a href="/WisdomEducatio-html/Student/profile.html">个人中心</a>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>📝 作业中心</h2>
+            <div class="homework-item">
+                <div class="homework-header">
+                    <div class="homework-title">数学单元测试</div>
+                    <div class="homework-status">截止：2026-01-22</div>
+                </div>
+                <div class="homework-content">
+                    <p>请完成以下选择题与计算题，系统将自动批改。</p>
+                </div>
+                <a href="/api/student/homework/101" class="btn">去完成</a>
+            </div>
+
+            <div class="homework-item">
+                <div class="homework-header">
+                    <div class="homework-title">英语作文：My Weekend</div>
+                    <div class="homework-status">已提交</div>
+                </div>
+                <div class="homework-content">
+                    <p>老师已批改，请查看反馈意见。</p>
+                </div>
+                <a href="/api/student/homework/102/review" class="btn">查看批改</a>
+            </div>
+
+            <div class="homework-item">
+                <div class="homework-header">
+                    <div class="homework-title">语文阅读理解</div>
+                    <div class="homework-status">未提交</div>
+                </div>
+                <div class="homework-content">
+                    <p>请在规定时间内上传答案文档或手写照片。</p>
+                </div>
+                <a href="/api/student/homework/103" class="btn">去提交</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

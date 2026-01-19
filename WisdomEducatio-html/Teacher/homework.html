@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>作业管理 - 智慧教育 AI 辅导平台</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI', 微软雅黑, sans-serif;
+            margin: 0;
+            background: #f5f7fa;
+        }
+
+        .header {
+            background: #1a73e8;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav {
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 2rem;
+        }
+
+        .nav a {
+            margin-right: 1.5rem;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .nav a.active {
+            color: #1a73e8;
+            border-bottom: 2px solid #1a73e8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn {
+            display: inline-block;
+            background: #1a73e8;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 0.8rem;
+        }
+
+        .btn:hover {
+            background: #0d5bb8;
+        }
+
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .class-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1.2rem;
+            text-align: center;
+        }
+
+        .class-card h3 {
+            margin: 0 0 0.8rem;
+            color: #222;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 1rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #1a73e8;
+        }
+
+        .homework-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .homework-header {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .homework-title {
+            font-weight: 500;
+        }
+
+        .homework-status {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .homework-content {
+            margin: 0.8rem 0;
+        }
+
+        .submit-btn {
+            background: #34a853;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>慧学澄明教育 AI 辅导平台</h1>
+        <div>
+            <span>李老师（教师）</span> |
+            <a href="/logout" style="color:white">退出</a>
+        </div>
+    </div>
+
+    <div class="nav">
+        <a href="/WisdomEducatio-html/Teacher/Teacher.html">首页</a>
+        <a href="/WisdomEducatio-html/Teacher/classes.html">我的班级</a>
+        <a href="/WisdomEducatio-html/Teacher/prepare.html">备课中心</a>
+        <a href="/teacher/homework" class="active">作业管理</a>
+        <a href="/WisdomEducatio-html/Teacher/analyze.html">学情分析</a>
+        <a href="/WisdomEducatio-html/Teacher/training.html">教师培训</a>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>📝 作业管理</h2>
+            <p>布置作业、查看提交情况、在线批改与反馈。</p>
+            <a href="/api/teacher/homework/create" class="btn">布置新作业</a>
+        </div>
+
+        <div class="card">
+            <h2>📋 近期作业</h2>
+            <div class="homework-item">
+                <div class="homework-header">
+                    <div class="homework-title">数学单元测试</div>
+                    <div class="homework-status">截止：2026-01-22</div>
+                </div>
+                <div class="homework-content">
+                    <p>请完成以下选择题与计算题，系统将自动批改。</p>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <a href="/api/teacher/homework/201/review" class="btn">批改作业</a>
+                    <a href="/api/teacher/homework/201/stats" class="btn">统计进度</a>
+                </div>
+            </div>
+
+            <div class="homework-item">
+                <div class="homework-header">
+                    <div class="homework-title">英语作文：My Weekend</div>
+                    <div class="homework-status">已结束</div>
+                </div>
+                <div class="homework-content">
+                    <p>请在规定时间内上传答案文档或手写照片。</p>
+                </div>
+                <a href="/api/teacher/homework/202/review" class="btn">查看批改</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

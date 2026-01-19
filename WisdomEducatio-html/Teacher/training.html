@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>教师培训 - 智慧教育 AI 辅导平台</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI', 微软雅黑, sans-serif;
+            margin: 0;
+            background: #f5f7fa;
+        }
+
+        .header {
+            background: #1a73e8;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav {
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 2rem;
+        }
+
+        .nav a {
+            margin-right: 1.5rem;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .nav a.active {
+            color: #1a73e8;
+            border-bottom: 2px solid #1a73e8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn {
+            display: inline-block;
+            background: #1a73e8;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 0.8rem;
+        }
+
+        .btn:hover {
+            background: #0d5bb8;
+        }
+
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .class-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1.2rem;
+            text-align: center;
+        }
+
+        .class-card h3 {
+            margin: 0 0 0.8rem;
+            color: #222;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 1rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #1a73e8;
+        }
+
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .course-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1.2rem;
+            text-align: center;
+        }
+
+        .course-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .course-title {
+            margin: 0.8rem 0;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #1a73e8;
+            width: 70%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>慧学澄明教育 AI 辅导平台</h1>
+        <div>
+            <span>李老师（教师）</span> |
+            <a href="/logout" style="color:white">退出</a>
+        </div>
+    </div>
+
+    <div class="nav">
+        <a href="/WisdomEducatio-html/Teacher/Teacher.html">首页</a>
+        <a href="/WisdomEducatio-html/Teacher/classes.html">我的班级</a>
+        <a href="/WisdomEducatio-html/Teacher/prepare.html">备课中心</a>
+        <a href="/WisdomEducatio-html/Teacher/homework.html">作业管理</a>
+        <a href="/WisdomEducatio-html/Teacher/analyze.html">学情分析</a>
+        <a href="/teacher/training" class="active">教师培训</a>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>🎓 教师成长计划</h2>
+            <p>参与线上培训，提升信息化教学能力，获取认证证书。</p>
+            <a href="/api/teacher/training/courses" class="btn">查看全部课程</a>
+        </div>
+
+        <div class="card">
+            <h2>📚 培训课程</h2>
+            <div class="course-grid">
+                <div class="course-card">
+                    <img src="https://via.placeholder.com/250x150?text=AI+教学" alt="AI教学" />
+                    <div class="course-title">AI 在教学中的应用</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <a href="/api/teacher/training/course/101" class="btn">继续学习</a>
+                </div>
+                <div class="course-card">
+                    <img src="https://via.placeholder.com/250x150?text=信息化培训" alt="信息化培训" />
+                    <div class="course-title">乡村教师信息化培训</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%;"></div>
+                    </div>
+                    <a href="/api/teacher/training/course/102" class="btn">已完成</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📥 培训资料</h2>
+            <p>下载课程讲义、PPT、教学案例等资源</p>
+            <a href="/api/teacher/training/download/101" class="btn">下载资料包</a>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>学情分析 - 智慧教育 AI 辅导平台</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI', 微软雅黑, sans-serif;
+            margin: 0;
+            background: #f5f7fa;
+        }
+
+        .header {
+            background: #1a73e8;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav {
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 2rem;
+        }
+
+        .nav a {
+            margin-right: 1.5rem;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .nav a.active {
+            color: #1a73e8;
+            border-bottom: 2px solid #1a73e8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn {
+            display: inline-block;
+            background: #1a73e8;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 0.8rem;
+        }
+
+        .btn:hover {
+            background: #0d5bb8;
+        }
+
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .class-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1.2rem;
+            text-align: center;
+        }
+
+        .class-card h3 {
+            margin: 0 0 0.8rem;
+            color: #222;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 1rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #1a73e8;
+        }
+
+        .chart-placeholder {
+            height: 200px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #666;
+        }
+
+        .student-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .student-item {
+            padding: 0.8rem 0;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .student-name {
+            font-weight: 500;
+        }
+
+        .student-score {
+            color: #34a853;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>慧学澄明教育 AI 辅导平台</h1>
+        <div>
+            <span>李老师（教师）</span> |
+            <a href="/logout" style="color:white">退出</a>
+        </div>
+    </div>
+
+    <div class="nav">
+        <a href="/WisdomEducatio-html/Teacher/Teacher.html">首页</a>
+        <a href="/WisdomEducatio-html/Teacher/classes.html">我的班级</a>
+        <a href="/WisdomEducatio-html/Teacher/prepare.html">备课中心</a>
+        <a href="/WisdomEducatio-html/Teacher/homework.html">作业管理</a>
+        <a href="/teacher/analyze" class="active">学情分析</a>
+        <a href="/WisdomEducatio-html/Teacher/training.html">教师培训</a>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>📈 班级学情概览</h2>
+            <p><strong>三年级（2）班</strong> 近7天学习数据：</p>
+            <div class="chart-placeholder">
+                <p>【此处可接入 ECharts 图表】</p>
+            </div>
+            <p>平均掌握率：<strong>82%</strong> | 最高分：98 | 最低分：56</p>
+            <a href="/api/teacher/analyze/class/302/detail" class="btn">查看详情</a>
+        </div>
+
+        <div class="card">
+            <h2>⚠️ 需重点关注学生</h2>
+            <ul class="student-list">
+                <li class="student-item">
+                    <div class="student-name">王小华</div>
+                    <div class="student-score">代数运算：62%</div>
+                    <div style="font-size: 0.9rem; color: #666;">建议加强基础训练</div>
+                </li>
+                <li class="student-item">
+                    <div class="student-name">刘芳</div>
+                    <div class="student-score">阅读理解：58%</div>
+                    <div style="font-size: 0.9rem; color: #666;">推荐每日精读训练</div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>📊 知识点掌握分布</h2>
+            <p>班级整体薄弱点：<strong>方程应用题</strong>（仅 45% 掌握）</p>
+            <p>建议：下周重点讲解“列方程解应用题”专题</p>
+            <a href="/api/teacher/analyze/knowledge" class="btn">查看详细分布</a>
+        </div>
+    </div>
+
+</body>
+
+</html>

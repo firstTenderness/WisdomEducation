@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>备课中心 - 智慧教育 AI 辅导平台</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI', 微软雅黑, sans-serif;
+            margin: 0;
+            background: #f5f7fa;
+        }
+
+        .header {
+            background: #1a73e8;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav {
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 2rem;
+        }
+
+        .nav a {
+            margin-right: 1.5rem;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .nav a.active {
+            color: #1a73e8;
+            border-bottom: 2px solid #1a73e8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn {
+            display: inline-block;
+            background: #1a73e8;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 0.8rem;
+        }
+
+        .btn:hover {
+            background: #0d5bb8;
+        }
+
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .class-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1.2rem;
+            text-align: center;
+        }
+
+        .class-card h3 {
+            margin: 0 0 0.8rem;
+            color: #222;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 1rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #1a73e8;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .feature-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1.2rem;
+            text-align: center;
+        }
+
+        .feature-card h3 {
+            margin: 0.8rem 0;
+            color: #222;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>慧学澄明教育 AI 辅导平台</h1>
+        <div>
+            <span>李老师（教师）</span> |
+            <a href="/logout" style="color:white">退出</a>
+        </div>
+    </div>
+
+    <div class="nav">
+        <a href="/WisdomEducatio-html/Teacher/Teacher.html">首页</a>
+        <a href="/WisdomEducatio-html/Teacher/classes.html">我的班级</a>
+        <a href="/teacher/prepare" class="active">备课中心</a>
+        <a href="/WisdomEducatio-html/Teacher/homework.html">作业管理</a>
+        <a href="/WisdomEducatio-html/Teacher/analyze.html">学情分析</a>
+        <a href="/WisdomEducatio-html/Teacher/training.html">教师培训</a>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>🛠️ 备课中心</h2>
+            <p>利用 AI 工具快速生成教案、练习题和课件，提升备课效率。</p>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div>📝</div>
+                    <h3>AI 教案生成</h3>
+                    <p>输入教学目标，自动生成完整教案</p>
+                    <a href="/api/teacher/generate/lesson-plan" class="btn">生成教案</a>
+                </div>
+                <div class="feature-card">
+                    <div>📋</div>
+                    <h3>智能组卷</h3>
+                    <p>根据知识点自动匹配题目，一键出卷</p>
+                    <a href="/api/teacher/generate/exam" class="btn">智能组卷</a>
+                </div>
+                <div class="feature-card">
+                    <div>📚</div>
+                    <h3>课件资源库</h3>
+                    <p>精选 PPT、微课视频、教学素材</p>
+                    <a href="/api/teacher/resource-library" class="btn">浏览资源</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📤 我的备课记录</h2>
+            <ul style="list-style: none; padding: 0;">
+                <li style="padding: 0.8rem 0; border-bottom: 1px solid #eee;">
+                    <strong>数学：一元一次方程</strong>
+                    <div style="font-size: 0.9rem; color: #666;">2026-01-18 | 已生成教案</div>
+                    <a href="/api/teacher/plan/101" class="btn">查看</a>
+                </li>
+                <li style="padding: 0.8rem 0;">
+                    <strong>语文：古诗赏析</strong>
+                    <div style="font-size: 0.9rem; color: #666;">2026-01-15 | 资源已下载</div>
+                    <a href="/api/teacher/resource/202" class="btn">查看</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+
+</html>
