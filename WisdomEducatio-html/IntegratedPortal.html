@@ -937,15 +937,18 @@
         }
 
         .carousel-slide {
-            min-width: 100%;
-            height: 100%;
             position: relative;
+            min-height: 200px;
+            /*可根据需要调整高度 */
+            overflow: hidden;
         }
 
         .carousel-slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            width: 50%;
+            height: 50%;
+            object-fit: contain;
+            /*关键：保持比例并覆盖整个区域*/
+            display: block;
         }
 
         .carousel-caption {
@@ -1459,8 +1462,8 @@
                             <div class="timeline-date">2023年7月</div>
                             <h3 class="card-title">乡村教师支持计划升级</h3>
                             <p class="card-text">教育部发布《关于进一步加强乡村教师队伍建设的意见》，提出扩大乡村教师补充渠道，提高待遇保障。</p>
-                            <a id="target-policy1" href="policy-teacher-support.html" class="btn btn-primary"
-                                style="margin-top: 10px; padding: 8px 16px;">阅读详情</a>
+                            <a id="target-policy1" href="/WisdomEducatio-html/Policy/policy-teacher-support.html"
+                                class="btn btn-primary" style="margin-top: 10px; padding: 8px 16px;">阅读详情</a>
                         </div>
                     </div>
 
@@ -1469,8 +1472,8 @@
                             <div class="timeline-date">2023年5月</div>
                             <h3 class="card-title">数字化教育资源下乡</h3>
                             <p class="card-text">国家启动"数字教育资源全覆盖"项目，计划为全国乡村学校提供优质数字化教学资源。</p>
-                            <a id="target-policy2" href="policy-digital-resources.html" class="btn btn-primary"
-                                style="margin-top: 10px; padding: 8px 16px;">阅读详情</a>
+                            <a id="target-policy2" href="/WisdomEducatio-html/Policy/policy-digital-resources.html"
+                                class="btn btn-primary" style="margin-top: 10px; padding: 8px 16px;">阅读详情</a>
                         </div>
                     </div>
 
@@ -1479,8 +1482,8 @@
                             <div class="timeline-date">2023年3月</div>
                             <h3 class="card-title">乡村教育振兴五年规划</h3>
                             <p class="card-text">教育部联合多部门发布《乡村教育振兴五年行动计划(2023-2027)》，明确未来五年发展目标。</p>
-                            <a href="policy-rural-education-plan.html" class="btn btn-primary"
-                                style="margin-top: 10px; padding: 8px 16px;">阅读详情</a>
+                            <a href="/WisdomEducatio-html/policy/Policy-rural-education-plan.html"
+                                class="btn btn-primary" style="margin-top: 10px; padding: 8px 16px;">阅读详情</a>
                         </div>
                     </div>
 
@@ -1489,8 +1492,8 @@
                             <div class="timeline-date">2023年1月</div>
                             <h3 class="card-title">"校校通"工程全面升级</h3>
                             <p class="card-text">全国乡村学校网络接入率已达98%，下一步将重点提升网络质量与应用水平。</p>
-                            <a href="policy-school-network-upgrade.html" class="btn btn-primary"
-                                style="margin-top: 10px; padding: 8px 16px;">阅读详情</a>
+                            <a href="/WisdomEducatio-html/policy/Policy-school-network-upgrade.html"
+                                class="btn btn-primary" style="margin-top: 10px; padding: 8px 16px;">阅读详情</a>
                         </div>
                     </div>
                 </div>
@@ -1517,7 +1520,7 @@
                     <div class="card-content">
                         <h3 class="card-title">云南山区新校舍落成</h3>
                         <p class="card-text">为云南偏远山区建设的现代化校舍，解决了200多名学生的上学问题，配备了标准化教室和宿舍。</p>
-                        <a href="school-detail.html" class="btn btn-primary"
+                        <a href="/WisdomEducatio-html//ResultShow/school-detail.html" class="btn btn-primary"
                             style="margin-top: 10px; padding: 8px 16px;">查看详情</a>
                     </div>
                 </div>
@@ -1528,7 +1531,7 @@
                     <div class="card-content">
                         <h3 class="card-title">数字化教室全覆盖</h3>
                         <p class="card-text">在甘肃50所乡村学校建设数字化教室，配备交互式白板、平板电脑等设备，实现优质教育资源共享。</p>
-                        <a href="info-detail.html" class="btn btn-primary"
+                        <a href="/WisdomEducatio-html//ResultShow/info-detail.html" class="btn btn-primary"
                             style="margin-top: 10px; padding: 8px 16px;">查看详情</a>
                     </div>
                 </div>
@@ -1539,7 +1542,7 @@
                     <div class="card-content">
                         <h3 class="card-title">"书香校园"图书角项目</h3>
                         <p class="card-text">在贵州100所乡村小学建立图书角，捐赠图书5万余册，培养孩子们的阅读习惯。</p>
-                        <a href="library-detail.html" class="btn btn-primary"
+                        <a href="/WisdomEducatio-html//ResultShow/library-detail.html" class="btn btn-primary"
                             style="margin-top: 10px; padding: 8px 16px;">查看详情</a>
                     </div>
                 </div>
@@ -1549,14 +1552,14 @@
                     <div class="card-content">
                         <h3 class="card-title">乡村教师能力提升培训</h3>
                         <p class="card-text">组织500名乡村教师参加教学能力提升培训，提升教学方法和信息化应用水平。</p>
-                        <a href="training-detail.html" class="btn btn-primary"
+                        <a href="/WisdomEducatio-html//ResultShow/training-detail.html" class="btn btn-primary"
                             style="margin-top: 10px; padding: 8px 16px;">查看详情</a>
                     </div>
                 </div>
             </div>
 
             <div style="text-align: center; margin-top: 30px;">
-                <a href="achievements-more.html" class="btn btn-secondary">查看更多成果</a>
+                <a href="/WisdomEducatio-html/ResultShow/achievements-more.html" class="btn btn-secondary">查看更多成果</a>
             </div>
         </section>
 
@@ -2050,29 +2053,27 @@
                 <div class="carousel">
                     <div class="carousel-track" id="carouselTrack">
                         <div class="carousel-slide">
-                            <img src="images/p1.png" alt="支教故事"
-                                style="width: 1200px; height: 500px; object-fit: cover; border-radius: 8px;" />
+                            <img src="images/p2.png" alt="支教故事 1" />
                             <div class="carousel-caption">
                                 <h4>张老师：我在云南支教的180天</h4>
                                 <p>"看到孩子们从羞涩不敢开口到自信地朗读课文，是我最大的成就感。"</p>
                             </div>
                         </div>
                         <div class="carousel-slide">
-                            <img src="images/p2.png" alt="支教故事"
-                                style="width: 1200px; height: 500px; object-fit: cover; border-radius: 8px;" />
+                            <img src="images/p1.png" alt="支教故事 2" />
                             <div class="carousel-caption">
                                 <h4>李同学：用音乐点亮乡村孩子的梦想</h4>
                                 <p>"我教孩子们唱歌、识谱，他们眼中闪烁的光芒让我明白了教育的意义。"</p>
                             </div>
                         </div>
                         <div class="carousel-slide">
-                            <img src="images/p3.png" alt="支教故事"
-                                style="width: 1200px; height: 500px; object-fit: cover; border-radius: 8px;" />
+                            <img src="images/p3.png" alt="支教故事 3" />
                             <div class="carousel-caption">
                                 <h4>王医生：从医疗援助到教育支持</h4>
                                 <p>"在义诊过程中，我发现孩子们更需要的是知识和机会，于是决定留下来支教。"</p>
                             </div>
                         </div>
+                        <!-- 可继续添加更多，无需指定宽高 -->
                     </div>
                     <button class="carousel-nav prev" id="prevBtn">&#10094;</button>
                     <button class="carousel-nav next" id="nextBtn">&#10095;</button>
@@ -2979,20 +2980,36 @@
             }, 16);
         }
 
-        // 轮播组件功能
+        // 轮播组件功能（支持任意数量图片）
         function initCarousel() {
             const track = document.getElementById('carouselTrack');
+            if (!track) return;
+
             const slides = Array.from(track.children);
             const prevBtn = document.getElementById('prevBtn');
             const nextBtn = document.getElementById('nextBtn');
+
+            if (slides.length === 0) return;
+
             let currentSlide = 0;
 
-            // 设置轮播宽度
+            // 设置轮播轨道宽度为 100% * slide数量，确保横向排列
+            track.style.display = 'flex';
             track.style.width = `${slides.length * 100}%`;
+            slides.forEach(slide => {
+                slide.style.flex = '0 0 100%'; // 每个 slide 占 100% 容器宽度
+                const img = slide.querySelector('img');
+                if (img) {
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                }
+            });
 
             // 更新轮播位置
             function updateCarousel() {
-                track.style.transform = `translateX(-${currentSlide * (100 / slides.length)}%)`;
+                const offset = -currentSlide * (100 / slides.length);
+                track.style.transform = `translateX(${offset}%)`;
             }
 
             // 下一张
@@ -3007,11 +3024,14 @@
                 updateCarousel();
             });
 
-            // 自动轮播
-            setInterval(() => {
-                currentSlide = (currentSlide + 1) % slides.length;
-                updateCarousel();
-            }, 5000);
+            // 自动轮播（可选）
+            let autoPlay = true;
+            if (autoPlay) {
+                setInterval(() => {
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    updateCarousel();
+                }, 5000);
+            }
         }
 
         // 筛选器功能
