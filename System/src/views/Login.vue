@@ -2,7 +2,7 @@
   <div class="login-container" :style="{ backgroundImage: `url(${loginBg})` }">
     <div class="login-card">
       <div class="login-header">
-        <h2 class="login-title">慧学澄明平台</h2>
+        <h2 class="login-title">慧学澄明学习教育平台</h2>
       </div>
       
       <el-form
