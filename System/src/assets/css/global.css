@@ -1,0 +1,23 @@
+/* 全局通用返回按钮样式 */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 8px 16px;
+  background-color: #f5f7fa;
+  border: 1px solid #e6e6e6;
+  border-radius: 4px;
+  color: #2c3e50;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none; /* 去掉默认按钮边框，更美观 */
+  outline: none;
+}
+.back-btn:hover {
+  background-color: #e6e6e6;
+  color: #3498db;
+}
+.back-btn .el-icon {
+  margin-right: 6px;
+}
