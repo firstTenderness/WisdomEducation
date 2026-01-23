@@ -1,82 +1,33 @@
 <template>
-  <div class="page-container">
-    <!-- 返回按钮 -->
-    <button class="back-btn" @click="goBack">
-      <el-icon><ArrowLeft /></el-icon>
-      返回上一页
-    </button>
-    
-    <div class="page-header">
-      <h2>智能练习中心</h2>
-      <p>个性化智能练习，提升学习效率</p>
+  <div class="practice-page">
+    <el-page-header content="智能练习中心"></el-page-header>
+    <div style="margin-top: 20px;">
+      <el-card v-for="(item, index) in questions" :key="item.id" style="margin-bottom: 15px;">
+        <h3 style="margin: 0 0 10px 0;">第 {{ index + 1 }} 题 ({{ item.type }})</h3>
+        <p style="font-weight: bold; margin: 0 0 10px 0;">{{ item.title }}</p>
+        <div style="padding-left: 20px;">
+          <el-radio-group v-model="answers[item.id]">
+            <el-radio label="A">A. 选项内容...</el-radio><br>
+            <el-radio label="B">B. 选项内容...</el-radio><br>
+            <el-radio label="C">C. 选项内容...</el-radio><br>
+            <el-radio label="D">D. 选项内容...</el-radio>
+          </el-radio-group>
+        </div>
+      </el-card>
+      <el-button type="primary">提交答案</el-button>
     </div>
-    <el-card class="page-card">
-      <el-empty description="暂无练习任务，点击下方按钮开始练习" :image-size="120" />
-      <el-button type="primary" style="margin-top: 20px;">开始练习</el-button>
-    </el-card>
   </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import { ArrowLeft } from '@element-plus/icons-vue'
+import { ref, onMounted, reactive } from 'vue'
+import { getPracticeList } from '@/api'
 
-const router = useRouter()
+const questions = ref([])
+const answers = reactive({})
 
-// 返回上一页（若无上一页则返回首页）
-const goBack = () => {
-  if (window.history.length > 1) {
-    router.go(-1)
-  } else {
-    router.push('/home')
-  }
-}
+onMounted(async () => {
+  const res = await getPracticeList()
+  questions.value = res.data.list
+})
 </script>
-
-<style scoped>
-.page-container {
-  width: 100%;
-  height: 100%;
-  padding: 10px 0;
-}
-.page-header {
-  margin-bottom: 20px;
-}
-.page-header h2 {
-  font-size: 22px;
-  color: #2c3e50;
-  margin: 0;
-}
-.page-header p {
-  font-size: 14px;
-  color: #909399;
-  margin: 5px 0 0 0;
-}
-.page-card {
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-  padding: 20px;
-  text-align: center;
-}
-/* 返回按钮样式 */
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 8px 16px;
-  background-color: #f5f7fa;
-  border: 1px solid #e6e6e6;
-  border-radius: 4px;
-  color: #2c3e50;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-.back-btn:hover {
-  background-color: #e6e6e6;
-  color: #3498db;
-}
-.back-btn .el-icon {
-  margin-right: 6px;
-}
-</style>

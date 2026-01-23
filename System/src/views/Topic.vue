@@ -1,82 +1,29 @@
 <template>
-  <div class="page-container">
-    <!-- 返回按钮 -->
-    <button class="back-btn" @click="goBack">
-      <el-icon><ArrowLeft /></el-icon>
-      返回上一页
-    </button>
-    
-    <div class="page-header">
-      <h2>专题创作</h2>
-      <p>创建和管理您的学习专题</p>
-    </div>
-    <el-card class="page-card">
-      <el-empty description="暂无创建的专题，点击下方按钮开始创作" :image-size="120" />
-      <el-button type="primary" style="margin-top: 20px;">创建新专题</el-button>
-    </el-card>
+  <div class="topic-page">
+    <el-page-header content="专题创作"></el-page-header>
+    <el-table :data="topics" border style="width: 100%; margin-top: 20px;">
+      <el-table-column prop="title" label="专题标题" min-width="300"></el-table-column>
+      <el-table-column prop="status" label="状态" width="120">
+        <template #default="scope">
+          <el-tag :type="scope.row.status === '已发布' ? 'success' : 'warning'">
+            {{ scope.row.status }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="viewCount" label="浏览量" width="100"></el-table-column>
+      <el-table-column prop="createTime" label="创建时间" width="180"></el-table-column>
+    </el-table>
   </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import { ArrowLeft } from '@element-plus/icons-vue'
+import { ref, onMounted } from 'vue'
+import { getTopicList } from '@/api'
 
-const router = useRouter()
+const topics = ref([])
 
-// 返回上一页（若无上一页则返回首页）
-const goBack = () => {
-  if (window.history.length > 1) {
-    router.go(-1)
-  } else {
-    router.push('/home')
-  }
-}
+onMounted(async () => {
+  const res = await getTopicList()
+  topics.value = res.data.list
+})
 </script>
-
-<style scoped>
-.page-container {
-  width: 100%;
-  height: 100%;
-  padding: 10px 0;
-}
-.page-header {
-  margin-bottom: 20px;
-}
-.page-header h2 {
-  font-size: 22px;
-  color: #2c3e50;
-  margin: 0;
-}
-.page-header p {
-  font-size: 14px;
-  color: #909399;
-  margin: 5px 0 0 0;
-}
-.page-card {
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-  padding: 20px;
-  text-align: center;
-}
-/* 返回按钮样式 */
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 8px 16px;
-  background-color: #f5f7fa;
-  border: 1px solid #e6e6e6;
-  border-radius: 4px;
-  color: #2c3e50;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-.back-btn:hover {
-  background-color: #e6e6e6;
-  color: #3498db;
-}
-.back-btn .el-icon {
-  margin-right: 6px;
-}
-</style>

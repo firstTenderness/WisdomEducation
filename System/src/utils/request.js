@@ -1,58 +1,55 @@
 import axios from 'axios'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 
-// 创建axios实例（适配后端实际地址）
+// 创建axios实例（无API前缀，对接真实后端）
 const service = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080', // 移除/api后缀，适配后端
-  timeout: 5000,
-  headers: {
-    'Content-Type': 'application/json;charset=utf-8'
-  }
+  baseURL: import.meta.env.VITE_API_URL,
+  timeout: 10000
 })
 
-// 请求拦截器：统一携带token
+// 强制启用Mock（仅拦截非登录/用户信息接口）
+console.log('%c[Mock Mode] 仅拦截业务接口，登录/用户信息走真实后端', 'color: #ff4444; font-weight: bold;')
+import('../mock/index.js')
+  .then(() => console.log('✅ Mock 数据加载成功'))
+  .catch(err => console.error('❌ Mock 加载失败:', err))
+
+// 请求拦截器：自动携带Token
 service.interceptors.request.use(
-  (config) => {
+  config => {
     const token = localStorage.getItem('token')
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers['Authorization'] = 'Bearer ' + token
     }
     return config
   },
-  (error) => {
-    ElMessage.error('请求发送失败：' + error.message)
-    return Promise.reject(error)
-  }
+  error => Promise.reject(error)
 )
 
-// 响应拦截器：适配后端code=1为成功
+// 响应拦截器：适配真实后端返回格式
 service.interceptors.response.use(
-  (response) => {
+  response => {
     const res = response.data
-    // 后端约定code=1为成功，其他为失败
-    if (res.code !== 1) {
-      ElMessage.error(res.msg || '操作失败')
-      return Promise.reject(new Error(res.msg || 'Error'))
-    } else {
+    // 兼容后端直接返回对象/无code字段的情况
+    if (res.token || res.id) { // 登录/用户信息接口直接返回数据
       return res
     }
-  },
-  (error) => {
-    // 401 token过期/无效
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem('token')
-      ElMessageBox.confirm('登录已过期，请重新登录', '提示', {
-        confirmButtonText: '重新登录',
-        showCancelButton: false,
-        type: 'warning'
-      }).then(() => {
-        const router = useRouter()
-        router.push('/login').catch(() => {})
-      })
-    } else {
-      ElMessage.error(error.message || '服务器错误')
+    // 业务接口按code判断
+    if (typeof res !== 'object' || res === null) {
+      ElMessage.error('接口返回格式异常')
+      return Promise.reject(new Error('接口返回格式异常'))
     }
+    if (res.code !== 200 && res.code !== 201) {
+      ElMessage.error(res.msg || '请求失败')
+      if (res.code === 401 || res.code === 403) {
+        localStorage.removeItem('token')
+        window.location.href = '/login'
+      }
+      return Promise.reject(new Error(res.msg || 'Error'))
+    }
+    return res
+  },
+  error => {
+    ElMessage.error(error.message || '服务器连接异常')
     return Promise.reject(error)
   }
 )

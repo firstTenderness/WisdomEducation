@@ -1,120 +1,37 @@
 <template>
   <div class="course-page">
-    <div class="page-header">
-      <h2>我的课程</h2>
-      <el-button type="primary" icon="Plus" @click="addCourse">添加课程</el-button>
-    </div>
-    <el-card v-for="course in courseList" :key="course.id" class="course-card">
-      <template #header>
-        <div class="course-header">
-          <h3>{{ course.courseName }}</h3>
-          <span class="status" :class="course.status">{{ course.statusText }}</span>
-        </div>
-      </template>
-      <div class="course-info">
-        <p><strong>教师：</strong>{{ course.teacherName }}</p>
-        <p><strong>进度：</strong>{{ course.progress }}%</p>
-      </div>
-      <div class="course-actions">
-        <el-button size="small" @click="enterCourse(course.id)">进入学习</el-button>
-        <el-button size="small" type="primary" @click="generateAiSummary(course.id)">生成AI总结</el-button>
-      </div>
-    </el-card>
+    <el-page-header content="课程中心"></el-page-header>
+    <el-row :gutter="20" style="margin-top: 20px;">
+      <el-col :span="6" v-for="course in courses" :key="course.id">
+        <el-card :body-style="{ padding: 0 }">
+          <img :src="course.cover" style="width: 100%; height: 120px; object-fit: cover;" />
+          <div style="padding: 10px;">
+            <h3 style="font-size: 16px; margin: 0 0 10px 0;">{{ course.title }}</h3>
+            <p style="margin: 0 0 10px 0; color: #666;">讲师：{{ course.teacher }}</p>
+            <el-progress :percentage="course.progress" :stroke-width="6"></el-progress>
+            <p style="margin: 10px 0 0 0; font-size: 12px; color: #999;">
+              已学 {{ course.finished }} / 共 {{ course.total }} 课时
+            </p>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { getCourseList } from '@/api'
 
-const courseList = ref([])
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const courses = ref([])
 
-// 获取课程列表
-const fetchCourseList = async () => {
+onMounted(async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/courses/my`, {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    })
-    const data = await res.json()
-    if (data.code === 200) courseList.value = data.data
-  } catch (err) {
-    ElMessage.error('获取课程列表失败')
+    // 无/api前缀请求
+    const res = await getCourseList({ page: 1 })
+    courses.value = res.data.list
+  } catch (error) {
+    console.error('获取课程失败：', error)
   }
-}
-
-// 生成AI总结
-const generateAiSummary = (courseId) => {
-  ElMessage.info(`正在为课程${courseId}生成AI总结`)
-}
-
-// 进入课程
-const enterCourse = (courseId) => {
-  ElMessage.info(`进入课程${courseId}`)
-}
-
-// 添加课程
-const addCourse = () => {
-  ElMessage.info('添加课程功能待开发')
-}
-
-onMounted(() => {
-  fetchCourseList()
 })
 </script>
-
-<style scoped>
-.course-page {
-  width: 100%;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.course-card {
-  margin-bottom: 16px;
-  transition: all 0.3s;
-}
-
-.course-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.course-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.status {
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-}
-
-.status.进行中 {
-  background: #e6f7ff;
-  color: #1890ff;
-}
-
-.status.已结束 {
-  background: #f6ffed;
-  color: #52c41a;
-}
-
-.course-info {
-  margin: 12px 0;
-  color: #666;
-}
-
-.course-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-</style>
