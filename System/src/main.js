@@ -1,12 +1,10 @@
-import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-
 // 全局注册ElementPlus
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-
+import { createApp } from 'vue'
 const app = createApp(App)
 // 注册所有图标
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
