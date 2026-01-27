@@ -1,64 +1,127 @@
 <template>
-  <div class="home-container" style="height: 100vh; display: flex;">
-    <!-- 侧边导航栏 -->
-    <div class="sidebar" style="width: 200px; background: #2f4050; color: #fff;">
-      <div class="logo" style="padding: 20px; text-align: center; font-size: 18px; font-weight: bold; border-bottom: 1px solid #3d5069;">
-        慧学澄明平台
+  <div class="home-container">
+    <!-- 顶部导航栏 -->
+    <div class="navbar">
+      <div class="nav-bg"></div>
+      <div class="nav-content">
+        <div class="nav-left">
+          <el-avatar :size="40" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=education%20platform%20logo%20with%20book%20and%20light%20symbol&image_size=square" class="nav-logo"></el-avatar>
+          <h1 class="platform-name">慧学澄明学习教育平台-学生端</h1>
+        </div>
+        <div class="nav-right">
+          <div class="nav-stats">
+            <div class="stat-item">
+              <span class="stat-label">今日学习</span>
+              <span class="stat-value">{{ todayStudyTime }}分钟</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">未读消息</span>
+              <span class="stat-value">{{ unreadMessages }}</span>
+            </div>
+          </div>
+          <div class="user-info">
+            <el-avatar :size="36" :src="userInfo.avatar || defaultAvatar" class="user-avatar"></el-avatar>
+            <span class="user-name">欢迎回来：{{ userInfo.name }}</span>
+          </div>
+          <el-button 
+            type="primary" 
+            @click="handleTeacherSwitch"
+            class="interactive-btn"
+          >
+            切换教师端
+          </el-button>
+          <el-button 
+            type="danger" 
+            @click="handleLogout"
+            class="interactive-btn"
+          >
+            退出登录
+          </el-button>
+        </div>
       </div>
-      <el-menu
-        default-active="1"
-        class="el-menu-vertical-demo"
-        @select="handleMenuSelect"
-        style="height: calc(100% - 60px); border-right: none;"
-      >
-        <el-menu-item index="1">
-          <el-icon><Menu /></el-icon>
-          <span slot="title">课程中心</span>
-        </el-menu-item>
-        <el-menu-item index="2">
-          <el-icon><Message /></el-icon>
-          <span slot="title">收件箱</span>
-        </el-menu-item>
-        <el-menu-item index="3">
-          <el-icon><Edit /></el-icon>
-          <span slot="title">专题创作</span>
-        </el-menu-item>
-        <el-menu-item index="4">
-          <el-icon><Document /></el-icon>
-          <span slot="title">学习笔记</span>
-        </el-menu-item>
-        <el-menu-item index="5">
-          <el-icon><Folder /></el-icon>
-          <span slot="title">个人云盘</span>
-        </el-menu-item>
-        <el-menu-item index="6">
-          <el-icon><Lightning /></el-icon>
-          <span slot="title">AI课堂总结</span>
-        </el-menu-item>
-        <el-menu-item index="7">
-          <el-icon><Brush /></el-icon>
-          <span slot="title">智能练习中心</span>
-        </el-menu-item>
-      </el-menu>
     </div>
 
-    <!-- 右侧内容区 -->
-    <div style="flex: 1; display: flex; flex-direction: column;">
-      <!-- 顶部栏：新增退出登录按钮 + 显示用户名 -->
-      <div class="header" style="height: 60px; padding: 0 20px; display: flex; justify-content: flex-end; align-items: center; border-bottom: 1px solid #e6e6e6;">
-        <span style="margin-right: 20px;">欢迎回来：{{ userInfo.name }}</span>
-        <el-button type="primary" plain @click="handleTeacherSwitch" style="margin-right: 10px;">
-          切换教师端
-        </el-button>
-        <!-- 新增：退出登录按钮 -->
-        <el-button type="danger" plain @click="handleLogout">
-          退出登录
-        </el-button>
+    <!-- 主体布局 -->
+    <div class="main-layout">
+      <!-- 左侧折叠菜单 -->
+      <div class="sidebar" :class="{ 'is-collapse': isCollapse }">
+        <el-menu
+          :default-active="currentMenu"
+          class="sidebar-menu"
+          background-color="#f5f7fa"
+          text-color="#303133"
+          active-text-color="#409eff"
+          :collapse="isCollapse"
+          @select="handleMenuSelect"
+        >
+          <div class="logo-container" @click="toggleCollapse">
+            <i class="el-icon-s-unfold" :class="{ 'rotate-icon': isCollapse }"></i>
+            <span v-show="!isCollapse" class="collapse-text">收起菜单</span>
+          </div>
+          
+          <el-menu-item index="1">
+            <template #title>
+              <i class="el-icon-menu"></i>
+              <span>课程中心</span>
+            </template>
+          </el-menu-item>
+          <el-menu-item index="2">
+            <template #title>
+              <i class="el-icon-message"></i>
+              <span>收件箱</span>
+            </template>
+          </el-menu-item>
+          <el-menu-item index="3">
+            <template #title>
+              <i class="el-icon-edit"></i>
+              <span>专题创作</span>
+            </template>
+          </el-menu-item>
+          <el-menu-item index="4">
+            <template #title>
+              <i class="el-icon-document"></i>
+              <span>学习笔记</span>
+            </template>
+          </el-menu-item>
+          <el-menu-item index="5">
+            <template #title>
+              <i class="el-icon-folder"></i>
+              <span>个人云盘</span>
+            </template>
+          </el-menu-item>
+          <el-menu-item index="6">
+            <template #title>
+              <i class="el-icon-lightning"></i>
+              <span>AI课堂总结</span>
+            </template>
+          </el-menu-item>
+          <el-menu-item index="7">
+            <template #title>
+              <i class="el-icon-brush"></i>
+              <span>智能练习中心</span>
+            </template>
+          </el-menu-item>
+        </el-menu>
       </div>
 
-      <!-- 主内容区 -->
-      <div class="main-content" style="flex: 1; padding: 20px; overflow-y: auto; background: #f3f3f4;">
-        <component :is="currentView"></component>
+      <!-- 右侧内容区 -->
+      <div class="content-area">
+        <!-- 页面头部 -->
+        <div class="page-header">
+          <div class="page-header-top">
+            <el-breadcrumb separator="/" class="breadcrumb">
+              <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+              <el-breadcrumb-item>{{ getPageTitle() }}</el-breadcrumb-item>
+            </el-breadcrumb>
+            <div class="header-decoration"></div>
+          </div>
+          <h2 class="page-title">{{ getPageTitle() }}</h2>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+          <component :is="currentView"></component>
+        </div>
       </div>
     </div>
   </div>
@@ -83,6 +146,12 @@ const router = useRouter()
 // 核心：从localStorage读取登录用户信息（优先）
 const userInfo = ref(JSON.parse(localStorage.getItem('userInfo') || '{"name":"未知用户"}'))
 const currentView = ref(Course) // 默认显示课程页面
+const currentMenu = ref('1') // 当前选中菜单
+const isCollapse = ref(false) // 侧边栏折叠状态
+const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png' // 默认头像
+// 新增：页面装饰性数据
+const todayStudyTime = ref(Math.floor(Math.random() * 120) + 10) // 今日学习时间
+const unreadMessages = ref(Math.floor(Math.random() * 5)) // 未读消息数
 
 // 菜单与组件映射
 const menuMap = {
@@ -93,6 +162,27 @@ const menuMap = {
   '5': Cloud,
   '6': AiSummary,
   '7': SmartPractice
+}
+
+// 菜单与标题映射
+const menuTitleMap = {
+  '1': '课程中心',
+  '2': '收件箱',
+  '3': '专题创作',
+  '4': '学习笔记',
+  '5': '个人云盘',
+  '6': 'AI课堂总结',
+  '7': '智能练习中心'
+}
+
+// 获取页面标题
+const getPageTitle = () => {
+  return menuTitleMap[currentMenu.value] || '课程中心'
+}
+
+// 切换侧边栏折叠状态
+const toggleCollapse = () => {
+  isCollapse.value = !isCollapse.value
 }
 
 // 初始化：1. 校验登录态 2. 获取用户信息
@@ -120,6 +210,7 @@ onMounted(async () => {
 
 // 菜单切换事件
 const handleMenuSelect = (index) => {
+  currentMenu.value = index
   currentView.value = menuMap[index]
 }
 
@@ -156,3 +247,397 @@ const handleLogout = () => {
   })
 }
 </script>
+
+<style scoped>
+/* 全局样式变量 */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f7fa;
+  --bg-header: #409eff;
+  --text-primary: #303133;
+  --text-secondary: #606266;
+  --text-light: #ffffff;
+  --border-color: #e4e7ed;
+  --accent-primary: #409eff;
+  --accent-secondary: #66b1ff;
+  --accent-tertiary: #9ecaff;
+  --transition-normal: 0.3s ease;
+}
+
+/* 主容器样式 */
+.home-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-secondary);
+}
+
+/* 顶部导航栏 */
+.navbar {
+  height: 80px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(64, 158, 255, 0.3);
+  z-index: 100;
+}
+
+.nav-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+  z-index: 1;
+}
+
+.nav-content {
+  position: relative;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px;
+  z-index: 2;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.nav-logo {
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.platform-name {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
+  color: var(--text-light);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-stats {
+  display: flex;
+  gap: 25px;
+  padding: 8px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--text-light);
+}
+
+/* 用户信息 */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.user-avatar {
+  border: 2px solid var(--text-light);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-light);
+  white-space: nowrap;
+}
+
+/* 交互按钮 */
+.interactive-btn {
+  transition: all var(--transition-normal);
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.interactive-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* 主体布局 */
+.main-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 左侧折叠菜单 */
+.sidebar {
+  width: 220px;
+  background-color: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  transition: all var(--transition-normal);
+  overflow-y: auto;
+}
+
+.sidebar.is-collapse {
+  width: 64px;
+}
+
+/* Logo容器 */
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  background-color: var(--bg-primary);
+}
+
+.logo-container:hover {
+  background-color: rgba(64, 158, 255, 0.1);
+}
+
+.logo-container i {
+  font-size: 16px;
+  color: var(--accent-primary);
+  transition: all var(--transition-normal);
+}
+
+.collapse-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  transition: all var(--transition-normal);
+}
+
+.rotate-icon {
+  transform: rotate(180deg);
+}
+
+/* 侧边栏菜单 */
+.sidebar-menu {
+  height: calc(100vh - 60px);
+  background-color: var(--bg-secondary) !important;
+  border-right: none !important;
+}
+
+.sidebar-menu .el-menu-item {
+  height: 50px;
+  line-height: 50px;
+  margin: 5px 10px;
+  border-radius: 4px;
+  transition: all var(--transition-normal);
+  border: 1px solid transparent;
+}
+
+.sidebar-menu .el-menu-item:hover {
+  background-color: rgba(64, 158, 255, 0.1);
+  border-color: rgba(64, 158, 255, 0.2);
+}
+
+.sidebar-menu .el-menu-item.is-active {
+  background-color: rgba(64, 158, 255, 0.15);
+  border-color: var(--accent-primary);
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.2);
+}
+
+.sidebar-menu .el-menu-item i {
+  font-size: 18px;
+  margin-right: 12px;
+  transition: all var(--transition-normal);
+  color: var(--text-secondary);
+}
+
+.sidebar-menu .el-menu-item:hover i {
+  color: var(--accent-primary);
+}
+
+.sidebar-menu .el-menu-item.is-active i {
+  color: var(--accent-primary);
+}
+
+.sidebar-menu .el-menu-item span {
+  font-size: 14px;
+  font-weight: 500;
+  transition: all var(--transition-normal);
+  color: var(--text-primary);
+}
+
+.sidebar-menu .el-menu-item:hover span {
+  color: var(--accent-primary);
+}
+
+.sidebar-menu .el-menu-item.is-active span {
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+/* 右侧内容区 */
+.content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+}
+
+/* 页面头部 */
+.page-header {
+  padding: 20px 30px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  position: relative;
+}
+
+.page-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.breadcrumb {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.header-decoration {
+  width: 120px;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  border-radius: 2px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin: 0;
+  position: relative;
+  padding-left: 15px;
+}
+
+.page-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 24px;
+  background-color: var(--accent-primary);
+  border-radius: 2px;
+}
+
+/* 主内容区 */
+.main-content {
+  flex: 1;
+  padding: 24px 30px;
+  overflow-y: auto;
+  background-color: var(--bg-secondary);
+}
+
+/* 滚动条样式 */
+.main-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.main-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  transition: all var(--transition-normal);
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 16px;
+    height: 50px;
+  }
+  
+  .platform-name {
+    font-size: 16px;
+  }
+  
+  .nav-right {
+    gap: 12px;
+  }
+  
+  .user-info {
+    padding: 6px 12px;
+  }
+  
+  .user-name {
+    font-size: 13px;
+  }
+  
+  .sidebar {
+    width: 200px;
+  }
+  
+  .sidebar.is-collapse {
+    width: 60px;
+  }
+  
+  .logo-container {
+    padding: 12px 16px;
+  }
+  
+  .sidebar-menu .el-menu-item {
+    height: 45px;
+    line-height: 45px;
+  }
+  
+  .sidebar-menu .el-menu-item i {
+    font-size: 16px;
+  }
+  
+  .page-header {
+    padding: 16px;
+  }
+  
+  .page-title {
+    font-size: 18px;
+  }
+  
+  .main-content {
+    padding: 16px;
+  }
+}
+</style>

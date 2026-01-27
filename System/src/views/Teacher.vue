@@ -294,6 +294,406 @@
           </div>
         </template>
 
+        <!-- 作业管理模块 -->
+        <template v-else-if="currentMenu.startsWith('2-')">
+          <div class="page-header">
+            <h2 class="page-title">{{ getHomeworkPageTitle() }}</h2>
+          </div>
+
+          <div class="action-bar">
+            <div class="left-actions">
+              <!-- 布置作业操作 -->
+              <template v-if="currentMenu === '2-1'">
+                <el-button type="primary" icon="el-icon-plus" @click="openAssignHomework">布置作业</el-button>
+                <el-button type="info" icon="el-icon-download" @click="exportHomeworkData">导出作业列表</el-button>
+              </template>
+
+              <!-- 作业批改操作 -->
+              <template v-if="currentMenu === '2-2'">
+                <el-button 
+                  type="success" 
+                  icon="el-icon-check" 
+                  @click="batchGradeHomework"
+                  :disabled="selectedHomeworks.length === 0"
+                >
+                  批量批改
+                </el-button>
+                <el-button 
+                  type="warning" 
+                  icon="el-icon-refresh" 
+                  @click="refreshHomeworkList"
+                >
+                  刷新列表
+                </el-button>
+              </template>
+
+              <!-- 作业统计操作 -->
+              <template v-if="currentMenu === '2-3'">
+                <el-button 
+                  type="primary" 
+                  icon="el-icon-s-data" 
+                  @click="showHomeworkChart"
+                >
+                  数据可视化
+                </el-button>
+                <el-button 
+                  type="success" 
+                  icon="el-icon-download" 
+                  @click="exportHomeworkStats"
+                >
+                  导出统计报告
+                </el-button>
+              </template>
+            </div>
+            <div class="right-actions">
+              <el-button 
+                v-if="currentMenu !== '2-3'"
+                type="danger" 
+                icon="el-icon-delete" 
+                @click="batchDeleteHomework"
+                :disabled="selectedHomeworks.length === 0"
+              >
+                批量删除({{ selectedHomeworks.length }})
+              </el-button>
+            </div>
+          </div>
+
+          <div class="search-panel">
+            <el-form :inline="true" :model="homeworkSearchForm" class="search-form">
+              <el-form-item label="作业名称">
+                <el-input 
+                  v-model="homeworkSearchForm.name" 
+                  placeholder="请输入作业名称" 
+                  clearable
+                />
+              </el-form-item>
+              <el-form-item label="课程">
+                <el-select 
+                  v-model="homeworkSearchForm.course" 
+                  placeholder="请选择课程" 
+                  clearable
+                >
+                  <el-option label="语文" value="chinese" />
+                  <el-option label="数学" value="math" />
+                  <el-option label="英语" value="english" />
+                  <el-option label="科学" value="science" />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="状态" v-if="currentMenu === '2-2'">
+                <el-select 
+                  v-model="homeworkSearchForm.status" 
+                  placeholder="请选择状态" 
+                  clearable
+                >
+                  <el-option label="未批改" value="pending" />
+                  <el-option label="已批改" value="graded" />
+                </el-select>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" icon="el-icon-search" @click="searchHomework">查询</el-button>
+                <el-button icon="el-icon-refresh" @click="resetHomeworkSearch">重置</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
+
+          <div class="table-container">
+            <el-table
+              :data="homeworkList"
+              border
+              stripe
+              v-loading="homeworkLoading"
+              @selection-change="handleHomeworkSelect"
+              empty-text="暂无作业数据"
+            >
+              <el-table-column type="selection" width="55" />
+              <el-table-column prop="id" label="作业ID" width="100" />
+              <el-table-column prop="name" label="作业名称" min-width="150" />
+              <el-table-column prop="course" label="课程" width="100">
+                <template #default="{ row }">
+                  <el-tag :type="getCourseTagType(row.course)">{{ getCourseName(row.course) }}</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="classes" label="班级" width="150" />
+              <el-table-column prop="deadline" label="截止时间" width="160" />
+              
+              <!-- 作业批改页面显示状态 -->
+              <el-table-column prop="status" label="批改状态" width="100" v-if="currentMenu === '2-2'">
+                <template #default="{ row }">
+                  <el-tag :type="row.status === 'graded' ? 'success' : 'warning'">
+                    {{ row.status === 'graded' ? '已批改' : '未批改' }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+
+              <!-- 作业统计页面显示数据 -->
+              <el-table-column label="提交人数" width="100" v-if="currentMenu === '2-3'">
+                <template #default="{ row }">
+                  <el-tag type="primary">{{ row.submittedCount || 0 }} 人</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column label="完成率" width="120" v-if="currentMenu === '2-3'">
+                <template #default="{ row }">
+                  <el-progress 
+                    :percentage="row.completionRate || 0" 
+                    size="small" 
+                    :color="getProgressColor(row.completionRate || 0)"
+                  />
+                </template>
+              </el-table-column>
+              <el-table-column label="平均分" width="100" v-if="currentMenu === '2-3'">
+                <template #default="{ row }">
+                  <span style="font-weight: bold; color: #667eea;">{{ row.avgScore || 0 }}</span>
+                </template>
+              </el-table-column>
+
+              <!-- 操作列 -->
+              <el-table-column label="操作" width="200" fixed="right">
+                <template #default="{ row }">
+                  <!-- 布置作业页面操作 -->
+                  <template v-if="currentMenu === '2-1'">
+                    <el-button size="small" type="primary" @click="editHomework(row)">编辑</el-button>
+                    <el-button size="small" type="danger" @click="deleteHomework(row)">删除</el-button>
+                  </template>
+
+                  <!-- 作业批改页面操作 -->
+                  <template v-if="currentMenu === '2-2'">
+                    <el-button 
+                      size="small" 
+                      type="success" 
+                      @click="gradeHomework(row)"
+                    >
+                      批改
+                    </el-button>
+                    <el-button 
+                      size="small" 
+                      type="primary" 
+                      @click="viewHomeworkDetail(row)"
+                    >
+                      查看
+                    </el-button>
+                  </template>
+                </template>
+              </el-table-column>
+            </el-table>
+
+            <div class="pagination-container">
+              <el-pagination
+                v-model:current-page="homeworkPagination.page"
+                v-model:page-size="homeworkPagination.pageSize"
+                :total="homeworkPagination.total"
+                :page-sizes="[10, 20, 50]"
+                layout="total, sizes, prev, pager, next, jumper"
+                @size-change="handleHomeworkSizeChange"
+                @current-change="handleHomeworkCurrentChange"
+                background
+              />
+            </div>
+          </div>
+        </template>
+
+        <!-- 教学工具模块 -->
+        <template v-else-if="currentMenu.startsWith('4-')">
+          <div class="page-header">
+            <h2 class="page-title">{{ getTeachingToolPageTitle() }}</h2>
+            <div class="page-description">
+              {{ currentMenu === '4-1' ? '在线备课管理，支持创建、编辑和查看备课内容' : 
+                 currentMenu === '4-2' ? '教学资源库，支持上传、下载和管理各类教学资源' : 
+                 '教学计划管理，支持创建、跟踪和统计教学计划' }}
+            </div>
+          </div>
+
+          <div class="action-bar">
+            <div class="left-actions">
+              <!-- 在线备课操作 -->
+              <template v-if="currentMenu === '4-1'">
+                <el-button type="primary" icon="el-icon-plus" @click="openLessonDialog">创建备课</el-button>
+                <el-button type="info" icon="el-icon-download" @click="exportLessonData">导出备课列表</el-button>
+              </template>
+
+              <!-- 资源库操作 -->
+              <template v-if="currentMenu === '4-2'">
+                <el-button type="primary" icon="el-icon-upload" @click="uploadResource">上传资源</el-button>
+                <el-button type="success" icon="el-icon-folder-add" @click="createFolder">新建文件夹</el-button>
+                <el-button type="info" icon="el-icon-download" @click="exportResourceData">导出资源</el-button>
+              </template>
+
+              <!-- 教学计划操作 -->
+              <template v-if="currentMenu === '4-3'">
+                <el-button type="primary" icon="el-icon-plus" @click="openPlanDialog">创建计划</el-button>
+                <el-button type="success" icon="el-icon-s-data" @click="showPlanChart">计划统计</el-button>
+                <el-button type="info" icon="el-icon-download" @click="exportPlanData">导出计划</el-button>
+              </template>
+            </div>
+            <div class="right-actions">
+              <el-button 
+                v-if="currentMenu !== '4-2'"
+                type="danger" 
+                icon="el-icon-delete" 
+                @click="batchDeleteTeachingTool"
+                :disabled="selectedTeachingTools.length === 0"
+              >
+                批量删除({{ selectedTeachingTools.length }})
+              </el-button>
+            </div>
+          </div>
+
+          <div class="search-panel">
+            <div class="search-header">
+              <h3>{{ currentMenu === '4-1' ? '备课搜索' : currentMenu === '4-2' ? '资源搜索' : '计划搜索' }}</h3>
+            </div>
+            <el-form :inline="true" :model="teachingToolSearchForm" class="search-form">
+              <el-form-item :label="currentMenu === '4-1' ? '备课名称' : currentMenu === '4-2' ? '资源名称' : '计划名称'">
+                <el-input 
+                  v-model="teachingToolSearchForm.name" 
+                  :placeholder="currentMenu === '4-1' ? '请输入备课名称' : currentMenu === '4-2' ? '请输入资源名称' : '请输入计划名称'" 
+                  clearable
+                  style="width: 200px;"
+                />
+              </el-form-item>
+              <el-form-item label="课程" v-if="currentMenu !== '4-2'">
+                <el-select 
+                  v-model="teachingToolSearchForm.course" 
+                  placeholder="请选择课程" 
+                  clearable
+                  style="width: 120px;"
+                >
+                  <el-option label="语文" value="chinese" />
+                  <el-option label="数学" value="math" />
+                  <el-option label="英语" value="english" />
+                  <el-option label="科学" value="science" />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="类型" v-if="currentMenu === '4-2'">
+                <el-select 
+                  v-model="teachingToolSearchForm.type" 
+                  placeholder="请选择资源类型" 
+                  clearable
+                  style="width: 120px;"
+                >
+                  <el-option label="文档" value="document" />
+                  <el-option label="视频" value="video" />
+                  <el-option label="音频" value="audio" />
+                  <el-option label="图片" value="image" />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="状态" v-if="currentMenu === '4-3'">
+                <el-select 
+                  v-model="teachingToolSearchForm.status" 
+                  placeholder="请选择状态" 
+                  clearable
+                  style="width: 120px;"
+                >
+                  <el-option label="进行中" value="ongoing" />
+                  <el-option label="已完成" value="completed" />
+                  <el-option label="已延期" value="delayed" />
+                </el-select>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" icon="el-icon-search" @click="searchTeachingTool">查询</el-button>
+                <el-button icon="el-icon-refresh" @click="resetTeachingToolSearch">重置</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
+
+          <div class="table-container">
+            <div class="table-header">
+              <span>数据列表</span>
+              <span class="data-count">共 {{ teachingToolPagination.total }} 条数据</span>
+            </div>
+            <el-table
+              :data="teachingToolList"
+              border
+              stripe
+              v-loading="teachingToolLoading"
+              @selection-change="handleTeachingToolSelect"
+              empty-text="暂无数据"
+              style="width: 100%;"
+            >
+              <el-table-column type="selection" width="55" />
+              <el-table-column prop="id" :label="currentMenu === '4-1' ? '备课ID' : currentMenu === '4-2' ? '资源ID' : '计划ID'" width="100" />
+              <el-table-column prop="name" :label="currentMenu === '4-1' ? '备课名称' : currentMenu === '4-2' ? '资源名称' : '计划名称'" min-width="150" />
+              
+              <!-- 在线备课和教学计划显示课程 -->
+              <el-table-column prop="course" label="课程" width="100" v-if="currentMenu !== '4-2'">
+                <template #default="{ row }">
+                  <el-tag :type="getCourseTagType(row.course)">{{ getCourseName(row.course) }}</el-tag>
+                </template>
+              </el-table-column>
+              
+              <!-- 资源库显示类型 -->
+              <el-table-column prop="type" label="资源类型" width="100" v-if="currentMenu === '4-2'">
+                <template #default="{ row }">
+                  <el-tag :type="getResourceTagType(row.type)">{{ getResourceTypeName(row.type) }}</el-tag>
+                </template>
+              </el-table-column>
+              
+              <el-table-column prop="grade" label="适用年级" width="100" v-if="currentMenu !== '4-2'" />
+              <el-table-column prop="size" label="文件大小" width="100" v-if="currentMenu === '4-2'" />
+              <el-table-column prop="uploadTime" label="上传时间" width="160" v-if="currentMenu === '4-2'" />
+              
+              <!-- 教学计划显示状态 -->
+              <el-table-column prop="status" label="状态" width="100" v-if="currentMenu === '4-3'">
+                <template #default="{ row }">
+                  <el-tag :type="row.status === 'completed' ? 'success' : row.status === 'ongoing' ? 'primary' : 'danger'">
+                    {{ row.status === 'completed' ? '已完成' : row.status === 'ongoing' ? '进行中' : '已延期' }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              
+              <!-- 教学计划显示进度 -->
+              <el-table-column label="进度" width="120" v-if="currentMenu === '4-3'">
+                <template #default="{ row }">
+                  <el-progress 
+                    :percentage="row.progress || 0" 
+                    size="small" 
+                    :color="getProgressColor(row.progress || 0)"
+                  />
+                </template>
+              </el-table-column>
+              
+              <el-table-column prop="createTime" :label="currentMenu === '4-1' ? '创建时间' : '开始时间'" width="160" v-if="currentMenu !== '4-2'" />
+              
+              <!-- 操作列 -->
+              <el-table-column label="操作" width="200" fixed="right">
+                <template #default="{ row }">
+                  <!-- 在线备课操作 -->
+                  <template v-if="currentMenu === '4-1'">
+                    <el-button size="small" type="primary" @click="editLesson(row)">编辑</el-button>
+                    <el-button size="small" @click="viewLesson(row)">查看</el-button>
+                    <el-button size="small" type="danger" @click="deleteLesson(row)">删除</el-button>
+                  </template>
+
+                  <!-- 资源库操作 -->
+                  <template v-if="currentMenu === '4-2'">
+                    <el-button size="small" type="primary" @click="downloadResource(row)">下载</el-button>
+                    <el-button size="small" type="danger" @click="deleteResource(row)">删除</el-button>
+                  </template>
+
+                  <!-- 教学计划操作 -->
+                  <template v-if="currentMenu === '4-3'">
+                    <el-button size="small" type="primary" @click="editPlan(row)">编辑</el-button>
+                    <el-button size="small" @click="viewPlan(row)">查看</el-button>
+                    <el-button size="small" type="danger" @click="deletePlan(row)">删除</el-button>
+                  </template>
+                </template>
+              </el-table-column>
+            </el-table>
+
+            <div class="pagination-container">
+              <el-pagination
+                v-model:current-page="teachingToolPagination.page"
+                v-model:page-size="teachingToolPagination.pageSize"
+                :total="teachingToolPagination.total"
+                :page-sizes="[10, 20, 50]"
+                layout="total, sizes, prev, pager, next, jumper"
+                @size-change="handleTeachingToolSizeChange"
+                @current-change="handleTeachingToolCurrentChange"
+                background
+              />
+            </div>
+          </div>
+        </template>
+
         <!-- 师生管理模块 -->
         <template v-else>
           <div class="page-header">
@@ -777,6 +1177,227 @@
       </template>
     </el-dialog>
 
+    <!-- 作业编辑弹窗 -->
+    <el-dialog
+      v-model="homeworkEditDialogVisible"
+      :title="homeworkEditForm.id ? '编辑作业' : '新增作业'"
+      width="600px"
+      center
+      :close-on-click-modal="false"
+    >
+      <el-form :model="homeworkEditForm" :rules="homeworkRules" ref="homeworkFormRef" label-width="100px">
+        <el-form-item label="作业名称" prop="name">
+          <el-input v-model="homeworkEditForm.name" placeholder="请输入作业名称" />
+        </el-form-item>
+        <el-form-item label="课程" prop="course">
+          <el-select v-model="homeworkEditForm.course" placeholder="请选择课程">
+            <el-option label="语文" value="chinese" />
+            <el-option label="数学" value="math" />
+            <el-option label="英语" value="english" />
+            <el-option label="科学" value="science" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="作业内容" prop="content">
+          <el-input type="textarea" v-model="homeworkEditForm.content" rows="4" placeholder="请输入作业内容" />
+        </el-form-item>
+        <el-form-item label="截止时间" prop="deadline">
+          <el-date-picker
+            v-model="homeworkEditForm.deadline"
+            type="datetime"
+            placeholder="请选择截止时间"
+            style="width: 100%;"
+          />
+        </el-form-item>
+        <el-form-item label="班级" prop="classes">
+          <el-select v-model="homeworkEditForm.classes" multiple placeholder="请选择班级">
+            <el-option label="1班" value="1班" />
+            <el-option label="2班" value="2班" />
+            <el-option label="3班" value="3班" />
+            <el-option label="4班" value="4班" />
+            <el-option label="5班" value="5班" />
+            <el-option label="6班" value="6班" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="homeworkEditDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="saveHomework" :loading="btnLoading.saveHomework">保存</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 作业批改弹窗 -->
+    <el-dialog
+      v-model="homeworkGradeDialogVisible"
+      title="作业批改"
+      width="800px"
+      center
+      :close-on-click-modal="false"
+    >
+      <div v-if="currentHomeworkDetail" class="homework-detail-info">
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="作业名称">{{ currentHomeworkDetail.name }}</el-descriptions-item>
+          <el-descriptions-item label="课程">{{ getCourseName(currentHomeworkDetail.course) }}</el-descriptions-item>
+          <el-descriptions-item label="班级">{{ currentHomeworkDetail.classes.join(', ') }}</el-descriptions-item>
+          <el-descriptions-item label="截止时间">{{ currentHomeworkDetail.deadline }}</el-descriptions-item>
+        </el-descriptions>
+      </div>
+      
+      <el-table :data="homeworkGradeForm.submissions" border style="margin-top: 20px;">
+        <el-table-column prop="studentName" label="学生姓名" width="120" />
+        <el-table-column prop="score" label="分数" width="120">
+          <template #default="{ row }">
+            <el-input-number v-model="row.score" :min="0" :max="100" size="small" />
+          </template>
+        </el-table-column>
+        <el-table-column prop="comment" label="评语">
+          <template #default="{ row }">
+            <el-input v-model="row.comment" placeholder="请输入评语" size="small" />
+          </template>
+        </el-table-column>
+      </el-table>
+      
+      <template #footer>
+        <el-button @click="homeworkGradeDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="saveHomeworkGrade">保存批改</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 作业详情弹窗 -->
+    <el-dialog
+      v-model="homeworkDetailDialogVisible"
+      title="作业详情"
+      width="700px"
+      center
+    >
+      <div v-if="currentHomeworkDetail">
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="作业ID">{{ currentHomeworkDetail.id }}</el-descriptions-item>
+          <el-descriptions-item label="作业名称">{{ currentHomeworkDetail.name }}</el-descriptions-item>
+          <el-descriptions-item label="课程">{{ getCourseName(currentHomeworkDetail.course) }}</el-descriptions-item>
+          <el-descriptions-item label="班级">{{ currentHomeworkDetail.classes.join(', ') }}</el-descriptions-item>
+          <el-descriptions-item label="截止时间">{{ currentHomeworkDetail.deadline }}</el-descriptions-item>
+          <el-descriptions-item label="批改状态">
+            <el-tag :type="currentHomeworkDetail.status === 'graded' ? 'success' : 'warning'">
+              {{ currentHomeworkDetail.status === 'graded' ? '已批改' : '未批改' }}
+            </el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="提交人数">{{ currentHomeworkDetail.submittedCount }} 人</el-descriptions-item>
+          <el-descriptions-item label="完成率">
+            <el-progress 
+              :percentage="currentHomeworkDetail.completionRate" 
+              size="small" 
+              :color="getProgressColor(currentHomeworkDetail.completionRate)"
+            />
+          </el-descriptions-item>
+          <el-descriptions-item label="平均分" :span="2">
+            <span style="font-size: 24px; font-weight: bold; color: #667eea;">{{ currentHomeworkDetail.avgScore }}</span>
+          </el-descriptions-item>
+        </el-descriptions>
+      </div>
+      <template #footer>
+        <el-button type="primary" @click="homeworkDetailDialogVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 在线备课编辑弹窗 -->
+    <el-dialog
+      v-model="lessonDialogVisible"
+      :title="lessonForm.id ? '编辑备课' : '创建备课'"
+      width="700px"
+      center
+      :close-on-click-modal="false"
+    >
+      <el-form :model="lessonForm" :rules="lessonRules" ref="lessonFormRef" label-width="100px">
+        <el-form-item label="备课名称" prop="name">
+          <el-input v-model="lessonForm.name" placeholder="请输入备课名称" />
+        </el-form-item>
+        <el-form-item label="课程" prop="course">
+          <el-select v-model="lessonForm.course" placeholder="请选择课程">
+            <el-option label="语文" value="chinese" />
+            <el-option label="数学" value="math" />
+            <el-option label="英语" value="english" />
+            <el-option label="科学" value="science" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="适用年级" prop="grade">
+          <el-select v-model="lessonForm.grade" placeholder="请选择年级">
+            <el-option label="一年级" value="1" />
+            <el-option label="二年级" value="2" />
+            <el-option label="三年级" value="3" />
+            <el-option label="四年级" value="4" />
+            <el-option label="五年级" value="5" />
+            <el-option label="六年级" value="6" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="备课内容" prop="content">
+          <el-input type="textarea" v-model="lessonForm.content" rows="6" placeholder="请输入备课内容" />
+        </el-form-item>
+        <el-form-item label="教学目标" prop="objectives">
+          <el-input type="textarea" v-model="lessonForm.objectives" rows="3" placeholder="请输入教学目标" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="lessonDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="saveLesson" :loading="btnLoading.saveLesson">保存</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 教学计划编辑弹窗 -->
+    <el-dialog
+      v-model="planDialogVisible"
+      :title="planForm.id ? '编辑计划' : '创建计划'"
+      width="700px"
+      center
+      :close-on-click-modal="false"
+    >
+      <el-form :model="planForm" :rules="planRules" ref="planFormRef" label-width="100px">
+        <el-form-item label="计划名称" prop="name">
+          <el-input v-model="planForm.name" placeholder="请输入计划名称" />
+        </el-form-item>
+        <el-form-item label="课程" prop="course">
+          <el-select v-model="planForm.course" placeholder="请选择课程">
+            <el-option label="语文" value="chinese" />
+            <el-option label="数学" value="math" />
+            <el-option label="英语" value="english" />
+            <el-option label="科学" value="science" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="适用年级" prop="grade">
+          <el-select v-model="planForm.grade" placeholder="请选择年级">
+            <el-option label="一年级" value="1" />
+            <el-option label="二年级" value="2" />
+            <el-option label="三年级" value="3" />
+            <el-option label="四年级" value="4" />
+            <el-option label="五年级" value="5" />
+            <el-option label="六年级" value="6" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="开始时间" prop="startTime">
+          <el-date-picker
+            v-model="planForm.startTime"
+            type="date"
+            placeholder="请选择开始时间"
+            style="width: 100%;"
+          />
+        </el-form-item>
+        <el-form-item label="结束时间" prop="endTime">
+          <el-date-picker
+            v-model="planForm.endTime"
+            type="date"
+            placeholder="请选择结束时间"
+            style="width: 100%;"
+          />
+        </el-form-item>
+        <el-form-item label="计划内容" prop="content">
+          <el-input type="textarea" v-model="planForm.content" rows="4" placeholder="请输入计划内容" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="planDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="savePlan" :loading="btnLoading.savePlan">保存</el-button>
+      </template>
+    </el-dialog>
+
     <!-- 成绩录入弹窗 -->
     <el-dialog
       v-model="scoreDialogVisible"
@@ -880,18 +1501,22 @@ const btnLoading = reactive({
   back: false, add: false, homework: false, notice: false,
   batchDel: false, search: false, reset: false, edit: false,
   del: false, savePerson: false, saveHomework: false, saveNotice: false,
-  export: false, saveScore: false
+  export: false, saveScore: false, saveLesson: false, savePlan: false
 })
 
 const dialogVisible = ref(false)
 const homeworkDialogVisible = ref(false)
 const noticeDialogVisible = ref(false)
 const scoreDialogVisible = ref(false)
+const lessonDialogVisible = ref(false)
+const planDialogVisible = ref(false)
 
 const formRef = ref(null)
 const homeworkFormRef = ref(null)
 const noticeFormRef = ref(null)
 const scoreFormRef = ref(null)
+const lessonFormRef = ref(null)
+const planFormRef = ref(null)
 
 const searchForm = reactive({
   name: '',
@@ -1003,6 +1628,121 @@ const courseRules = reactive({
   teacher: [{ required: true, message: '请输入授课教师姓名', trigger: 'blur' }],
   hour: [{ required: true, message: '请输入课时数', trigger: 'change' }]
 })
+
+// 作业管理相关数据
+const homeworkLoading = ref(false)
+const selectedHomeworks = ref([])
+const homeworkData = ref([])
+const homeworkList = ref([])
+const homeworkPagination = reactive({
+  page: 1,
+  pageSize: 10,
+  total: 0
+})
+const homeworkSearchForm = reactive({
+  name: '',
+  course: '',
+  status: ''
+})
+const homeworkEditDialogVisible = ref(false)
+const homeworkGradeDialogVisible = ref(false)
+const homeworkDetailDialogVisible = ref(false)
+const currentHomeworkDetail = ref(null)
+const homeworkEditForm = reactive({
+  id: '',
+  name: '',
+  course: '',
+  content: '',
+  deadline: '',
+  classes: []
+})
+const homeworkGradeForm = reactive({
+  homeworkId: '',
+  submissions: []
+})
+
+// 教学工具相关数据
+const teachingToolLoading = ref(false)
+const selectedTeachingTools = ref([])
+const teachingToolData = ref([])
+const teachingToolList = ref([])
+const teachingToolPagination = reactive({
+  page: 1,
+  pageSize: 10,
+  total: 0
+})
+const teachingToolSearchForm = reactive({
+  name: '',
+  course: '',
+  type: '',
+  status: ''
+})
+const lessonForm = reactive({
+  id: '',
+  name: '',
+  course: '',
+  grade: '',
+  content: '',
+  objectives: ''
+})
+const planForm = reactive({
+  id: '',
+  name: '',
+  course: '',
+  grade: '',
+  startTime: '',
+  endTime: '',
+  content: ''
+})
+const lessonRules = reactive({
+  name: [{ required: true, message: '请输入备课名称', trigger: 'blur' }],
+  course: [{ required: true, message: '请选择课程', trigger: 'change' }],
+  grade: [{ required: true, message: '请选择年级', trigger: 'change' }],
+  content: [{ required: true, message: '请输入备课内容', trigger: 'blur' }],
+  objectives: [{ required: true, message: '请输入教学目标', trigger: 'blur' }]
+})
+const planRules = reactive({
+  name: [{ required: true, message: '请输入计划名称', trigger: 'blur' }],
+  course: [{ required: true, message: '请选择课程', trigger: 'change' }],
+  grade: [{ required: true, message: '请选择年级', trigger: 'change' }],
+  startTime: [{ required: true, message: '请选择开始时间', trigger: 'change' }],
+  endTime: [{ required: true, message: '请选择结束时间', trigger: 'change' }],
+  content: [{ required: true, message: '请输入计划内容', trigger: 'blur' }]
+})
+
+// 默认作业数据
+const DEFAULT_HOMEWORKS = [
+  { id: 'HW001', name: '第一章练习', course: 'math', classes: ['1班', '2班'], deadline: '2024-02-15 23:59', status: 'pending', submittedCount: 45, totalStudents: 50, completionRate: 90, avgScore: 85 },
+  { id: 'HW002', name: '英语单词听写', course: 'english', classes: ['3班'], deadline: '2024-02-16 23:59', status: 'graded', submittedCount: 30, totalStudents: 35, completionRate: 86, avgScore: 78 },
+  { id: 'HW003', name: '语文阅读理解', course: 'chinese', classes: ['1班', '2班', '3班'], deadline: '2024-02-17 23:59', status: 'pending', submittedCount: 80, totalStudents: 100, completionRate: 80, avgScore: 82 },
+  { id: 'HW004', name: '科学实验报告', course: 'science', classes: ['4班'], deadline: '2024-02-18 23:59', status: 'graded', submittedCount: 25, totalStudents: 30, completionRate: 83, avgScore: 88 },
+  { id: 'HW005', name: '数学综合测试', course: 'math', classes: ['5班', '6班'], deadline: '2024-02-19 23:59', status: 'pending', submittedCount: 55, totalStudents: 60, completionRate: 92, avgScore: 90 }
+]
+
+// 默认在线备课数据
+const DEFAULT_LESSONS = [
+  { id: 'L001', name: '第一章数学备课', course: 'math', grade: '3', content: '第一章内容...', objectives: '掌握基础运算', createTime: '2024-01-15 10:00' },
+  { id: 'L002', name: '英语单词教学', course: 'english', grade: '4', content: '单词记忆方法...', objectives: '掌握50个单词', createTime: '2024-01-16 14:00' },
+  { id: 'L003', name: '语文阅读课', course: 'chinese', grade: '2', content: '阅读理解技巧...', objectives: '提高阅读能力', createTime: '2024-01-17 09:00' }
+]
+
+// 默认资源库数据
+const DEFAULT_RESOURCES = [
+  { id: 'R001', name: '数学课件.pptx', type: 'document', size: '2.5MB', uploadTime: '2024-01-10 15:30' },
+  { id: 'R002', name: '英语听力.mp3', type: 'audio', size: '5.8MB', uploadTime: '2024-01-11 10:20' },
+  { id: 'R003', name: '科学实验视频.mp4', type: 'video', size: '128MB', uploadTime: '2024-01-12 16:45' },
+  { id: 'R004', name: '教学图片.jpg', type: 'image', size: '1.2MB', uploadTime: '2024-01-13 11:15' },
+  { id: 'R005', name: '语文教案.docx', type: 'document', size: '0.8MB', uploadTime: '2024-01-14 09:30' }
+]
+
+// 默认教学计划数据
+const DEFAULT_PLANS = [
+  { id: 'P001', name: '第一学期教学计划', course: 'math', grade: '3', startTime: '2024-02-01', endTime: '2024-06-30', content: '完成第一章到第五章教学', status: 'ongoing', progress: 45 },
+  { id: 'P002', name: '英语教学计划', course: 'english', grade: '4', startTime: '2024-02-01', endTime: '2024-06-30', content: '完成单词和语法教学', status: 'ongoing', progress: 60 },
+  { id: 'P003', name: '语文阅读计划', course: 'chinese', grade: '2', startTime: '2024-01-01', endTime: '2024-01-31', content: '完成阅读理解训练', status: 'completed', progress: 100 },
+  { id: 'P004', name: '科学实验计划', course: 'science', grade: '5', startTime: '2024-02-15', endTime: '2024-03-15', content: '完成基础实验', status: 'delayed', progress: 30 }
+]
+
 const courseDetailVisible = ref(false)
 const currentCourseDetail = ref(null)
 const chartVisible = ref(false)
@@ -1043,6 +1783,24 @@ const initMockData = () => {
   const savedCourses = loadFromStorage(STORAGE_KEYS.COURSE)
   courseData.value = savedCourses || [...DEFAULT_DATA.courses]
   saveToStorage(STORAGE_KEYS.COURSE, courseData.value)
+
+  const savedHomeworks = loadFromStorage('mock_homeworks')
+  homeworkData.value = savedHomeworks || [...DEFAULT_HOMEWORKS]
+  saveToStorage('mock_homeworks', homeworkData.value)
+
+  const savedLessons = loadFromStorage('mock_lessons')
+  teachingToolData.value = savedLessons || [...DEFAULT_LESSONS]
+  saveToStorage('mock_lessons', teachingToolData.value)
+
+  const savedResources = loadFromStorage('mock_resources')
+  const savedResourcesData = savedResources || [...DEFAULT_RESOURCES]
+  teachingToolData.value = [...teachingToolData.value, ...savedResourcesData]
+  saveToStorage('mock_resources', savedResourcesData)
+
+  const savedPlans = loadFromStorage('mock_plans')
+  const savedPlansData = savedPlans || [...DEFAULT_PLANS]
+  teachingToolData.value = [...teachingToolData.value, ...savedPlansData]
+  saveToStorage('mock_plans', savedPlansData)
 
   ElMessage.info('数据初始化完成（本地模拟模式）')
 }
@@ -1323,11 +2081,16 @@ const handleMenuSelect = (index) => {
     coursePagination.page = 1
     resetCourseSearch()
     loadCourseData()
+  } else if (index.startsWith('2-')) {
+    homeworkPagination.page = 1
+    resetHomeworkSearch()
+    loadHomeworkData()
+  } else if (index.startsWith('4-')) {
+    teachingToolPagination.page = 1
+    resetTeachingToolSearch()
+    loadTeachingToolData()
   } else {
     switch (index) {
-      case '2-1':
-        homeworkDialogVisible.value = true
-        break
       case '3-1':
         currentModule.value = '教师'
         switchModule()
@@ -1387,11 +2150,71 @@ const saveHomework = async () => {
     await homeworkFormRef.value.validate()
     btnLoading.saveHomework = true
     await new Promise(resolve => setTimeout(resolve, 800))
-    ElMessage.success('作业发布成功（模拟）')
-    homeworkDialogVisible.value = false
-    Object.assign(homeworkForm, { name: '', course: '', content: '', deadline: '', classes: [] })
+    
+    if (homeworkEditDialogVisible.value) {
+      const submitData = {
+        id: homeworkEditForm.id,
+        name: homeworkEditForm.name,
+        course: homeworkEditForm.course,
+        content: homeworkEditForm.content,
+        deadline: homeworkEditForm.deadline,
+        classes: homeworkEditForm.classes,
+        status: 'pending',
+        submittedCount: 0,
+        totalStudents: homeworkEditForm.classes.length * 10,
+        completionRate: 0,
+        avgScore: 0
+      }
+      
+      if (homeworkEditForm.id) {
+        const index = homeworkData.value.findIndex(item => item.id === homeworkEditForm.id)
+        if (index > -1) {
+          homeworkData.value[index] = { ...homeworkData.value[index], ...submitData }
+          ElMessage.success('作业更新成功')
+        }
+      } else {
+        const maxId = homeworkData.value.reduce((max, item) => {
+          const num = parseInt(item.id.slice(2))
+          return num > max ? num : max
+        }, 0)
+        submitData.id = `HW${String(maxId + 1).padStart(3, '0')}`
+        homeworkData.value.unshift(submitData)
+        ElMessage.success('作业创建成功')
+      }
+      
+      saveToStorage('mock_homeworks', homeworkData.value)
+      homeworkEditDialogVisible.value = false
+      loadHomeworkData()
+    } else {
+      ElMessage.success('作业发布成功（模拟）')
+      homeworkDialogVisible.value = false
+      Object.assign(homeworkForm, { name: '', course: '', content: '', deadline: '', classes: [] })
+    }
   } catch (error) {
     ElMessage.warning('请完善作业信息')
+  } finally {
+    btnLoading.saveHomework = false
+  }
+}
+
+const saveHomeworkGrade = async () => {
+  try {
+    btnLoading.saveHomework = true
+    await new Promise(resolve => setTimeout(resolve, 800))
+    
+    const homeworkIndex = homeworkData.value.findIndex(item => item.id === homeworkGradeForm.homeworkId)
+    if (homeworkIndex > -1) {
+      homeworkData.value[homeworkIndex].status = 'graded'
+      const totalScore = homeworkGradeForm.submissions.reduce((sum, item) => sum + item.score, 0)
+      homeworkData.value[homeworkIndex].avgScore = Math.round(totalScore / homeworkGradeForm.submissions.length)
+      saveToStorage('mock_homeworks', homeworkData.value)
+    }
+    
+    ElMessage.success('批改保存成功')
+    homeworkGradeDialogVisible.value = false
+    loadHomeworkData()
+  } catch (error) {
+    ElMessage.error(`批改保存失败：${error.message}`)
   } finally {
     btnLoading.saveHomework = false
   }
@@ -1464,6 +2287,594 @@ const getCoursePageTitle = () => {
   }
 }
 
+// 作业管理相关方法
+const getHomeworkPageTitle = () => {
+  switch (currentMenu.value) {
+    case '2-1':
+      return '布置作业'
+    case '2-2':
+      return '作业批改'
+    case '2-3':
+      return '作业统计'
+    default:
+      return '作业管理'
+  }
+}
+
+const getCourseName = (course) => {
+  const courseMap = {
+    chinese: '语文',
+    math: '数学',
+    english: '英语',
+    science: '科学'
+  }
+  return courseMap[course] || '未知'
+}
+
+const getCourseTagType = (course) => {
+  const courseMap = {
+    chinese: 'primary',
+    math: 'success',
+    english: 'warning',
+    science: 'danger'
+  }
+  return courseMap[course] || 'info'
+}
+
+const loadHomeworkData = () => {
+  homeworkLoading.value = true
+  setTimeout(() => {
+    const rawData = [...homeworkData.value]
+    
+    const filteredData = rawData.filter(item => {
+      let match = true
+      if (homeworkSearchForm.name) {
+        match = match && item.name.includes(homeworkSearchForm.name)
+      }
+      if (homeworkSearchForm.course) {
+        match = match && item.course === homeworkSearchForm.course
+      }
+      if (homeworkSearchForm.status) {
+        match = match && item.status === homeworkSearchForm.status
+      }
+      return match
+    })
+
+    homeworkPagination.total = filteredData.length
+    const start = (homeworkPagination.page - 1) * homeworkPagination.pageSize
+    const end = start + homeworkPagination.pageSize
+    homeworkList.value = filteredData.slice(start, end)
+    
+    homeworkLoading.value = false
+  }, 500)
+}
+
+const handleHomeworkSelect = (selection) => {
+  selectedHomeworks.value = selection
+}
+
+const handleHomeworkSizeChange = (size) => {
+  homeworkPagination.pageSize = size
+  loadHomeworkData()
+}
+
+const handleHomeworkCurrentChange = (page) => {
+  homeworkPagination.page = page
+  loadHomeworkData()
+}
+
+const searchHomework = () => {
+  homeworkPagination.page = 1
+  loadHomeworkData()
+}
+
+const resetHomeworkSearch = () => {
+  homeworkSearchForm.name = ''
+  homeworkSearchForm.course = ''
+  homeworkSearchForm.status = ''
+  searchHomework()
+}
+
+const loadTeachingToolData = () => {
+  teachingToolLoading.value = true
+  setTimeout(() => {
+    let rawData = []
+    
+    if (currentMenu.value === '4-1') {
+      rawData = teachingToolData.value.filter(item => item.id.startsWith('L'))
+    } else if (currentMenu.value === '4-2') {
+      rawData = teachingToolData.value.filter(item => item.id.startsWith('R'))
+    } else if (currentMenu.value === '4-3') {
+      rawData = teachingToolData.value.filter(item => item.id.startsWith('P'))
+    }
+    
+    const filteredData = rawData.filter(item => {
+      let match = true
+      if (teachingToolSearchForm.name) {
+        match = match && item.name.includes(teachingToolSearchForm.name)
+      }
+      if (teachingToolSearchForm.course && currentMenu.value !== '4-2') {
+        match = match && item.course === teachingToolSearchForm.course
+      }
+      if (teachingToolSearchForm.type && currentMenu.value === '4-2') {
+        match = match && item.type === teachingToolSearchForm.type
+      }
+      if (teachingToolSearchForm.status && currentMenu.value === '4-3') {
+        match = match && item.status === teachingToolSearchForm.status
+      }
+      return match
+    })
+
+    teachingToolPagination.total = filteredData.length
+    const start = (teachingToolPagination.page - 1) * teachingToolPagination.pageSize
+    const end = start + teachingToolPagination.pageSize
+    teachingToolList.value = filteredData.slice(start, end)
+    
+    teachingToolLoading.value = false
+  }, 500)
+}
+
+const handleTeachingToolSelect = (selection) => {
+  selectedTeachingTools.value = selection
+}
+
+const handleTeachingToolSizeChange = (size) => {
+  teachingToolPagination.pageSize = size
+  loadTeachingToolData()
+}
+
+const handleTeachingToolCurrentChange = (page) => {
+  teachingToolPagination.page = page
+  loadTeachingToolData()
+}
+
+const searchTeachingTool = () => {
+  teachingToolPagination.page = 1
+  loadTeachingToolData()
+}
+
+const resetTeachingToolSearch = () => {
+  teachingToolSearchForm.name = ''
+  teachingToolSearchForm.course = ''
+  teachingToolSearchForm.type = ''
+  teachingToolSearchForm.status = ''
+  searchTeachingTool()
+}
+
+const getTeachingToolPageTitle = () => {
+  if (currentMenu.value === '4-1') return '在线备课'
+  if (currentMenu.value === '4-2') return '资源库'
+  if (currentMenu.value === '4-3') return '教学计划'
+  return ''
+}
+
+const getResourceTagType = (type) => {
+  const typeMap = {
+    document: 'primary',
+    video: 'success',
+    audio: 'warning',
+    image: 'info'
+  }
+  return typeMap[type] || 'info'
+}
+
+const getResourceTypeName = (type) => {
+  const typeMap = {
+    document: '文档',
+    video: '视频',
+    audio: '音频',
+    image: '图片'
+  }
+  return typeMap[type] || type
+}
+
+const getProgressColor = (progress) => {
+  if (progress < 30) return '#f56c6c'
+  if (progress < 70) return '#e6a23c'
+  return '#67c23a'
+}
+
+const openLessonDialog = () => {
+  Object.assign(lessonForm, {
+    id: '',
+    name: '',
+    course: '',
+    grade: '',
+    content: '',
+    objectives: ''
+  })
+  lessonDialogVisible.value = true
+}
+
+const editLesson = (row) => {
+  Object.assign(lessonForm, {
+    id: row.id,
+    name: row.name,
+    course: row.course,
+    grade: row.grade,
+    content: row.content,
+    objectives: row.objectives
+  })
+  lessonDialogVisible.value = true
+}
+
+const viewLesson = (row) => {
+  ElMessageBox.alert(`
+    <div style="text-align: left;">
+      <p><strong>备课名称：</strong>${row.name}</p>
+      <p><strong>课程：</strong>${getCourseName(row.course)}</p>
+      <p><strong>适用年级：</strong>${row.grade}年级</p>
+      <p><strong>教学目标：</strong>${row.objectives}</p>
+      <p><strong>备课内容：</strong>${row.content}</p>
+      <p><strong>创建时间：</strong>${row.createTime}</p>
+    </div>
+  `, '备课详情', {
+    dangerouslyUseHTMLString: true,
+    confirmButtonText: '关闭'
+  })
+}
+
+const saveLesson = () => {
+  lessonFormRef.value.validate((valid) => {
+    if (valid) {
+      btnLoading.saveLesson = true
+      setTimeout(() => {
+        if (lessonForm.id) {
+          const index = teachingToolData.value.findIndex(item => item.id === lessonForm.id)
+          if (index !== -1) {
+            teachingToolData.value[index] = { ...lessonForm }
+          }
+          ElMessage.success('备课更新成功')
+        } else {
+          const newLesson = {
+            ...lessonForm,
+            id: `L${String(Date.now()).slice(-6)}`,
+            createTime: new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-')
+          }
+          teachingToolData.value.unshift(newLesson)
+          ElMessage.success('备课创建成功')
+        }
+        saveToStorage('mock_lessons', teachingToolData.value.filter(item => item.id.startsWith('L')))
+        lessonDialogVisible.value = false
+        btnLoading.saveLesson = false
+        loadTeachingToolData()
+      }, 500)
+    }
+  })
+}
+
+const deleteLesson = async (row) => {
+  try {
+    await ElMessageBox.confirm(`确定要删除备课"${row.name}"吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    
+    teachingToolData.value = teachingToolData.value.filter(item => item.id !== row.id)
+    saveToStorage('mock_lessons', teachingToolData.value.filter(item => item.id.startsWith('L')))
+    ElMessage.success('删除成功')
+    loadTeachingToolData()
+  } catch (error) {
+    console.log('取消删除')
+  }
+}
+
+const openPlanDialog = () => {
+  Object.assign(planForm, {
+    id: '',
+    name: '',
+    course: '',
+    grade: '',
+    startTime: '',
+    endTime: '',
+    content: '',
+    status: 'ongoing',
+    progress: 0
+  })
+  planDialogVisible.value = true
+}
+
+const editPlan = (row) => {
+  Object.assign(planForm, {
+    id: row.id,
+    name: row.name,
+    course: row.course,
+    grade: row.grade,
+    startTime: row.startTime,
+    endTime: row.endTime,
+    content: row.content,
+    status: row.status,
+    progress: row.progress
+  })
+  planDialogVisible.value = true
+}
+
+const viewPlan = (row) => {
+  ElMessageBox.alert(`
+    <div style="text-align: left;">
+      <p><strong>计划名称：</strong>${row.name}</p>
+      <p><strong>课程：</strong>${getCourseName(row.course)}</p>
+      <p><strong>适用年级：</strong>${row.grade}年级</p>
+      <p><strong>开始时间：</strong>${row.startTime}</p>
+      <p><strong>结束时间：</strong>${row.endTime}</p>
+      <p><strong>状态：</strong>${row.status === 'completed' ? '已完成' : row.status === 'ongoing' ? '进行中' : '已延期'}</p>
+      <p><strong>进度：</strong>${row.progress}%</p>
+      <p><strong>计划内容：</strong>${row.content}</p>
+    </div>
+  `, '计划详情', {
+    dangerouslyUseHTMLString: true,
+    confirmButtonText: '关闭'
+  })
+}
+
+const savePlan = () => {
+  planFormRef.value.validate((valid) => {
+    if (valid) {
+      btnLoading.savePlan = true
+      setTimeout(() => {
+        if (planForm.id) {
+          const index = teachingToolData.value.findIndex(item => item.id === planForm.id)
+          if (index !== -1) {
+            teachingToolData.value[index] = { ...planForm }
+          }
+          ElMessage.success('计划更新成功')
+        } else {
+          const newPlan = {
+            ...planForm,
+            id: `P${String(Date.now()).slice(-6)}`,
+            progress: 0
+          }
+          teachingToolData.value.unshift(newPlan)
+          ElMessage.success('计划创建成功')
+        }
+        saveToStorage('mock_plans', teachingToolData.value.filter(item => item.id.startsWith('P')))
+        planDialogVisible.value = false
+        btnLoading.savePlan = false
+        loadTeachingToolData()
+      }, 500)
+    }
+  })
+}
+
+const deletePlan = async (row) => {
+  try {
+    await ElMessageBox.confirm(`确定要删除计划"${row.name}"吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    
+    teachingToolData.value = teachingToolData.value.filter(item => item.id !== row.id)
+    saveToStorage('mock_plans', teachingToolData.value.filter(item => item.id.startsWith('P')))
+    ElMessage.success('删除成功')
+    loadTeachingToolData()
+  } catch (error) {
+    console.log('取消删除')
+  }
+}
+
+const uploadResource = () => {
+  ElMessage.info('上传资源功能（模拟）')
+}
+
+const createFolder = () => {
+  ElMessage.info('新建文件夹功能（模拟）')
+}
+
+const downloadResource = (row) => {
+  ElMessage.success(`正在下载资源：${row.name}`)
+}
+
+const deleteResource = async (row) => {
+  try {
+    await ElMessageBox.confirm(`确定要删除资源"${row.name}"吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    
+    teachingToolData.value = teachingToolData.value.filter(item => item.id !== row.id)
+    saveToStorage('mock_resources', teachingToolData.value.filter(item => item.id.startsWith('R')))
+    ElMessage.success('删除成功')
+    loadTeachingToolData()
+  } catch (error) {
+    console.log('取消删除')
+  }
+}
+
+const exportLessonData = () => {
+  const lessons = teachingToolData.value.filter(item => item.id.startsWith('L'))
+  const ws = XLSX.utils.json_to_sheet(lessons.map(item => ({
+    '备课ID': item.id,
+    '备课名称': item.name,
+    '课程': getCourseName(item.course),
+    '适用年级': item.grade + '年级',
+    '教学目标': item.objectives,
+    '备课内容': item.content,
+    '创建时间': item.createTime
+  })))
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, '备课列表')
+  XLSX.writeFile(wb, '备课列表.xlsx')
+  ElMessage.success('导出成功')
+}
+
+const exportResourceData = () => {
+  const resources = teachingToolData.value.filter(item => item.id.startsWith('R'))
+  const ws = XLSX.utils.json_to_sheet(resources.map(item => ({
+    '资源ID': item.id,
+    '资源名称': item.name,
+    '资源类型': getResourceTypeName(item.type),
+    '文件大小': item.size,
+    '上传时间': item.uploadTime
+  })))
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, '资源列表')
+  XLSX.writeFile(wb, '资源列表.xlsx')
+  ElMessage.success('导出成功')
+}
+
+const exportPlanData = () => {
+  const plans = teachingToolData.value.filter(item => item.id.startsWith('P'))
+  const ws = XLSX.utils.json_to_sheet(plans.map(item => ({
+    '计划ID': item.id,
+    '计划名称': item.name,
+    '课程': getCourseName(item.course),
+    '适用年级': item.grade + '年级',
+    '开始时间': item.startTime,
+    '结束时间': item.endTime,
+    '状态': item.status === 'completed' ? '已完成' : item.status === 'ongoing' ? '进行中' : '已延期',
+    '进度': item.progress + '%',
+    '计划内容': item.content
+  })))
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, '计划列表')
+  XLSX.writeFile(wb, '计划列表.xlsx')
+  ElMessage.success('导出成功')
+}
+
+const showPlanChart = () => {
+  const plans = teachingToolData.value.filter(item => item.id.startsWith('P'))
+  const completedCount = plans.filter(item => item.status === 'completed').length
+  const ongoingCount = plans.filter(item => item.status === 'ongoing').length
+  const delayedCount = plans.filter(item => item.status === 'delayed').length
+  
+  ElMessageBox.alert(`
+    <div style="text-align: center;">
+      <h3>教学计划统计</h3>
+      <p>已完成：${completedCount}</p>
+      <p>进行中：${ongoingCount}</p>
+      <p>已延期：${delayedCount}</p>
+      <p>总计：${plans.length}</p>
+    </div>
+  `, '计划统计', {
+    dangerouslyUseHTMLString: true,
+    confirmButtonText: '关闭'
+  })
+}
+
+const batchDeleteTeachingTool = async () => {
+  try {
+    await ElMessageBox.confirm(`确定要删除选中的${selectedTeachingTools.value.length}项吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    
+    const selectedIds = selectedTeachingTools.value.map(item => item.id)
+    teachingToolData.value = teachingToolData.value.filter(item => !selectedIds.includes(item.id))
+    
+    if (currentMenu.value === '4-1') {
+      saveToStorage('mock_lessons', teachingToolData.value.filter(item => item.id.startsWith('L')))
+    } else if (currentMenu.value === '4-2') {
+      saveToStorage('mock_resources', teachingToolData.value.filter(item => item.id.startsWith('R')))
+    } else if (currentMenu.value === '4-3') {
+      saveToStorage('mock_plans', teachingToolData.value.filter(item => item.id.startsWith('P')))
+    }
+    
+    ElMessage.success('批量删除成功')
+    selectedTeachingTools.value = []
+    loadTeachingToolData()
+  } catch (error) {
+    console.log('取消删除')
+  }
+}
+
+const editHomework = (row) => {
+  Object.assign(homeworkEditForm, {
+    id: row.id,
+    name: row.name,
+    course: row.course,
+    content: row.content || '',
+    deadline: row.deadline,
+    classes: [...row.classes]
+  })
+  homeworkEditDialogVisible.value = true
+}
+
+const deleteHomework = async (row) => {
+  try {
+    await ElMessageBox.confirm(`确定要删除作业"${row.name}"吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    
+    homeworkData.value = homeworkData.value.filter(item => item.id !== row.id)
+    saveToStorage('mock_homeworks', homeworkData.value)
+    ElMessage.success('删除成功')
+    loadHomeworkData()
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error(`删除失败：${error.message}`)
+    }
+  }
+}
+
+const batchDeleteHomework = async () => {
+  if (selectedHomeworks.value.length === 0) {
+    ElMessage.warning('请先选择要删除的作业')
+    return
+  }
+  
+  try {
+    await ElMessageBox.confirm(`确定要删除选中的 ${selectedHomeworks.value.length} 个作业吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    
+    const idsToDelete = selectedHomeworks.value.map(item => item.id)
+    homeworkData.value = homeworkData.value.filter(item => !idsToDelete.includes(item.id))
+    saveToStorage('mock_homeworks', homeworkData.value)
+    ElMessage.success('批量删除成功')
+    selectedHomeworks.value = []
+    loadHomeworkData()
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error(`批量删除失败：${error.message}`)
+    }
+  }
+}
+
+const gradeHomework = (row) => {
+  currentHomeworkDetail.value = row
+  homeworkGradeForm.homeworkId = row.id
+  homeworkGradeForm.submissions = [
+    { studentId: 'S001', studentName: '小明', score: 85, comment: '完成良好' },
+    { studentId: 'S002', studentName: '小红', score: 92, comment: '优秀' },
+    { studentId: 'S003', studentName: '小刚', score: 78, comment: '需要加强' }
+  ]
+  homeworkGradeDialogVisible.value = true
+}
+
+const batchGradeHomework = () => {
+  ElMessage.info('批量批改功能已触发')
+}
+
+const refreshHomeworkList = () => {
+  loadHomeworkData()
+  ElMessage.success('刷新成功')
+}
+
+const viewHomeworkDetail = (row) => {
+  currentHomeworkDetail.value = row
+  homeworkDetailDialogVisible.value = true
+}
+
+const exportHomeworkData = () => {
+  ElMessage.info('导出作业列表功能已触发')
+}
+
+const showHomeworkChart = () => {
+  ElMessage.info('作业数据可视化功能已触发')
+}
+
+const exportHomeworkStats = () => {
+  ElMessage.info('导出统计报告功能已触发')
+}
+
 const getTypeName = (type) => {
   const typeMap = {
     chinese: '语文',
@@ -1484,13 +2895,6 @@ const getTypeTagType = (type) => {
     pe: 'danger'
   }
   return typeMap[type] || 'default'
-}
-
-// 获取进度条颜色
-const getProgressColor = (rate) => {
-  if (rate >= 80) return '#67c23a'
-  if (rate >= 60) return '#e6a23c'
-  return '#f56c6c'
 }
 
 // 生成课程ID
@@ -2113,8 +3517,8 @@ watch(currentMenu, () => {
 
 .page-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   margin-bottom: 24px;
   padding: 24px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -2122,6 +3526,26 @@ watch(currentMenu, () => {
   box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
   position: relative;
   overflow: hidden;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 1;
+}
+
+.page-description {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+  margin-bottom: 0;
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
 }
 
 .page-header::before {
@@ -2141,10 +3565,60 @@ watch(currentMenu, () => {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #f093fb 0%, #f5576c 50%, #f093fb 100%);
-  background-size: 200% 100%;
-  animation: shimmer 3s ease-in-out infinite;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+  pointer-events: none;
+}
+
+/* 搜索面板样式 */
+.search-panel {
+  margin-bottom: 20px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.search-header {
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.search-header h3 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #303133;
+  margin: 0;
+}
+
+/* 表格容器样式 */
+.table-container {
+  margin-bottom: 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.table-header span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #303133;
+}
+
+.data-count {
+  font-size: 13px;
+  color: #909399;
 }
 
 @keyframes shimmer {
