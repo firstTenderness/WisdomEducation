@@ -4,8 +4,8 @@
       <div class="header-bg"></div>
       <div class="header-content">
         <div class="header-left">
-          <h2 class="topic-title">专题创作</h2>
-          <p class="topic-subtitle">创建和管理您的学习专题</p>
+          <h2 class="topic-title">科普创作</h2>
+          <p class="topic-subtitle">分享科学知识，记录探索发现</p>
         </div>
         <div class="topic-actions">
           <el-button type="primary" @click="createNewTopic">
@@ -145,53 +145,53 @@ const topicFilter = ref('all')
 const topics = ref([
   {
     id: 1,
-    title: '前端开发技术栈',
-    description: '介绍现代前端开发的主要技术栈，包括HTML5、CSS3、JavaScript、Vue、React等。',
+    title: '大山里的奇妙生物',
+    description: '探索山区常见的动植物，了解它们的生活习性和生态价值，培养对自然的热爱。',
     status: 'published',
     createdAt: '2024-01-20',
-    views: 1256,
-    category: '前端开发',
-    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20frontend%20development%20technology%20stack%20cover&image_size=square'
+    views: 1567,
+    category: '生物科普',
+    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=colorful%20mountain%20wildlife%20science%20cover%20with%20animals%20and%20plants%20for%20children&image_size=square'
   },
   {
     id: 2,
-    title: 'Python数据分析入门',
-    description: '从基础开始学习Python数据分析，包括NumPy、Pandas、Matplotlib等库的使用。',
+    title: '神奇的天气变化',
+    description: '了解天气的形成原因，学习观察云的变化预测天气，探索山区独特的气候现象。',
     status: 'published',
     createdAt: '2024-01-18',
-    views: 892,
-    category: '数据分析',
-    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Python%20data%20analysis%20intro%20course%20cover&image_size=square'
+    views: 1234,
+    category: '气象科普',
+    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=magic%20weather%20changes%20science%20cover%20with%20clouds%20and%20rainbow%20for%20kids&image_size=square'
   },
   {
     id: 3,
-    title: '人工智能基础概念',
-    description: '介绍人工智能的基本概念、发展历史和主要应用领域。',
-    status: 'draft',
+    title: '简单有趣的科学小实验',
+    description: '用身边的材料做科学实验，探索科学原理，培养动手能力和科学思维。',
+    status: 'published',
     createdAt: '2024-01-15',
-    views: 0,
-    category: '人工智能',
-    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=artificial%20intelligence%20basic%20concepts%20cover&image_size=square'
+    views: 987,
+    category: '实验科普',
+    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=fun%20science%20experiments%20cover%20with%20kids%20doing%20experiments%20for%20children&image_size=square'
   },
   {
     id: 4,
-    title: '数据库设计原则',
-    description: '讲解数据库设计的基本原则和最佳实践，包括范式、索引、优化等。',
+    title: '星空探秘',
+    description: '认识常见的星座和天体，了解宇宙的奥秘，培养对天文学的兴趣。',
     status: 'published',
     createdAt: '2024-01-10',
-    views: 645,
-    category: '数据库',
-    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=database%20design%20principles%20course%20cover&image_size=square'
+    views: 1890,
+    category: '天文科普',
+    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=starry%20sky%20exploration%20science%20cover%20with%20constellations%20for%20kids&image_size=square'
   },
   {
     id: 5,
-    title: '网络安全基础',
-    description: '介绍网络安全的基本概念和防护措施，包括加密、认证、防火墙等。',
+    title: '山区环境保护',
+    description: '了解山区生态环境的重要性，学习如何保护我们的家园，从小树立环保意识。',
     status: 'draft',
     createdAt: '2024-01-05',
     views: 0,
-    category: '网络安全',
-    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=network%20security%20basics%20course%20cover&image_size=square'
+    category: '环保科普',
+    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=mountain%20environmental%20protection%20cover%20with%20green%20nature%20for%20children&image_size=square'
   }
 ])
 

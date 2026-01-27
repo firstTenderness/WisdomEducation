@@ -32,28 +32,28 @@
       </el-card>
       <el-card shadow="hover" class="stat-card">
         <div class="stat-item">
-          <div class="stat-icon course-icon"><i class="el-icon-notebook-2"></i></div>
+          <div class="stat-icon experiment-icon"><i class="el-icon-s-marketing"></i></div>
           <div class="stat-info">
-            <div class="stat-label">课程笔记</div>
-            <div class="stat-value">{{ courseNotesCount }}</div>
+            <div class="stat-label">科学实验</div>
+            <div class="stat-value">{{ experimentNotesCount }}</div>
           </div>
         </div>
       </el-card>
       <el-card shadow="hover" class="stat-card">
         <div class="stat-item">
-          <div class="stat-icon reading-icon"><i class="el-icon-read"></i></div>
+          <div class="stat-icon nature-icon"><i class="el-icon-picture"></i></div>
           <div class="stat-info">
-            <div class="stat-label">读书心得</div>
-            <div class="stat-value">{{ readingNotesCount }}</div>
+            <div class="stat-label">自然观察</div>
+            <div class="stat-value">{{ natureNotesCount }}</div>
           </div>
         </div>
       </el-card>
       <el-card shadow="hover" class="stat-card">
         <div class="stat-item">
-          <div class="stat-icon tech-icon"><i class="el-icon-s-marketing"></i></div>
+          <div class="stat-icon astronomy-icon"><i class="el-icon-moon"></i></div>
           <div class="stat-info">
-            <div class="stat-label">技术总结</div>
-            <div class="stat-value">{{ techNotesCount }}</div>
+            <div class="stat-label">天文观测</div>
+            <div class="stat-value">{{ astronomyNotesCount }}</div>
           </div>
         </div>
       </el-card>
@@ -62,10 +62,11 @@
     <div class="notes-filters">
       <el-select v-model="noteFilter" placeholder="按分类筛选" clearable style="width: 150px;">
         <el-option label="全部" value="all"></el-option>
-        <el-option label="课程笔记" value="course"></el-option>
-        <el-option label="读书心得" value="reading"></el-option>
-        <el-option label="技术总结" value="tech"></el-option>
-        <el-option label="其他" value="other"></el-option>
+        <el-option label="科学实验" value="experiment"></el-option>
+        <el-option label="自然观察" value="nature"></el-option>
+        <el-option label="天文观测" value="astronomy"></el-option>
+        <el-option label="气象观测" value="weather"></el-option>
+        <el-option label="环保知识" value="environmental"></el-option>
       </el-select>
       <el-input
         v-model="searchKeyword"
@@ -142,41 +143,41 @@ const noteFilter = ref('all')
 const notes = ref([
   {
     id: 1,
-    title: 'JavaScript闭包详解',
-    content: '闭包是指有权访问另一个函数作用域中变量的函数...',
-    category: 'tech',
-    createdAt: '2024-01-27',
-    updatedAt: '2024-01-27'
+    title: '科学小实验：水的净化',
+    content: '今天做了一个关于水净化的小实验，用沙子、活性炭和棉花制作了一个简易净水器...',
+    category: 'experiment',
+    createdAt: '2024-01-28',
+    updatedAt: '2024-01-28'
   },
   {
     id: 2,
-    title: 'Vue3 Composition API使用心得',
-    content: 'Composition API提供了更好的代码组织方式...',
-    category: 'tech',
+    title: '山区植物观察笔记',
+    content: '在学校后面的山上发现了几种有趣的植物，包括野草莓、蕨类植物和一些不知名的小花...',
+    category: 'nature',
     createdAt: '2024-01-25',
     updatedAt: '2024-01-26'
   },
   {
     id: 3,
-    title: 'Python数据分析课程笔记',
-    content: 'NumPy是Python中用于科学计算的核心库...',
-    category: 'course',
+    title: '星空观测记录',
+    content: '晴朗的夜晚，用简易望远镜观察了月亮和一些明亮的星星，看到了月亮上的环形山...',
+    category: 'astronomy',
     createdAt: '2024-01-20',
     updatedAt: '2024-01-20'
   },
   {
     id: 4,
-    title: '《深入理解计算机系统》读后感',
-    content: '这本书从程序员的视角讲解了计算机系统的各个层次...',
-    category: 'reading',
+    title: '气象观测日记',
+    content: '连续一周记录了每天的天气变化，包括温度、湿度、风向和云量，发现了一些天气变化的规律...',
+    category: 'weather',
     createdAt: '2024-01-15',
     updatedAt: '2024-01-16'
   },
   {
     id: 5,
-    title: '数据库索引优化策略',
-    content: '合理的索引设计可以显著提高查询性能...',
-    category: 'tech',
+    title: '环保小知识',
+    content: '学习了如何分类垃圾、节约水资源和保护森林的知识，我们应该从身边的小事做起...',
+    category: 'environmental',
     createdAt: '2024-01-10',
     updatedAt: '2024-01-12'
   }
@@ -205,36 +206,40 @@ const filteredNotes = computed(() => {
 
 // 统计数据计算属性
 const totalNotes = computed(() => notes.value.length)
-const courseNotesCount = computed(() => notes.value.filter(note => note.category === 'course').length)
-const readingNotesCount = computed(() => notes.value.filter(note => note.category === 'reading').length)
-const techNotesCount = computed(() => notes.value.filter(note => note.category === 'tech').length)
+const experimentNotesCount = computed(() => notes.value.filter(note => note.category === 'experiment').length)
+const natureNotesCount = computed(() => notes.value.filter(note => note.category === 'nature').length)
+const astronomyNotesCount = computed(() => notes.value.filter(note => note.category === 'astronomy').length)
+const weatherNotesCount = computed(() => notes.value.filter(note => note.category === 'weather').length)
 
 const getCategoryType = (category) => {
   const typeMap = {
-    course: 'primary',
-    reading: 'success',
-    tech: 'warning',
-    other: 'info'
+    experiment: 'primary',
+    nature: 'success',
+    astronomy: 'warning',
+    weather: 'info',
+    environmental: 'danger'
   }
   return typeMap[category] || 'info'
 }
 
 const getCategoryName = (category) => {
   const nameMap = {
-    course: '课程笔记',
-    reading: '读书心得',
-    tech: '技术总结',
-    other: '其他'
+    experiment: '科学实验',
+    nature: '自然观察',
+    astronomy: '天文观测',
+    weather: '气象观测',
+    environmental: '环保知识'
   }
   return nameMap[category] || '其他'
 }
 
 const getCategoryIcon = (category) => {
   const iconMap = {
-    course: 'course-icon',
-    reading: 'reading-icon',
-    tech: 'tech-icon',
-    other: 'other-icon'
+    experiment: 'experiment-icon',
+    nature: 'nature-icon',
+    astronomy: 'astronomy-icon',
+    weather: 'weather-icon',
+    environmental: 'environmental-icon'
   }
   return iconMap[category] || 'other-icon'
 }

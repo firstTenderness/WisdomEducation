@@ -4,8 +4,8 @@
       <div class="header-bg"></div>
       <div class="header-content">
         <div class="header-left">
-          <h2 class="course-title">我的课程</h2>
-          <p class="course-subtitle">探索知识的海洋，开启学习之旅</p>
+          <h2 class="course-title">快乐学习课堂</h2>
+          <p class="course-subtitle">轻松学知识，快乐成长每一天</p>
         </div>
         <div class="course-actions">
           <el-select v-model="selectedCategory" placeholder="按分类筛选" style="width: 150px; margin-right: 10px;">
@@ -128,113 +128,113 @@ const selectedCategory = ref('all')
 const courses = ref([
   {
     id: 1,
-    title: 'JavaScript基础入门',
-    teacher: '张老师',
-    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20programming%20course%20cover%20with%20JavaScript%20logo%20and%20code%20symbols&image_size=square',
-    progress: 44,
-    finished: 2,
-    total: 16,
+    title: '趣味语文：童话阅读与写作',
+    teacher: '李老师',
+    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=colorful%20children%20chinese%20language%20course%20cover%20with%20fairy%20tales%20and%20books%20for%20elementary%20students&image_size=square',
+    progress: 60,
+    finished: 6,
+    total: 10,
     level: 'beginner',
-    category: '编程'
+    category: '语文'
   },
   {
     id: 2,
-    title: 'Python数据分析',
+    title: '数学王国大冒险',
     teacher: '王老师',
-    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20data%20analysis%20course%20cover%20with%20Python%20logo%20and%20charts&image_size=square',
-    progress: 98,
-    finished: 19,
-    total: 19,
-    level: 'intermediate',
-    category: '数据分析'
+    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=fun%20math%20adventure%20course%20cover%20with%20numbers%20and%20cartoon%20characters%20for%20kids&image_size=square',
+    progress: 85,
+    finished: 17,
+    total: 20,
+    level: 'beginner',
+    category: '数学'
   },
   {
     id: 3,
-    title: 'HTML5 & CSS3 实战',
-    teacher: '李老师',
-    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20web%20development%20course%20cover%20with%20HTML5%20and%20CSS3%20logos&image_size=square',
-    progress: 15,
-    finished: 3,
-    total: 18,
+    title: '快乐英语：日常会话',
+    teacher: '张老师',
+    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=happy%20english%20conversation%20course%20cover%20with%20cartoon%20animals%20talking%20for%20children&image_size=square',
+    progress: 45,
+    finished: 9,
+    total: 20,
     level: 'beginner',
-    category: '前端'
+    category: '英语'
   },
   {
     id: 4,
-    title: 'Vue3 从入门到精通',
+    title: '科学小实验：探索自然',
     teacher: '刘老师',
-    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20Vue.js%20course%20cover%20with%20Vue%20logo%20and%20modern%20UI&image_size=square',
-    progress: 45,
-    finished: 2,
-    total: 12,
-    level: 'intermediate',
-    category: '前端'
+    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=colorful%20science%20experiments%20course%20cover%20with%20kids%20doing%20experiments%20for%20elementary%20students&image_size=square',
+    progress: 70,
+    finished: 14,
+    total: 20,
+    level: 'beginner',
+    category: '科学'
   },
   {
     id: 5,
-    title: 'React 高级开发',
+    title: '美术天地：创意绘画',
     teacher: '陈老师',
-    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20React%20course%20cover%20with%20React%20logo%20and%20components&image_size=square',
-    progress: 54,
-    finished: 8,
-    total: 17,
-    level: 'advanced',
-    category: '前端'
+    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=creative%20art%20painting%20course%20cover%20with%20colorful%20paintings%20and%20kids%20for%20children&image_size=square',
+    progress: 30,
+    finished: 6,
+    total: 20,
+    level: 'beginner',
+    category: '艺术'
   },
   {
     id: 6,
-    title: 'Node.js 后端开发',
+    title: '音乐乐园：儿歌演唱',
     teacher: '赵老师',
-    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20Node.js%20course%20cover%20with%20Node.js%20logo%20and%20server%20icons&image_size=square',
-    progress: 17,
-    finished: 3,
-    total: 19,
-    level: 'intermediate',
-    category: '后端'
+    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=happy%20music%20course%20cover%20with%20kids%20singing%20and%20musical%20notes%20for%20children&image_size=square',
+    progress: 50,
+    finished: 10,
+    total: 20,
+    level: 'beginner',
+    category: '音乐'
   },
   {
     id: 7,
-    title: '数据库原理与应用',
+    title: '体育小健将：基础运动',
     teacher: '周老师',
-    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20database%20course%20cover%20with%20database%20icons%20and%20tables&image_size=square',
-    progress: 71,
-    finished: 14,
-    total: 19,
-    level: 'intermediate',
-    category: '数据库'
+    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=energetic%20sports%20course%20cover%20with%20kids%20playing%20sports%20for%20elementary%20students&image_size=square',
+    progress: 90,
+    finished: 18,
+    total: 20,
+    level: 'beginner',
+    category: '体育'
   },
   {
     id: 8,
-    title: '人工智能基础',
+    title: '历史故事：中华五千年',
     teacher: '吴老师',
-    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20artificial%20intelligence%20course%20cover%20with%20AI%20symbols&image_size=square',
-    progress: 97,
-    finished: 14,
-    total: 15,
-    level: 'advanced',
-    category: 'AI'
+    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=colorful%20chinese%20history%20course%20cover%20with%20ancient%20stories%20and%20cartoon%20figures%20for%20kids&image_size=square',
+    progress: 65,
+    finished: 13,
+    total: 20,
+    level: 'beginner',
+    category: '历史'
   },
   {
     id: 9,
-    title: '数据结构与算法',
+    title: '小小数学家：趣味算术',
     teacher: '郑老师',
-    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20data%20structures%20and%20algorithms%20course%20cover%20with%20graphs&image_size=square',
-    progress: 0,
-    finished: 0,
+    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=fun%20math%20arithmetic%20course%20cover%20with%20numbers%20and%20cartoon%20math%20heroes%20for%20children&image_size=square',
+    progress: 40,
+    finished: 8,
     total: 20,
-    level: 'intermediate',
-    category: '计算机基础'
+    level: 'beginner',
+    category: '数学'
   },
   {
     id: 10,
-    title: '网络安全基础',
+    title: '英语动画配音',
     teacher: '孙老师',
-    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20network%20security%20course%20cover%20with%20security%20icons&image_size=square',
-    progress: 0,
-    finished: 0,
-    total: 18,
-    level: 'beginner',
-    category: '网络'
+    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=english%20animation%20dubbing%20course%20cover%20with%20cartoon%20characters%20and%20microphones%20for%20kids&image_size=square',
+    progress: 25,
+    finished: 5,
+    total: 20,
+    level: 'intermediate',
+    category: '英语'
   }
 ])
 

@@ -5,17 +5,17 @@
       <div class="header-bg"></div>
       <div class="header-content">
         <div class="header-left">
-          <h2 class="practice-title">智能练习中心</h2>
-          <p class="practice-subtitle">个性化练习，智能评测，高效提升</p>
+          <h2 class="practice-title">趣味练习中心</h2>
+          <p class="practice-subtitle">快乐学习，趣味挑战，轻松提升</p>
         </div>
         <div class="practice-actions">
           <el-select v-model="selectedSubject" placeholder="选择科目" style="width: 150px; margin-right: 10px;">
             <el-option label="全部" value="all"></el-option>
+            <el-option label="语文" value="chinese"></el-option>
             <el-option label="数学" value="math"></el-option>
+            <el-option label="科学" value="science"></el-option>
             <el-option label="英语" value="english"></el-option>
-            <el-option label="物理" value="physics"></el-option>
-            <el-option label="化学" value="chemistry"></el-option>
-            <el-option label="生物" value="biology"></el-option>
+            <el-option label="艺术" value="art"></el-option>
           </el-select>
           <el-select v-model="selectedDifficulty" placeholder="选择难度" style="width: 150px; margin-right: 10px;">
             <el-option label="全部" value="all"></el-option>
@@ -324,55 +324,120 @@ const mockQuestions = [
   {
     id: 1,
     type: 'single',
-    title: '以下哪个不是JavaScript的数据类型？',
+    title: '以下哪个是童话故事中的角色？',
     options: [
-      { label: 'A', content: 'String' },
-      { label: 'B', content: 'Number' },
-      { label: 'C', content: 'Boolean' },
-      { label: 'D', content: 'Struct' }
+      { label: 'A', content: '孙悟空' },
+      { label: 'B', content: '小红帽' },
+      { label: 'C', content: '哪吒' },
+      { label: 'D', content: '葫芦娃' }
     ],
-    correctAnswer: 'D',
-    explanation: 'JavaScript的数据类型包括String、Number、Boolean、Null、Undefined、Symbol和Object，没有Struct类型。'
+    correctAnswer: 'B',
+    explanation: '小红帽是经典童话故事《小红帽》中的角色，其他选项都是中国神话或动画中的角色。'
   },
   {
     id: 2,
-    type: 'multiple',
-    title: '以下哪些是Vue3的特性？',
+    type: 'single',
+    title: '3 + 5 × 2 = ?',
     options: [
-      { label: 'A', content: 'Composition API' },
-      { label: 'B', content: 'Options API' },
-      { label: 'C', content: 'Teleport' },
-      { label: 'D', content: 'Suspense' }
+      { label: 'A', content: '16' },
+      { label: 'B', content: '13' },
+      { label: 'C', content: '10' },
+      { label: 'D', content: '25' }
     ],
-    correctAnswer: ['A', 'C', 'D'],
-    explanation: 'Vue3的新特性包括Composition API、Teleport、Suspense等，Options API是Vue2中就有的特性。'
+    correctAnswer: 'B',
+    explanation: '根据数学运算顺序，先乘除后加减，所以5×2=10，然后3+10=13。'
   },
   {
     id: 3,
-    type: 'fill',
-    title: 'React中用于管理组件状态的Hook是______。',
-    correctAnswer: 'useState',
-    explanation: 'useState是React中最基本的Hook，用于在函数组件中添加状态管理。'
+    type: 'multiple',
+    title: '以下哪些是自然现象？',
+    options: [
+      { label: 'A', content: '彩虹' },
+      { label: 'B', content: '火山喷发' },
+      { label: 'C', content: '人工降雨' },
+      { label: 'D', content: '闪电' }
+    ],
+    correctAnswer: ['A', 'B', 'D'],
+    explanation: '彩虹、火山喷发和闪电都是自然现象，人工降雨是人类干预的结果，不属于自然现象。'
   },
   {
     id: 4,
-    type: 'essay',
-    title: '请简述闭包的概念及其在JavaScript中的应用场景。',
-    correctAnswer: '闭包是指有权访问另一个函数作用域中变量的函数。在JavaScript中，闭包的应用场景包括：1. 实现数据私有化 2. 实现函数柯里化 3. 实现模块化 4. 延长变量的生命周期',
-    explanation: '闭包是JavaScript中的一个重要概念，它允许函数访问其外部作用域中的变量，即使外部函数已经执行完毕。闭包的核心在于作用域链的查找机制。'
+    type: 'fill',
+    title: '英语中，"猫"的单词是______。',
+    correctAnswer: 'cat',
+    explanation: '英语中，"猫"的单词是cat。'
   },
   {
     id: 5,
     type: 'single',
-    title: '以下哪个命令用于安装npm包？',
+    title: '以下哪种颜色是三原色之一？',
     options: [
-      { label: 'A', content: 'npm add' },
-      { label: 'B', content: 'npm install' },
-      { label: 'C', content: 'npm create' },
-      { label: 'D', content: 'npm init' }
+      { label: 'A', content: '紫色' },
+      { label: 'B', content: '橙色' },
+      { label: 'C', content: '绿色' },
+      { label: 'D', content: '蓝色' }
     ],
-    correctAnswer: 'B',
-    explanation: 'npm install命令用于安装npm包，可以简写为npm i。'
+    correctAnswer: 'D',
+    explanation: '三原色是指红、黄、蓝三种颜色，其他颜色都可以由这三种颜色混合而成。'
+  },
+  {
+    id: 6,
+    type: 'single',
+    title: '以下哪个是中国的传统节日？',
+    options: [
+      { label: 'A', content: '圣诞节' },
+      { label: 'B', content: '感恩节' },
+      { label: 'C', content: '中秋节' },
+      { label: 'D', content: '万圣节' }
+    ],
+    correctAnswer: 'C',
+    explanation: '中秋节是中国的传统节日，其他选项都是西方国家的节日。'
+  },
+  {
+    id: 7,
+    type: 'multiple',
+    title: '以下哪些是植物的组成部分？',
+    options: [
+      { label: 'A', content: '根' },
+      { label: 'B', content: '茎' },
+      { label: 'C', content: '叶' },
+      { label: 'D', content: '心脏' }
+    ],
+    correctAnswer: ['A', 'B', 'C'],
+    explanation: '根、茎、叶是植物的基本组成部分，心脏是动物的器官。'
+  },
+  {
+    id: 8,
+    type: 'fill',
+    title: '一年有______个季节。',
+    correctAnswer: '4',
+    explanation: '一年有春、夏、秋、冬四个季节。'
+  },
+  {
+    id: 9,
+    type: 'single',
+    title: '以下哪个是太阳系中的行星？',
+    options: [
+      { label: 'A', content: '月亮' },
+      { label: 'B', content: '太阳' },
+      { label: 'C', content: '地球' },
+      { label: 'D', content: '北斗七星' }
+    ],
+    correctAnswer: 'C',
+    explanation: '地球是太阳系中的行星，月亮是地球的卫星，太阳是恒星，北斗七星是恒星组成的星座。'
+  },
+  {
+    id: 10,
+    type: 'single',
+    title: '以下哪个数字是偶数？',
+    options: [
+      { label: 'A', content: '1' },
+      { label: 'B', content: '3' },
+      { label: 'C', content: '5' },
+      { label: 'D', content: '6' }
+    ],
+    correctAnswer: 'D',
+    explanation: '偶数是能够被2整除的数，6÷2=3，所以6是偶数。'
   }
 ]
 

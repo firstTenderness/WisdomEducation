@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 // 懒加载导入页面组件（优化加载速度）
-const Home = () => import('../views/Home.vue')
+const StudentHome = () => import('../views/StudentHome.vue')
 const Login = () => import('../views/Login.vue')
 const Teacher = () => import('../views/Teacher.vue') // 教师端页面（若有）
 
@@ -14,7 +14,7 @@ const routes = [
   {
     path: '/home',
     name: 'Home',
-    component: Home,
+    component: StudentHome,
     meta: { 
       requiresAuth: true, // 标记：需要登录才能访问
       title: '慧学澄明平台-首页' 

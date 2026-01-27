@@ -5,8 +5,8 @@
       <div class="header-bg"></div>
       <div class="header-content">
         <div class="header-left">
-          <h2 class="cloud-title">个人云盘</h2>
-          <p class="cloud-subtitle">安全存储，随时访问，便捷管理</p>
+          <h2 class="cloud-title">资源宝库</h2>
+          <p class="cloud-subtitle">丰富的学习资源，助力山区孩子成长</p>
         </div>
         <div class="cloud-actions">
           <el-button type="primary" @click="uploadFile">
@@ -160,21 +160,21 @@ const selectedFiles = ref([])
 const files = ref([
   {
     id: 1,
-    name: '课程资料',
+    name: '科学实验资料',
     type: 'folder',
     size: 0,
     updateTime: '2024-01-27 10:00:00'
   },
   {
     id: 2,
-    name: '学习笔记',
+    name: '自然探索',
     type: 'folder',
     size: 0,
     updateTime: '2024-01-26 15:30:00'
   },
   {
     id: 3,
-    name: 'JavaScript基础入门.pdf',
+    name: '天文知识手册.pdf',
     type: 'file',
     extension: 'pdf',
     size: 20480,
@@ -182,7 +182,7 @@ const files = ref([
   },
   {
     id: 4,
-    name: 'Vue3学习总结.docx',
+    name: '山区生物图鉴.docx',
     type: 'file',
     extension: 'docx',
     size: 15360,
@@ -190,23 +190,23 @@ const files = ref([
   },
   {
     id: 5,
-    name: 'Python数据分析.xlsx',
+    name: '科学小实验指南.pptx',
     type: 'file',
-    extension: 'xlsx',
-    size: 10240,
+    extension: 'pptx',
+    size: 25600,
     updateTime: '2024-01-23 11:00:00'
   },
   {
     id: 6,
-    name: '数据库原理与应用.pptx',
+    name: '气象观测记录.xlsx',
     type: 'file',
-    extension: 'pptx',
-    size: 25600,
+    extension: 'xlsx',
+    size: 10240,
     updateTime: '2024-01-22 16:45:00'
   },
   {
     id: 7,
-    name: '个人简历.pdf',
+    name: '环保知识手册.pdf',
     type: 'file',
     extension: 'pdf',
     size: 8192,
@@ -214,7 +214,7 @@ const files = ref([
   },
   {
     id: 8,
-    name: '算法笔记.txt',
+    name: '星空观测笔记.txt',
     type: 'file',
     extension: 'txt',
     size: 2048,
@@ -222,7 +222,7 @@ const files = ref([
   },
   {
     id: 9,
-    name: '课程截图.png',
+    name: '山区植物照片.png',
     type: 'file',
     extension: 'png',
     size: 12288,
@@ -230,7 +230,7 @@ const files = ref([
   },
   {
     id: 10,
-    name: '项目代码',
+    name: '科普视频',
     type: 'folder',
     size: 0,
     updateTime: '2024-01-18 14:50:00'

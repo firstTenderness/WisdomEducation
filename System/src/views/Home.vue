@@ -5,7 +5,7 @@
       <div class="nav-bg"></div>
       <div class="nav-content">
         <div class="nav-left">
-          <el-avatar :size="40" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=education%20platform%20logo%20with%20book%20and%20light%20symbol&image_size=square" class="nav-logo"></el-avatar>
+          <el-avatar :size="40" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" class="nav-logo"></el-avatar>
           <h1 class="platform-name">慧学澄明学习教育平台-学生端</h1>
         </div>
         <div class="nav-right">
@@ -62,43 +62,43 @@
           <el-menu-item index="1">
             <template #title>
               <i class="el-icon-menu"></i>
-              <span>课程中心</span>
+              <span>智学课栈</span>
             </template>
           </el-menu-item>
           <el-menu-item index="2">
             <template #title>
               <i class="el-icon-message"></i>
-              <span>收件箱</span>
+              <span>灵犀消息台</span>
             </template>
           </el-menu-item>
           <el-menu-item index="3">
             <template #title>
               <i class="el-icon-edit"></i>
-              <span>专题创作</span>
+              <span>妙思创作间</span>
             </template>
           </el-menu-item>
           <el-menu-item index="4">
             <template #title>
               <i class="el-icon-document"></i>
-              <span>学习笔记</span>
+              <span>智记手札</span>
             </template>
           </el-menu-item>
           <el-menu-item index="5">
             <template #title>
               <i class="el-icon-folder"></i>
-              <span>个人云盘</span>
+              <span>智存云空间</span>
             </template>
           </el-menu-item>
           <el-menu-item index="6">
             <template #title>
               <i class="el-icon-lightning"></i>
-              <span>AI课堂总结</span>
+              <span>灵智知识集</span>
             </template>
           </el-menu-item>
           <el-menu-item index="7">
             <template #title>
               <i class="el-icon-brush"></i>
-              <span>智能练习中心</span>
+              <span>智适应练场</span>
             </template>
           </el-menu-item>
         </el-menu>
@@ -166,13 +166,13 @@ const menuMap = {
 
 // 菜单与标题映射
 const menuTitleMap = {
-  '1': '课程中心',
-  '2': '收件箱',
-  '3': '专题创作',
-  '4': '学习笔记',
-  '5': '个人云盘',
-  '6': 'AI课堂总结',
-  '7': '智能练习中心'
+  '1': '智学课栈',
+  '2': '灵犀消息台',
+  '3': '妙思创作间',
+  '4': '智记手札',
+  '5': '智存云空间',
+  '6': '灵智知识集',
+  '7': '智适应练场'
 }
 
 // 获取页面标题
