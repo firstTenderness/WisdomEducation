@@ -6,6 +6,10 @@
         <h1 class="platform-name">慧学澄明教育平台-教师端</h1>
       </div>
       <div class="nav-right">
+        <div class="user-info">
+          <el-avatar :size="36" :src="userInfo.avatar || defaultAvatar" class="user-avatar"></el-avatar>
+          <span class="user-name">欢迎回来：{{ userInfo.name }}</span>
+        </div>
         <div class="refresh-control">
           <span>手动刷新</span>
           <el-switch 
@@ -1488,6 +1492,10 @@ const DEFAULT_DATA = {
 }
 
 const router = useRouter()
+
+// 核心：从localStorage读取登录用户信息（优先）
+const userInfo = ref(JSON.parse(localStorage.getItem('userInfo') || '{"name":"未知用户"}'))
+const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png' // 默认头像
 
 const isCollapse = ref(false)
 const autoRefresh = ref(false)
@@ -3385,6 +3393,24 @@ watch(currentMenu, () => {
   gap: 20px;
   position: relative;
   z-index: 1;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 20px;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 14px;
+}
+
+.user-avatar {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.user-name {
+  font-weight: 500;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .refresh-control {
