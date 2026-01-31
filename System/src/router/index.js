@@ -1,15 +1,61 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-// 懒加载导入页面组件（优化加载速度）
+// 懒加载导入页面组件
 const StudentHome = () => import('../views/StudentHome.vue')
 const Login = () => import('../views/Login.vue')
+const Register = () => import('../views/Register.vue')
 const Teacher = () => import('../views/Teacher.vue') // 教师端页面（若有）
+const PortalHome = () => import('../views/PortalHome.vue') // 门户网站
+const CourseDetail = () => import('../views/CourseDetail.vue') // 课程详情页面
+const PolicyDetail = () => import('../views/PolicyDetail.vue') // 政策详情页面
+const VideoDetail = () => import('../views/VideoDetail.vue') // 视频详情页面
+const FeatureDetail = () => import('../views/FeatureDetail.vue') // 特色功能详情页面
 
 // 路由规则配置
 const routes = [
   {
-    path: '/', // 首页默认跳Home
-    redirect: '/home' // 重定向到/home，避免路由冲突
+    path: '/', // 首页默认跳门户网站
+    redirect: '/portal' // 重定向到/portal
+  },
+  {
+    path: '/portal',
+    name: 'Portal',
+    component: PortalHome,
+    meta: { 
+      title: '慧学澄明教育学习平台' 
+    }
+  },
+  {
+    path: '/course/:id',
+    name: 'CourseDetail',
+    component: CourseDetail,
+    meta: { 
+      title: '课程详情' 
+    }
+  },
+  {
+    path: '/policy/:id',
+    name: 'PolicyDetail',
+    component: PolicyDetail,
+    meta: { 
+      title: '政策详情' 
+    }
+  },
+  {
+    path: '/video/:id',
+    name: 'VideoDetail',
+    component: VideoDetail,
+    meta: { 
+      title: '视频详情' 
+    }
+  },
+  {
+    path: '/feature/:id',
+    name: 'FeatureDetail',
+    component: FeatureDetail,
+    meta: { 
+      title: '功能详情' 
+    }
   },
   {
     path: '/home',
@@ -26,6 +72,14 @@ const routes = [
     component: Login,
     meta: { 
       title: '慧学澄明平台-登录' 
+    }
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: Register,
+    meta: { 
+      title: '慧学澄明平台-注册' 
     }
   },
   {
@@ -66,8 +120,8 @@ router.beforeEach((to, from, next) => {
     // 可选：记录跳转前的页面，登录后可返回
     // localStorage.setItem('redirectPath', to.fullPath)
   } 
-  // 4. 已登录但访问登录页 → 跳首页
-  else if (to.path === '/login' && token) {
+  // 4. 已登录但访问登录页或注册页 → 跳首页
+  else if ((to.path === '/login' || to.path === '/register') && token) {
     next('/home')
   } 
   // 5. 其他情况正常放行

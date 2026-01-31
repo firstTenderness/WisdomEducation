@@ -5,6 +5,7 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import { createApp } from 'vue'
+import 'font-awesome/css/font-awesome.min.css'
 const app = createApp(App)
 // 注册所有图标
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
