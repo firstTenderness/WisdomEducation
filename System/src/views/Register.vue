@@ -21,6 +21,39 @@
           <span class="error-message" v-if="errors.username">{{ errors.username }}</span>
         </div>
         
+        <div class="form-group" :class="{ 'has-error': errors.identity }">
+          <div class="identity-wrapper">
+            <label class="identity-label">请选择身份</label>
+            <div class="identity-options">
+              <label class="identity-option" :class="{ 'active': formData.identity === 'student' }">
+                <input 
+                  type="radio" 
+                  v-model="formData.identity" 
+                  value="student"
+                  @change="validateField('identity')"
+                />
+                <div class="identity-card">
+                  <i class="fas fa-user-graduate identity-icon"></i>
+                  <span class="identity-name">学生</span>
+                </div>
+              </label>
+              <label class="identity-option" :class="{ 'active': formData.identity === 'teacher' }">
+                <input 
+                  type="radio" 
+                  v-model="formData.identity" 
+                  value="teacher"
+                  @change="validateField('identity')"
+                />
+                <div class="identity-card">
+                  <i class="fas fa-chalkboard-teacher identity-icon"></i>
+                  <span class="identity-name">教师</span>
+                </div>
+              </label>
+            </div>
+          </div>
+          <span class="error-message" v-if="errors.identity">{{ errors.identity }}</span>
+        </div>
+        
         <div class="form-group" :class="{ 'has-error': errors.email }">
           <div class="input-wrapper">
             <i class="fas fa-envelope input-icon"></i>
@@ -168,6 +201,7 @@ const router = useRouter();
 
 const formData = reactive({
   username: '',
+  identity: '',
   email: '',
   phone: '',
   password: '',
@@ -178,6 +212,7 @@ const formData = reactive({
 
 const errors = reactive({
   username: '',
+  identity: '',
   email: '',
   phone: '',
   password: '',
@@ -224,6 +259,14 @@ const passwordStrengthText = computed(() => {
 });
 
 const validateField = (field) => {
+  if (field === 'identity') {
+    if (!formData.identity) {
+      errors.identity = '请选择身份';
+      return false;
+    }
+    errors.identity = '';
+  }
+  
   if (field === 'username') {
     if (!formData.username.trim()) {
       errors.username = '请输入用户名';
@@ -304,7 +347,7 @@ const validateField = (field) => {
 };
 
 const validateForm = () => {
-  const fields = ['username', 'email', 'phone', 'password', 'confirmPassword', 'code'];
+  const fields = ['identity', 'username', 'email', 'phone', 'password', 'confirmPassword', 'code'];
   return fields.every(field => validateField(field));
 };
 
@@ -358,12 +401,16 @@ const handleRegister = async () => {
   successMessage.value = '';
   
   setTimeout(() => {
+    const roleType = formData.identity === 'teacher' ? 2 : 1;
     const userData = {
       username: formData.username,
+      identity: formData.identity,
+      role_type: roleType,
       email: formData.email,
       phone: formData.phone,
       token: 'mock-token-' + Date.now(),
-      userId: 'user-' + Date.now()
+      userId: 'user-' + Date.now(),
+      avatar: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
     };
     
     localStorage.setItem('token', userData.token);
@@ -464,6 +511,105 @@ const showPrivacy = () => {
 
 .form-group {
   margin-bottom: 18px;
+}
+
+.identity-wrapper {
+  width: 100%;
+}
+
+.identity-label {
+  display: block;
+  font-size: 14px;
+  color: #2c3e50;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.identity-options {
+  display: flex;
+  gap: 15px;
+}
+
+.identity-option {
+  flex: 1;
+  cursor: pointer;
+  position: relative;
+}
+
+.identity-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.identity-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  background: #fff;
+}
+
+.identity-icon {
+  font-size: 32px;
+  color: #95a5a6;
+  margin-bottom: 8px;
+  transition: color 0.3s ease;
+}
+
+.identity-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #7f8c8d;
+  transition: color 0.3s ease;
+}
+
+.identity-option:hover .identity-card {
+  border-color: #667eea;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+}
+
+.identity-option:hover .identity-icon {
+  color: #667eea;
+}
+
+.identity-option:hover .identity-name {
+  color: #667eea;
+}
+
+.identity-option.active .identity-card {
+  border-color: #667eea;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.identity-option.active .identity-icon {
+  color: #667eea;
+}
+
+.identity-option.active .identity-name {
+  color: #667eea;
+  font-weight: 600;
+}
+
+.form-group.has-error .identity-card {
+  border-color: #e74c3c;
+}
+
+.form-group.has-error .identity-option.active .identity-card {
+  border-color: #e74c3c;
+  background: rgba(231, 76, 60, 0.05);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+}
+
+.form-group.has-error .identity-option.active .identity-icon,
+.form-group.has-error .identity-option.active .identity-name {
+  color: #e74c3c;
 }
 
 .input-wrapper {
