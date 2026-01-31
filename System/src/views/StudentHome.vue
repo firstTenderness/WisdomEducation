@@ -448,8 +448,13 @@ const handleTeacherSwitch = () => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
-    ElMessage.success('切换到教师端')
-    // 这里可以添加切换到教师端的逻辑
+    const roleType = userInfo.value.role_type || JSON.parse(localStorage.getItem('userInfo') || '{}').role_type
+    if (roleType === 2) {
+      ElMessage.success('切换到教师端')
+      router.push('/teacher')
+    } else {
+      ElMessage.warning('当前账号为学生身份，无法进入教师端')
+    }
   }).catch(() => {
     ElMessage.info('取消切换')
   })
