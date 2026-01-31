@@ -6,7 +6,7 @@ Mock.setup({
 })
 
 // 过滤登录/用户信息接口（走真实后端）
-Mock.mock(/auth\/login|user\/info/, 'any', (options) => {
+Mock.mock(/login|user\/info/, 'any', (options) => {
   // 放行，不拦截
   return options
 })

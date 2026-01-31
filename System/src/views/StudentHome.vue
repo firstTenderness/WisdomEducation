@@ -282,7 +282,7 @@ import SmartPractice from './SmartPractice.vue'
 
 const router = useRouter()
 // 核心：从localStorage读取登录用户信息（优先）
-const userInfo = ref(JSON.parse(localStorage.getItem('userInfo') || '{"name":"未知用户"}'))
+const userInfo = ref(JSON.parse(localStorage.getItem('userInfo') || '{"name":"未知用户","avatar":""}'))
 const currentMenu = ref('0') // 当前选中菜单
 const isCollapse = ref(false) // 侧边栏折叠状态
 const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png' // 默认头像
@@ -448,7 +448,21 @@ const handleTeacherSwitch = () => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
-    const roleType = userInfo.value.role_type || JSON.parse(localStorage.getItem('userInfo') || '{}').role_type
+    // 更可靠的角色类型获取方式
+    const userInfoStr = localStorage.getItem('userInfo')
+    let roleType = 0
+    if (userInfoStr) {
+      try {
+        const userInfoObj = JSON.parse(userInfoStr)
+        roleType = userInfoObj.role_type || 0
+      } catch (e) {
+        console.error('解析用户信息失败:', e)
+      }
+    }
+    
+    console.log('当前角色类型:', roleType)
+    
+    // 明确检查只有角色类型为2的用户才能切换到教师端
     if (roleType === 2) {
       ElMessage.success('切换到教师端')
       router.push('/teacher')

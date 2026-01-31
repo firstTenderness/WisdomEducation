@@ -78,6 +78,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { login } from '@/api/index';
 
 const router = useRouter();
 
@@ -162,32 +163,39 @@ const handleLogin = async () => {
   errorMessage.value = '';
   
   try {
-    // 模拟登录，支持不同角色
-    let userData;
+    // 调用后端登录API
+    console.log('开始登录，账号：', formData.account);
+    console.log('登录请求数据：', { account: formData.account, password: formData.password });
     
-    // 模拟不同角色的账号
-    if (formData.account === 'teacher' || formData.account === 'admin') {
-      // 教师角色
-      userData = {
-        name: formData.account === 'teacher' ? '张老师' : '管理员',
-        role_type: 2, // 教师角色
-        token: 'mock-token-teacher-' + Date.now(),
-        userId: 'teacher-' + Date.now(),
-        avatar: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
-      };
-    } else {
-      // 学生角色
-      userData = {
-        name: formData.account === 'student' ? '李学生' : formData.account,
-        role_type: 1, // 学生角色
-        token: 'mock-token-student-' + Date.now(),
-        userId: 'student-' + Date.now(),
-        avatar: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
-      };
+    const response = await login({
+      account: formData.account,
+      password: formData.password
+    });
+    
+    console.log('登录响应：', response);
+    
+    // 后端返回的用户数据
+    let userData = response;
+    
+    // 检查用户数据是否存在
+    if (!userData) {
+      throw new Error('登录响应数据为空');
     }
     
+    // 检查是否包含token
+    if (!userData.token) {
+      throw new Error('登录响应数据中缺少token');
+    }
+    
+    console.log('用户数据：', userData);
+    
+    // 保存用户信息到本地存储
     localStorage.setItem('token', userData.token);
     localStorage.setItem('userInfo', JSON.stringify(userData));
+    
+    console.log('保存用户信息成功');
+    console.log('本地存储中的token：', localStorage.getItem('token'));
+    console.log('本地存储中的userInfo：', localStorage.getItem('userInfo'));
     
     if (formData.rememberMe) {
       localStorage.setItem('rememberedCredentials', JSON.stringify({
@@ -198,12 +206,21 @@ const handleLogin = async () => {
       localStorage.removeItem('rememberedCredentials');
     }
     
-    router.push('/home');
+    console.log('准备跳转到首页');
+    
+    // 强制跳转到首页
+    setTimeout(() => {
+      console.log('执行跳转');
+      window.location.href = '/home';
+    }, 500);
+    
   } catch (err) {
     console.error('登录错误:', err);
-    errorMessage.value = '登录失败，请稍后重试';
+    console.error('错误堆栈:', err.stack);
+    errorMessage.value = err.message || '登录失败，请稍后重试';
   } finally {
     isLoading.value = false;
+    console.log('登录流程结束');
   }
 };
 

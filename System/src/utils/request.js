@@ -28,27 +28,42 @@ service.interceptors.request.use(
 // 响应拦截器：适配真实后端返回格式
 service.interceptors.response.use(
   response => {
+    console.log('响应数据：', response.data);
     const res = response.data
-    // 兼容后端直接返回对象/无code字段的情况
-    if (res.token || res.id) { // 登录/用户信息接口直接返回数据
+    
+    // 检查是否为Result格式
+    if (res.code !== undefined && res.msg !== undefined) {
+      console.log('检测到Result格式，code:', res.code, 'msg:', res.msg);
+      
+      // 业务接口按code判断
+      // 注意：后端使用 code: 1 表示成功，而不是 200
+      if (res.code !== 1) {
+        console.log('响应失败，code:', res.code);
+        ElMessage.error(res.msg || '请求失败')
+        if (res.code === 401 || res.code === 403) {
+          localStorage.removeItem('token')
+          window.location.href = '/login'
+        }
+        return Promise.reject(new Error(res.msg || 'Error'))
+      }
+      
+      console.log('响应成功，返回data字段：', res.data);
+      
+      // 直接返回data字段，无论它是什么格式
+      return res.data
+    }
+    // 检查是否直接返回LoginInfo格式
+    else if (res.token && res.account) {
+      console.log('直接返回LoginInfo格式：', res);
       return res
     }
-    // 业务接口按code判断
-    if (typeof res !== 'object' || res === null) {
-      ElMessage.error('接口返回格式异常')
-      return Promise.reject(new Error('接口返回格式异常'))
-    }
-    if (res.code !== 200 && res.code !== 201) {
-      ElMessage.error(res.msg || '请求失败')
-      if (res.code === 401 || res.code === 403) {
-        localStorage.removeItem('token')
-        window.location.href = '/login'
-      }
-      return Promise.reject(new Error(res.msg || 'Error'))
-    }
+    // 兼容其他格式
+    console.log('兼容其他格式：', res);
     return res
   },
   error => {
+    console.error('响应错误：', error);
+    console.error('错误详情：', error.response);
     ElMessage.error(error.message || '服务器连接异常')
     return Promise.reject(error)
   }

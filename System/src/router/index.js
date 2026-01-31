@@ -113,19 +113,28 @@ router.beforeEach((to, from, next) => {
   const requiresAuth = to.meta.requiresAuth
   // 从本地缓存获取token（登录成功后存储）
   const token = localStorage.getItem('token')
+  
+  console.log('路由守卫检查：', {
+    to: to.path,
+    requiresAuth,
+    token: token ? '存在' : '不存在'
+  })
 
   // 3. 核心规则：需要登录但无token → 跳登录页
   if (requiresAuth && !token) {
+    console.log('需要登录但无token，跳转到登录页')
     next('/login') // 强制跳登录页
     // 可选：记录跳转前的页面，登录后可返回
     // localStorage.setItem('redirectPath', to.fullPath)
   } 
   // 4. 已登录但访问登录页或注册页 → 跳首页
   else if ((to.path === '/login' || to.path === '/register') && token) {
+    console.log('已登录但访问登录/注册页，跳转到首页')
     next('/home')
   } 
   // 5. 其他情况正常放行
   else {
+    console.log('正常放行')
     next()
   }
 })

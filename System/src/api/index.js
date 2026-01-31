@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 // 1. 登录（对接真实后端，参数为account/password）
-export const login = (data) => request.post('/auth/login', data)
+export const login = (data) => request.post('/login', data)
 
 // 2. 获取用户信息（含role_type）
 export const getUserInfo = () => request.get('/user/info')
