@@ -162,38 +162,46 @@ const handleLogin = async () => {
   errorMessage.value = '';
   
   try {
-    const res = await fetch('http://localhost:8080/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        account: formData.account, 
-        password: formData.password 
-      })
-    });
+    // 模拟登录，支持不同角色
+    let userData;
     
-    const data = await res.json();
-    const userData = data.data;
-    
-    if (res.ok && userData?.token) {
-      localStorage.setItem('token', userData.token);
-      localStorage.setItem('userInfo', JSON.stringify(userData));
-      
-      if (formData.rememberMe) {
-        localStorage.setItem('rememberedCredentials', JSON.stringify({
-          account: formData.account,
-          password: formData.password
-        }));
-      } else {
-        localStorage.removeItem('rememberedCredentials');
-      }
-      
-      router.push('/home');
+    // 模拟不同角色的账号
+    if (formData.account === 'teacher' || formData.account === 'admin') {
+      // 教师角色
+      userData = {
+        name: formData.account === 'teacher' ? '张老师' : '管理员',
+        role_type: 2, // 教师角色
+        token: 'mock-token-teacher-' + Date.now(),
+        userId: 'teacher-' + Date.now(),
+        avatar: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+      };
     } else {
-      errorMessage.value = data.message || '登录失败，请检查账号和密码';
+      // 学生角色
+      userData = {
+        name: formData.account === 'student' ? '李学生' : formData.account,
+        role_type: 1, // 学生角色
+        token: 'mock-token-student-' + Date.now(),
+        userId: 'student-' + Date.now(),
+        avatar: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+      };
     }
+    
+    localStorage.setItem('token', userData.token);
+    localStorage.setItem('userInfo', JSON.stringify(userData));
+    
+    if (formData.rememberMe) {
+      localStorage.setItem('rememberedCredentials', JSON.stringify({
+        account: formData.account,
+        password: formData.password
+      }));
+    } else {
+      localStorage.removeItem('rememberedCredentials');
+    }
+    
+    router.push('/home');
   } catch (err) {
-    console.error('请求错误:', err);
-    errorMessage.value = '连接服务器失败，请稍后重试';
+    console.error('登录错误:', err);
+    errorMessage.value = '登录失败，请稍后重试';
   } finally {
     isLoading.value = false;
   }

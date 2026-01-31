@@ -18,7 +18,7 @@
         </ul>
         <div class="nav-buttons">
           <router-link to="/login" class="btn btn-secondary login-btn">登录</router-link>
-          <router-link to="/login" class="btn btn-primary">注册</router-link>
+          <router-link to="/register" class="btn btn-primary">注册</router-link>
         </div>
       </div>
     </nav>
