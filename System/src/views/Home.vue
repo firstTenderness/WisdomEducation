@@ -5,7 +5,7 @@
       <div class="nav-bg"></div>
       <div class="nav-content">
         <div class="nav-left">
-          <el-avatar :size="40" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" class="nav-logo"></el-avatar>
+          <el-avatar :size="40" src="/src/assets/logo.svg" class="nav-logo"></el-avatar>
           <h1 class="platform-name">慧学澄明学习教育平台-学生端</h1>
         </div>
         <div class="nav-right">
@@ -101,6 +101,12 @@
               <span>智适应练场</span>
             </template>
           </el-menu-item>
+          <el-menu-item index="8">
+            <template #title>
+              <i class="el-icon-trophy"></i>
+              <span>鸿鹄榜</span>
+            </template>
+          </el-menu-item>
         </el-menu>
       </div>
 
@@ -139,6 +145,7 @@ import Notes from './Notes.vue'
 import Cloud from './Cloud.vue'
 import AiSummary from './AiSummary.vue'
 import SmartPractice from './SmartPractice.vue'
+import HeroRank from './HeroRank.vue'
 // 导入接口（若没有getUserInfo接口，可注释，仅用本地缓存）
 // import { getUserInfo } from '@/api'
 
@@ -161,7 +168,8 @@ const menuMap = {
   '4': Notes,
   '5': Cloud,
   '6': AiSummary,
-  '7': SmartPractice
+  '7': SmartPractice,
+  '8': HeroRank
 }
 
 // 菜单与标题映射
@@ -172,7 +180,8 @@ const menuTitleMap = {
   '4': '智记手札',
   '5': '智存云空间',
   '6': '灵智知识集',
-  '7': '智适应练场'
+  '7': '智适应练场',
+  '8': '鸿鹄榜'
 }
 
 // 获取页面标题
@@ -204,7 +213,7 @@ onMounted(async () => {
     //   localStorage.setItem('userInfo', JSON.stringify(userData))
     // }
   } catch (error) {
-    console.log('获取用户信息失败，使用本地缓存：', error)
+    ElMessage.error('获取用户信息失败，使用本地缓存')
   }
 })
 

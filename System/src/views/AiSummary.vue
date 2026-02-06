@@ -156,6 +156,61 @@
         <el-empty description="暂无历史总结记录" />
       </div>
     </div>
+    
+    <!-- 历史总结详情弹窗 -->
+    <el-dialog v-model="showHistoryDetail" :title="`历史总结：${currentHistorySummary?.courseTitle || ''}`" width="700px">
+      <div v-if="currentHistorySummary" class="history-detail-content">
+        <div class="detail-section">
+          <h4 class="section-title">核心知识点</h4>
+          <div class="keywords">
+            <el-tag 
+              v-for="keyword in currentHistorySummary.keywords" 
+              :key="keyword" 
+              type="primary"
+              effect="plain"
+              class="keyword-tag"
+            >
+              {{ keyword }}
+            </el-tag>
+          </div>
+        </div>
+        
+        <div class="detail-section">
+          <h4 class="section-title">课堂总结</h4>
+          <div class="summary-content">
+            <p v-for="(paragraph, index) in currentHistorySummary.content.split('\n')" :key="index" class="summary-paragraph">
+              {{ paragraph }}
+            </p>
+          </div>
+        </div>
+        
+        <div class="detail-section">
+          <h4 class="section-title">学习建议</h4>
+          <ul class="suggestions-list">
+            <li v-for="(suggestion, index) in currentHistorySummary.suggestions" :key="index" class="suggestion-item">
+              <div class="suggestion-icon"><i class="el-icon-check"></i></div>
+              <div class="suggestion-text">{{ suggestion }}</div>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="detail-footer">
+          <div class="detail-meta">
+            <span class="meta-item">
+              <i class="el-icon-time"></i> 生成时间：{{ currentHistorySummary.generatedTime }}
+            </span>
+            <span class="meta-item">
+              <i class="el-icon-view"></i> 查看次数：{{ currentHistorySummary.viewCount }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <template #footer>
+        <el-button @click="showHistoryDetail = false">关闭</el-button>
+        <el-button type="primary" @click="loadHistoryToCurrent">加载到当前</el-button>
+        <el-button type="success" @click="exportHistorySummary">导出</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -164,6 +219,8 @@ import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 
 const selectedCourse = ref('1')
+const showHistoryDetail = ref(false)
+const currentHistorySummary = ref(null)
 const courses = ref([
   { id: '1', title: '趣味语文：童话阅读与写作' },
   { id: '2', title: '数学王国大冒险' },
@@ -277,18 +334,50 @@ const totalViews = computed(() => {
 })
 
 const generateSummary = () => {
-  ElMessage.success('AI总结已生成')
-  // 这里可以添加生成总结的逻辑
+  ElMessage.loading('AI正在生成总结，请稍候...')
+  // 模拟AI生成过程
+  setTimeout(() => {
+    ElMessage.success('AI总结已生成')
+    // 更新历史记录
+    const course = courses.value.find(c => c.id === selectedCourse.value)
+    const existingIndex = summaryHistory.value.findIndex(h => h.courseId === selectedCourse.value)
+    const newHistoryItem = {
+      id: Date.now(),
+      courseId: selectedCourse.value,
+      courseTitle: course?.title || '未知课程',
+      generatedTime: new Date().toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      }),
+      viewCount: 0
+    }
+    
+    if (existingIndex !== -1) {
+      summaryHistory.value[existingIndex] = newHistoryItem
+    } else {
+      summaryHistory.value.unshift(newHistoryItem)
+    }
+  }, 2000)
 }
 
 const exportSummary = () => {
-  ElMessage.success('总结已导出')
-  // 这里可以添加导出总结的逻辑
+  ElMessage.success('总结已导出为PDF文件')
+  // 模拟导出过程
+  setTimeout(() => {
+    ElMessage.success('文件下载完成')
+  }, 1500)
 }
 
 const shareSummary = () => {
   ElMessage.success('总结分享链接已复制到剪贴板')
-  // 这里可以添加分享总结的逻辑
+  // 模拟分享功能
+  setTimeout(() => {
+    ElMessage.info('链接有效期：7天')
+  }, 1000)
 }
 
 const removeKeyword = (keyword) => {
@@ -300,8 +389,36 @@ const removeKeyword = (keyword) => {
 }
 
 const viewHistorySummary = (historyItem) => {
-  selectedCourse.value = historyItem.courseId
-  ElMessage.info(`查看历史总结：${historyItem.courseTitle}`)
+  const summary = summaryData.value[historyItem.courseId]
+  if (summary) {
+    currentHistorySummary.value = {
+      ...historyItem,
+      keywords: summary.keywords,
+      content: summary.content,
+      suggestions: summary.suggestions
+    }
+    showHistoryDetail.value = true
+    ElMessage.success(`打开历史总结：${historyItem.courseTitle}`)
+  } else {
+    ElMessage.warning('该历史总结数据已丢失')
+  }
+}
+
+const loadHistoryToCurrent = () => {
+  if (currentHistorySummary.value) {
+    selectedCourse.value = currentHistorySummary.value.courseId
+    showHistoryDetail.value = false
+    ElMessage.success('已加载到当前课程')
+  }
+}
+
+const exportHistorySummary = () => {
+  if (currentHistorySummary.value) {
+    ElMessage.success(`正在导出：${currentHistorySummary.value.courseTitle}`)
+    setTimeout(() => {
+      ElMessage.success('导出完成，文件已下载')
+    }, 1500)
+  }
 }
 
 const refreshHistory = () => {
@@ -761,5 +878,136 @@ const refreshHistory = () => {
     align-items: flex-start;
     gap: 12px;
   }
+}
+
+/* 历史总结详情弹窗样式 */
+.history-detail-content {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.detail-section {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.detail-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.detail-section .section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-section .section-title::before {
+  content: '';
+  width: 4px;
+  height: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+}
+
+.detail-section .keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.detail-section .keyword-tag {
+  margin: 0;
+}
+
+.detail-section .summary-content {
+  line-height: 1.8;
+  color: #606266;
+  background-color: #f8f9fa;
+  padding: 16px;
+  border-radius: 6px;
+  border-left: 4px solid #667eea;
+}
+
+.detail-section .summary-paragraph {
+  margin-bottom: 12px;
+  text-indent: 2em;
+}
+
+.detail-section .summary-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.detail-section .suggestions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.detail-section .suggestion-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background-color: #f0f9ff;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+}
+
+.detail-section .suggestion-item:hover {
+  background-color: #e0f2fe;
+  transform: translateX(4px);
+}
+
+.detail-section .suggestion-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #10b981;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.detail-section .suggestion-text {
+  flex: 1;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.detail-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid #ebeef5;
+}
+
+.detail-meta {
+  display: flex;
+  gap: 20px;
+  color: #909399;
+  font-size: 14px;
+}
+
+.detail-meta .meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.detail-meta .meta-item i {
+  font-size: 16px;
 }
 </style>

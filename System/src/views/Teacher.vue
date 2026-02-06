@@ -1,5 +1,5 @@
 <template>
-  <div class="teacher-platform">
+  <div class="teacher-container">
     <!-- 顶部导航栏 -->
     <div class="navbar">
       <div class="nav-left">
@@ -25,7 +25,7 @@
           :loading="btnLoading.back"
           class="interactive-btn"
         >
-<i class="el-icon-back"></i> 返回首页        </el-button>
+<i class="el-icon-back"></i> 返回学生端        </el-button>
       </div>
     </div>
 
@@ -699,7 +699,7 @@
         </template>
 
         <!-- 师生管理模块 -->
-        <template v-else>
+        <template v-if="currentMenu.startsWith('3-')">
           <div class="page-header">
             <h2 class="page-title">{{ currentModule }}管理</h2>
             <div class="module-switch">
@@ -878,6 +878,58 @@
                 background
               />
             </div>
+          </div>
+        </template>
+
+        <!-- 成绩管理模块 -->
+        <template v-else-if="currentMenu.startsWith('5-')">
+          <div class="page-header">
+            <h2 class="page-title">{{ getScorePageTitle() }}</h2>
+          </div>
+          <div class="action-bar">
+            <div class="left-actions">
+              <el-button 
+                type="primary" 
+                icon="el-icon-plus" 
+                @click="scoreDialogVisible = true"
+              >
+                录入成绩
+              </el-button>
+              <el-button 
+                type="success" 
+                icon="el-icon-s-data" 
+                @click="showScoreStatistics"
+              >
+                成绩统计
+              </el-button>
+            </div>
+          </div>
+          <div class="table-container">
+            <el-table
+              :data="scoreList"
+              border
+              stripe
+              v-loading="scoreLoading"
+              empty-text="暂无成绩数据"
+            >
+              <el-table-column prop="id" label="ID" width="100" />
+              <el-table-column prop="studentId" label="学生ID" width="100" />
+              <el-table-column prop="subject" label="科目" width="100">
+                <template #default="{ row }">
+                  <el-tag :type="getSubjectTagType(row.subject)">{{ getSubjectName(row.subject) }}</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="score" label="分数" width="100" />
+              <el-table-column prop="examType" label="考试类型" width="120" />
+              <el-table-column prop="createTime" label="录入时间" width="160" />
+            </el-table>
+          </div>
+        </template>
+
+        <!-- 默认空白模块 -->
+        <template v-else>
+          <div class="empty-module">
+            <el-empty description="请选择左侧菜单" />
           </div>
         </template>
       </div>
@@ -1463,31 +1515,32 @@ const STORAGE_KEYS = {
 
 const DEFAULT_DATA = {
   teachers: [
-    { id: 'T001', name: '张三', gender: 1, age: 35, phone: '13800138000', idCard: '110101198901011234', position: '数学教研组组长', attendance: 'normal' },
-    { id: 'T002', name: '李四', gender: 2, age: 28, phone: '13900139000', idCard: '110101199602021234', position: '语文老师', attendance: 'normal' },
-    { id: 'T003', name: '王五', gender: 1, age: 42, phone: '13700137000', idCard: '110101198203031234', position: '英语老师', attendance: 'leave' },
-    { id: 'T004', name: '赵六', gender: 2, age: 31, phone: '13600136000', idCard: '110101199304041234', position: '科学老师', attendance: 'normal' },
-    { id: 'T005', name: '钱七', gender: 1, age: 38, phone: '13500135000', idCard: '110101198605051234', position: '体育老师', attendance: 'absent' },
-    { id: 'T006', name: '孙八', gender: 2, age: 29, phone: '13400134000', idCard: '110101199506061234', position: '美术老师', attendance: 'normal' }
+    { id: 'T001', name: '张大山', gender: 1, age: 45, phone: '13800138000', idCard: '110101198901011234', position: '乡村学校校长', attendance: 'normal' },
+    { id: 'T002', name: '李小花', gender: 2, age: 32, phone: '13900139000', idCard: '110101199602021234', position: '语文老师', attendance: 'normal' },
+    { id: 'T003', name: '王强', gender: 1, age: 40, phone: '13700137000', idCard: '110101198203031234', position: '数学老师', attendance: 'leave' },
+    { id: 'T004', name: '赵美丽', gender: 2, age: 28, phone: '13600136000', idCard: '110101199304041234', position: '英语老师', attendance: 'normal' },
+    { id: 'T005', name: '陈老师', gender: 1, age: 35, phone: '13500135000', idCard: '110101198605051234', position: '科学老师', attendance: 'normal' },
+    { id: 'T006', name: '刘老师', gender: 2, age: 30, phone: '13400134000', idCard: '110101199506061234', position: '音乐老师', attendance: 'normal' }
   ],
   students: [
-    { id: 'S001', name: '小明', gender: 1, age: 10, phone: '13811111111', idCard: '110101201403031234', grade: '3', className: '3班' },
-    { id: 'S002', name: '小红', gender: 2, age: 9, phone: '13822222222', idCard: '110101201504041234', grade: '2', className: '2班' },
-    { id: 'S003', name: '小刚', gender: 1, age: 11, phone: '13833333333', idCard: '110101201305051234', grade: '4', className: '4班' },
+    { id: 'S001', name: '小明', gender: 1, age: 10, phone: '13811111111', idCard: '110101201403031234', grade: '3', className: '1班' },
+    { id: 'S002', name: '小红', gender: 2, age: 9, phone: '13822222222', idCard: '110101201504041234', grade: '2', className: '1班' },
+    { id: 'S003', name: '小刚', gender: 1, age: 11, phone: '13833333333', idCard: '110101201305051234', grade: '4', className: '1班' },
     { id: 'S004', name: '小丽', gender: 2, age: 8, phone: '13844444444', idCard: '110101201606061234', grade: '1', className: '1班' },
-    { id: 'S005', name: '小亮', gender: 1, age: 12, phone: '13855555555', idCard: '110101201207071234', grade: '5', className: '5班' },
-    { id: 'S006', name: '小美', gender: 2, age: 10, phone: '13866666666', idCard: '110101201408081234', grade: '3', className: '3班' },
-    { id: 'S007', name: '小军', gender: 1, age: 9, phone: '13877777777', idCard: '110101201509091234', grade: '2', className: '2班' },
-    { id: 'S008', name: '小雅', gender: 2, age: 11, phone: '13888888888', idCard: '110101201310101234', grade: '4', className: '4班' },
+    { id: 'S005', name: '小亮', gender: 1, age: 12, phone: '13855555555', idCard: '110101201207071234', grade: '5', className: '1班' },
+    { id: 'S006', name: '小美', gender: 2, age: 10, phone: '13866666666', idCard: '110101201408081234', grade: '3', className: '1班' },
+    { id: 'S007', name: '小军', gender: 1, age: 9, phone: '13877777777', idCard: '110101201509091234', grade: '2', className: '1班' },
+    { id: 'S008', name: '小雅', gender: 2, age: 11, phone: '13888888888', idCard: '110101201310101234', grade: '4', className: '1班' },
     { id: 'S009', name: '小虎', gender: 1, age: 8, phone: '13899999999', idCard: '110101201611111234', grade: '1', className: '1班' },
-    { id: 'S010', name: '小婷', gender: 2, age: 12, phone: '13800000000', idCard: '110101201212121234', grade: '5', className: '5班' }
+    { id: 'S010', name: '小婷', gender: 2, age: 12, phone: '13800000000', idCard: '110101201212121234', grade: '5', className: '1班' }
   ],
   courses: [
-    { id: 'C001', name: '三年级数学上册', type: 'math', grade: '3', teacher: '张三', hour: 40, status: 'published', studentCount: 45, completionRate: 85, avgScore: 88, excellentRate: 35 },
-    { id: 'C002', name: '二年级语文下册', type: 'chinese', grade: '2', teacher: '李四', hour: 36, status: 'draft', studentCount: 38, completionRate: 78, avgScore: 82, excellentRate: 25 },
-    { id: 'C003', name: '四年级英语基础', type: 'english', grade: '4', teacher: '王五', hour: 45, status: 'published', studentCount: 28, completionRate: 92, avgScore: 90, excellentRate: 45 },
-    { id: 'C004', name: '五年级科学实验', type: 'science', grade: '5', teacher: '赵六', hour: 30, status: 'draft', studentCount: 0, completionRate: 0, avgScore: 0, excellentRate: 0 },
-    { id: 'C005', name: '三年级体育健康', type: 'pe', grade: '3', teacher: '钱七', hour: 20, status: 'offline', studentCount: 15, completionRate: 65, avgScore: 75, excellentRate: 10 }
+    { id: 'C001', name: '三年级数学上册', type: 'math', grade: '3', teacher: '王强', hour: 40, status: 'published', studentCount: 25, completionRate: 85, avgScore: 88, excellentRate: 35 },
+    { id: 'C002', name: '二年级语文下册', type: 'chinese', grade: '2', teacher: '李小花', hour: 36, status: 'draft', studentCount: 20, completionRate: 78, avgScore: 82, excellentRate: 25 },
+    { id: 'C003', name: '四年级英语基础', type: 'english', grade: '4', teacher: '赵美丽', hour: 45, status: 'published', studentCount: 18, completionRate: 92, avgScore: 90, excellentRate: 45 },
+    { id: 'C004', name: '五年级科学实验', type: 'science', grade: '5', teacher: '陈老师', hour: 30, status: 'draft', studentCount: 0, completionRate: 0, avgScore: 0, excellentRate: 0 },
+    { id: 'C005', name: '乡村音乐欣赏', type: 'music', grade: '3', teacher: '刘老师', hour: 20, status: 'published', studentCount: 25, completionRate: 65, avgScore: 75, excellentRate: 10 },
+    { id: 'C006', name: '乡村特色课程', type: 'special', grade: '4', teacher: '张大山', hour: 25, status: 'published', studentCount: 22, completionRate: 70, avgScore: 80, excellentRate: 20 }
   ]
 }
 
@@ -1495,7 +1548,7 @@ const router = useRouter()
 
 // 核心：从localStorage读取登录用户信息（优先）
 const userInfo = ref(JSON.parse(localStorage.getItem('userInfo') || '{"name":"未知用户"}'))
-const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png' // 默认头像
+const defaultAvatar = '/src/assets/logo.svg' // 默认头像
 
 const isCollapse = ref(false)
 const autoRefresh = ref(false)
@@ -1516,6 +1569,8 @@ const dialogVisible = ref(false)
 const homeworkDialogVisible = ref(false)
 const noticeDialogVisible = ref(false)
 const scoreDialogVisible = ref(false)
+const scoreLoading = ref(false)
+const scoreList = ref([])
 const lessonDialogVisible = ref(false)
 const planDialogVisible = ref(false)
 
@@ -1720,35 +1775,38 @@ const planRules = reactive({
 
 // 默认作业数据
 const DEFAULT_HOMEWORKS = [
-  { id: 'HW001', name: '第一章练习', course: 'math', classes: ['1班', '2班'], deadline: '2024-02-15 23:59', status: 'pending', submittedCount: 45, totalStudents: 50, completionRate: 90, avgScore: 85 },
-  { id: 'HW002', name: '英语单词听写', course: 'english', classes: ['3班'], deadline: '2024-02-16 23:59', status: 'graded', submittedCount: 30, totalStudents: 35, completionRate: 86, avgScore: 78 },
-  { id: 'HW003', name: '语文阅读理解', course: 'chinese', classes: ['1班', '2班', '3班'], deadline: '2024-02-17 23:59', status: 'pending', submittedCount: 80, totalStudents: 100, completionRate: 80, avgScore: 82 },
-  { id: 'HW004', name: '科学实验报告', course: 'science', classes: ['4班'], deadline: '2024-02-18 23:59', status: 'graded', submittedCount: 25, totalStudents: 30, completionRate: 83, avgScore: 88 },
-  { id: 'HW005', name: '数学综合测试', course: 'math', classes: ['5班', '6班'], deadline: '2024-02-19 23:59', status: 'pending', submittedCount: 55, totalStudents: 60, completionRate: 92, avgScore: 90 }
+  { id: 'HW001', name: '乡村数学练习', course: 'math', classes: ['1班'], deadline: '2024-02-15 23:59', status: 'pending', submittedCount: 20, totalStudents: 25, completionRate: 80, avgScore: 85 },
+  { id: 'HW002', name: '乡村英语单词听写', course: 'english', classes: ['1班'], deadline: '2024-02-16 23:59', status: 'graded', submittedCount: 18, totalStudents: 25, completionRate: 72, avgScore: 78 },
+  { id: 'HW003', name: '乡村语文阅读理解', course: 'chinese', classes: ['1班'], deadline: '2024-02-17 23:59', status: 'pending', submittedCount: 22, totalStudents: 25, completionRate: 88, avgScore: 82 },
+  { id: 'HW004', name: '乡村科学实验报告', course: 'science', classes: ['1班'], deadline: '2024-02-18 23:59', status: 'graded', submittedCount: 15, totalStudents: 25, completionRate: 60, avgScore: 88 },
+  { id: 'HW005', name: '乡村音乐欣赏作业', course: 'music', classes: ['1班'], deadline: '2024-02-19 23:59', status: 'pending', submittedCount: 18, totalStudents: 25, completionRate: 72, avgScore: 90 }
 ]
 
 // 默认在线备课数据
 const DEFAULT_LESSONS = [
-  { id: 'L001', name: '第一章数学备课', course: 'math', grade: '3', content: '第一章内容...', objectives: '掌握基础运算', createTime: '2024-01-15 10:00' },
-  { id: 'L002', name: '英语单词教学', course: 'english', grade: '4', content: '单词记忆方法...', objectives: '掌握50个单词', createTime: '2024-01-16 14:00' },
-  { id: 'L003', name: '语文阅读课', course: 'chinese', grade: '2', content: '阅读理解技巧...', objectives: '提高阅读能力', createTime: '2024-01-17 09:00' }
+  { id: 'L001', name: '乡村数学基础备课', course: 'math', grade: '3', content: '乡村数学基础运算，结合农村实际生活场景，如农作物种植、家畜养殖等实际问题进行数学教学', objectives: '掌握基础运算，能解决农村实际生活中的数学问题', createTime: '2024-01-15 10:00' },
+  { id: 'L002', name: '乡村英语单词教学', course: 'english', grade: '4', content: '结合农村实际生活场景，教授与农业、农村生活相关的英语单词和短语', objectives: '掌握与农村生活相关的50个英语单词', createTime: '2024-01-16 14:00' },
+  { id: 'L003', name: '乡村语文阅读课', course: 'chinese', grade: '2', content: '选择与农村生活相关的阅读材料，如农村故事、农业知识等，教授阅读理解技巧', objectives: '提高阅读能力，了解农村文化', createTime: '2024-01-17 09:00' },
+  { id: 'L004', name: '乡村科学实验课', course: 'science', grade: '5', content: '利用农村常见材料进行科学实验，如土壤测试、植物生长观察等', objectives: '培养科学探究能力，了解农村科学知识', createTime: '2024-01-18 15:00' }
 ]
 
 // 默认资源库数据
 const DEFAULT_RESOURCES = [
-  { id: 'R001', name: '数学课件.pptx', type: 'document', size: '2.5MB', uploadTime: '2024-01-10 15:30' },
-  { id: 'R002', name: '英语听力.mp3', type: 'audio', size: '5.8MB', uploadTime: '2024-01-11 10:20' },
-  { id: 'R003', name: '科学实验视频.mp4', type: 'video', size: '128MB', uploadTime: '2024-01-12 16:45' },
-  { id: 'R004', name: '教学图片.jpg', type: 'image', size: '1.2MB', uploadTime: '2024-01-13 11:15' },
-  { id: 'R005', name: '语文教案.docx', type: 'document', size: '0.8MB', uploadTime: '2024-01-14 09:30' }
+  { id: 'R001', name: '乡村数学课件.pptx', type: 'document', size: '2.5MB', uploadTime: '2024-01-10 15:30' },
+  { id: 'R002', name: '乡村英语听力.mp3', type: 'audio', size: '5.8MB', uploadTime: '2024-01-11 10:20' },
+  { id: 'R003', name: '乡村科学实验视频.mp4', type: 'video', size: '128MB', uploadTime: '2024-01-12 16:45' },
+  { id: 'R004', name: '乡村教学图片.jpg', type: 'image', size: '1.2MB', uploadTime: '2024-01-13 11:15' },
+  { id: 'R005', name: '乡村语文教案.docx', type: 'document', size: '0.8MB', uploadTime: '2024-01-14 09:30' },
+  { id: 'R006', name: '乡村特色课程资源.pdf', type: 'document', size: '1.5MB', uploadTime: '2024-01-15 14:30' }
 ]
 
 // 默认教学计划数据
 const DEFAULT_PLANS = [
-  { id: 'P001', name: '第一学期教学计划', course: 'math', grade: '3', startTime: '2024-02-01', endTime: '2024-06-30', content: '完成第一章到第五章教学', status: 'ongoing', progress: 45 },
-  { id: 'P002', name: '英语教学计划', course: 'english', grade: '4', startTime: '2024-02-01', endTime: '2024-06-30', content: '完成单词和语法教学', status: 'ongoing', progress: 60 },
-  { id: 'P003', name: '语文阅读计划', course: 'chinese', grade: '2', startTime: '2024-01-01', endTime: '2024-01-31', content: '完成阅读理解训练', status: 'completed', progress: 100 },
-  { id: 'P004', name: '科学实验计划', course: 'science', grade: '5', startTime: '2024-02-15', endTime: '2024-03-15', content: '完成基础实验', status: 'delayed', progress: 30 }
+  { id: 'P001', name: '乡村数学教学计划', course: 'math', grade: '3', startTime: '2024-02-01', endTime: '2024-06-30', content: '完成乡村数学基础运算、应用题等教学，结合农村实际生活场景', status: 'ongoing', progress: 45 },
+  { id: 'P002', name: '乡村英语教学计划', course: 'english', grade: '4', startTime: '2024-02-01', endTime: '2024-06-30', content: '完成与农村生活相关的英语单词、短语和简单对话教学', status: 'ongoing', progress: 60 },
+  { id: 'P003', name: '乡村语文阅读计划', course: 'chinese', grade: '2', startTime: '2024-01-01', endTime: '2024-01-31', content: '完成与农村生活相关的阅读理解训练，提高学生阅读能力', status: 'completed', progress: 100 },
+  { id: 'P004', name: '乡村科学实验计划', course: 'science', grade: '5', startTime: '2024-02-15', endTime: '2024-03-15', content: '利用农村常见材料完成基础科学实验，培养学生科学探究能力', status: 'delayed', progress: 30 },
+  { id: 'P005', name: '乡村特色课程计划', course: 'special', grade: '4', startTime: '2024-02-01', endTime: '2024-06-30', content: '开发和实施乡村特色课程，如农业知识、农村文化等', status: 'ongoing', progress: 20 }
 ]
 
 const courseDetailVisible = ref(false)
@@ -1844,6 +1902,14 @@ const fetchData = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const loadScoreData = () => {
+  scoreLoading.value = true
+  setTimeout(() => {
+    scoreList.value = scoreData.value
+    scoreLoading.value = false
+  }, 500)
 }
 
 const formatTableItem = (item) => {
@@ -2093,32 +2159,29 @@ const handleMenuSelect = (index) => {
     homeworkPagination.page = 1
     resetHomeworkSearch()
     loadHomeworkData()
+  } else if (index.startsWith('3-')) {
+    if (index === '3-1') {
+      currentModule.value = '教师'
+      switchModule()
+    } else if (index === '3-2') {
+      currentModule.value = '学生'
+      switchModule()
+    } else if (index === '3-3') {
+      noticeDialogVisible.value = true
+    }
   } else if (index.startsWith('4-')) {
     teachingToolPagination.page = 1
     resetTeachingToolSearch()
     loadTeachingToolData()
-  } else {
-    switch (index) {
-      case '3-1':
-        currentModule.value = '教师'
-        switchModule()
-        break
-      case '3-2':
-        currentModule.value = '学生'
-        switchModule()
-        break
-      case '3-3':
-        noticeDialogVisible.value = true
-        break
-      case '5-1':
-        scoreDialogVisible.value = true
-        break
-      case '5-2':
-        ElMessage.info('成绩统计功能已触发，可扩展表格展示成绩分布')
-        break
-      default:
-        ElMessage.info('该功能正在开发中')
+  } else if (index.startsWith('5-')) {
+    loadScoreData()
+    if (index === '5-1') {
+      scoreDialogVisible.value = true
+    } else if (index === '5-2') {
+      showScoreStatistics()
     }
+  } else {
+    ElMessage.info('该功能正在开发中')
   }
 }
 
@@ -2138,7 +2201,7 @@ const goBack = () => {
     try {
       router.push('/home')
     } catch (error) {
-      ElMessage.warning(`返回首页失败：${error.message}`)
+      ElMessage.warning(`返回学生端失败：${error.message}`)
     } finally {
       btnLoading.back = false
     }
@@ -2482,6 +2545,44 @@ const getProgressColor = (progress) => {
   return '#67c23a'
 }
 
+// 成绩管理相关方法
+const getScorePageTitle = () => {
+  switch (currentMenu.value) {
+    case '5-1':
+      return '成绩录入'
+    case '5-2':
+      return '成绩统计'
+    default:
+      return '成绩管理'
+  }
+}
+
+const showScoreStatistics = () => {
+  ElMessage.info('成绩统计功能已触发，可扩展表格展示成绩分布')
+}
+
+const getSubjectName = (subject) => {
+  const subjectMap = {
+    chinese: '语文',
+    math: '数学',
+    english: '英语',
+    science: '科学',
+    pe: '体育'
+  }
+  return subjectMap[subject] || '未知'
+}
+
+const getSubjectTagType = (subject) => {
+  const subjectMap = {
+    chinese: 'primary',
+    math: 'success',
+    english: 'warning',
+    science: 'info',
+    pe: 'danger'
+  }
+  return subjectMap[subject] || 'default'
+}
+
 const openLessonDialog = () => {
   Object.assign(lessonForm, {
     id: '',
@@ -2564,7 +2665,7 @@ const deleteLesson = async (row) => {
     ElMessage.success('删除成功')
     loadTeachingToolData()
   } catch (error) {
-    console.log('取消删除')
+    ElMessage.info('已取消删除')
   }
 }
 
@@ -2658,7 +2759,7 @@ const deletePlan = async (row) => {
     ElMessage.success('删除成功')
     loadTeachingToolData()
   } catch (error) {
-    console.log('取消删除')
+    ElMessage.info('已取消删除')
   }
 }
 
@@ -2687,7 +2788,7 @@ const deleteResource = async (row) => {
     ElMessage.success('删除成功')
     loadTeachingToolData()
   } catch (error) {
-    console.log('取消删除')
+    ElMessage.info('已取消删除')
   }
 }
 
@@ -2785,7 +2886,7 @@ const batchDeleteTeachingTool = async () => {
     selectedTeachingTools.value = []
     loadTeachingToolData()
   } catch (error) {
-    console.log('取消删除')
+    ElMessage.info('已取消删除')
   }
 }
 
@@ -3333,6 +3434,71 @@ watch(currentMenu, () => {
 </script>
 
 <style scoped>
+/* 教师端蓝色主题样式 */
+.teacher-container {
+  /* 主色：天空蓝/湖蓝 */
+  --primary-color: #409eff;
+  --primary-light: #66b1ff;
+  --primary-lighter: #a0cfff;
+  --primary-dark: #337ecc;
+  --primary-hover: #66b1ff;
+  
+  /* 辅色：草绿/白色 */
+  --secondary-color: #67c23a;
+  --secondary-light: #85ce61;
+  --secondary-lighter: #a5d881;
+  --secondary-dark: #529b2e;
+  --secondary-hover: #85ce61;
+  
+  /* 点缀色：橙色（活力） */
+  --accent-color: #e6a23c;
+  --accent-light: #ebb563;
+  --accent-lighter: #f0c48c;
+  --accent-hover: #ebb563;
+  
+  /* 功能色 */
+  --success-color: #67c23a;
+  --success-light: #85ce61;
+  --success-hover: #85ce61;
+  --warning-color: #e6a23c;
+  --warning-light: #ebb563;
+  --warning-hover: #ebb563;
+  --danger-color: #f56c6c;
+  --danger-light: #f78989;
+  --danger-hover: #f78989;
+  --info-color: #909399;
+  --info-light: #a6a9ad;
+  --info-hover: #a6a9ad;
+  
+  /* 文字色 */
+  --text-primary: #303133;
+  --text-secondary: #606266;
+  --text-light: #909399;
+  --text-lighter: #c0c4cc;
+  
+  /* 背景色 */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f7fa;
+  --bg-tertiary: #ecf5ff;
+  --bg-quaternary: #f0f9eb;
+  
+  /* 边框色 */
+  --border-color: #e4e7ed;
+  --border-light: #ebeef5;
+  --border-dark: #dcdfe6;
+  --border-medium: #dcdfe6;
+  
+  /* 阴影 */
+  --shadow-sm: 0 2px 12px 0 rgba(64, 158, 255, 0.1);
+  --shadow-md: 0 10px 20px rgba(64, 158, 255, 0.15);
+  --shadow-lg: 0 20px 30px rgba(64, 158, 255, 0.2);
+  
+  /* 其他 */
+  --border-radius: 8px;
+  --transition-normal: all 0.3s ease;
+  --transition-fast: all 0.2s ease;
+}
+
 /* 教师端样式 */
 .main-layout {
   display: flex;
@@ -3342,8 +3508,8 @@ watch(currentMenu, () => {
 /* 顶部导航栏样式 */
 .navbar {
   height: 60px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.4);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -3370,7 +3536,7 @@ watch(currentMenu, () => {
 .platform-name {
   font-size: 20px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--bg-primary);
   margin: 0;
   display: flex;
   align-items: center;
@@ -3435,19 +3601,19 @@ watch(currentMenu, () => {
 
 .interactive-btn {
   transition: all 0.3s ease;
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-light) 100%);
   border: none;
   color: white;
   font-weight: 600;
   padding: 10px 24px;
   border-radius: 25px;
-  box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+  box-shadow: 0 4px 15px rgba(230, 162, 60, 0.4);
 }
 
 .interactive-btn:hover {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 6px 20px rgba(240, 147, 251, 0.6);
-  background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+  box-shadow: 0 6px 20px rgba(230, 162, 60, 0.6);
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent-color) 100%);
 }
 
 /* 左侧菜单栏样式 */
@@ -3481,7 +3647,7 @@ watch(currentMenu, () => {
 }
 
 .logo-container:hover {
-  background-color: var(--primary-light);
+  background-color: var(--primary-lighter);
 }
 
 .rotate-icon {
@@ -3547,9 +3713,9 @@ watch(currentMenu, () => {
   align-items: flex-start;
   margin-bottom: 24px;
   padding: 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 24px rgba(64, 158, 255, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -3558,7 +3724,7 @@ watch(currentMenu, () => {
   font-size: 28px;
   font-weight: bold;
   margin-bottom: 12px;
-  color: #ffffff;
+  color: var(--bg-primary);
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   position: relative;
   z-index: 1;
@@ -3600,7 +3766,7 @@ watch(currentMenu, () => {
 .search-panel {
   margin-bottom: 20px;
   padding: 20px;
-  background: #ffffff;
+  background: var(--bg-primary);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -3608,20 +3774,20 @@ watch(currentMenu, () => {
 .search-header {
   margin-bottom: 15px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .search-header h3 {
   font-size: 16px;
   font-weight: bold;
-  color: #303133;
+  color: var(--text-primary);
   margin: 0;
 }
 
 /* 表格容器样式 */
 .table-container {
   margin-bottom: 20px;
-  background: #ffffff;
+  background: var(--bg-primary);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   overflow: hidden;
@@ -3632,19 +3798,19 @@ watch(currentMenu, () => {
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  background: #fafafa;
-  border-bottom: 1px solid #f0f0f0;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .table-header span {
   font-size: 14px;
   font-weight: 500;
-  color: #303133;
+  color: var(--text-primary);
 }
 
 .data-count {
   font-size: 13px;
-  color: #909399;
+  color: var(--text-light);
 }
 
 @keyframes shimmer {
@@ -3656,7 +3822,7 @@ watch(currentMenu, () => {
   margin: 0;
   font-size: 28px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--bg-primary);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -3669,9 +3835,9 @@ watch(currentMenu, () => {
   content: "";
   width: 6px;
   height: 28px;
-  background: linear-gradient(180deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(180deg, var(--accent-color) 0%, var(--accent-light) 100%);
   border-radius: 3px;
-  box-shadow: 0 0 12px rgba(240, 147, 251, 0.6);
+  box-shadow: 0 0 12px rgba(230, 162, 60, 0.6);
 }
 
 .action-bar {
@@ -3682,10 +3848,10 @@ watch(currentMenu, () => {
   flex-wrap: wrap;
   gap: 12px;
   padding: 20px 24px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.12);
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  box-shadow: 0 4px 16px rgba(64, 158, 255, 0.12);
+  border: 1px solid rgba(64, 158, 255, 0.1);
   position: relative;
   overflow: hidden;
 }
@@ -3697,7 +3863,7 @@ watch(currentMenu, () => {
   left: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-light) 100%);
 }
 
 .left-actions {
@@ -3722,22 +3888,22 @@ watch(currentMenu, () => {
 }
 
 .left-actions .el-button--primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
   border: none;
 }
 
 .left-actions .el-button--success {
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  background: linear-gradient(135deg, var(--success-color) 0%, var(--success-light) 100%);
   border: none;
 }
 
 .left-actions .el-button--warning {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, var(--warning-color) 0%, var(--warning-light) 100%);
   border: none;
 }
 
 .left-actions .el-button--info {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  background: linear-gradient(135deg, var(--info-color) 0%, var(--info-light) 100%);
   border: none;
 }
 
@@ -3762,17 +3928,17 @@ watch(currentMenu, () => {
 }
 
 .right-actions .el-button--danger {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  background: linear-gradient(135deg, var(--danger-color) 0%, var(--danger-light) 100%);
   border: none;
 }
 
 .search-panel {
   margin-bottom: 24px;
   padding: 24px;
-  background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.12);
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  box-shadow: 0 4px 16px rgba(64, 158, 255, 0.12);
+  border: 1px solid rgba(64, 158, 255, 0.1);
   position: relative;
   overflow: hidden;
 }
@@ -3784,7 +3950,7 @@ watch(currentMenu, () => {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 50%, var(--accent-color) 100%);
 }
 
 .search-panel .el-form-item {
@@ -3799,18 +3965,18 @@ watch(currentMenu, () => {
 
 .search-panel .el-input:hover,
 .search-panel .el-select:hover {
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.2);
 }
 
 .search-panel .el-input__inner {
   border-radius: 8px;
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  border: 1px solid rgba(64, 158, 255, 0.2);
   transition: all 0.3s ease;
 }
 
 .search-panel .el-input__inner:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.1);
 }
 
 .search-panel .el-button {
@@ -3827,14 +3993,14 @@ watch(currentMenu, () => {
 }
 
 .search-panel .el-button--primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
   border: none;
 }
 
 .search-panel .el-button--default {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
-  border: 1px solid rgba(102, 126, 234, 0.2);
-  color: #667eea;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+  border: 1px solid rgba(64, 158, 255, 0.2);
+  color: var(--primary-color);
 }
 
 .search-form {
@@ -3846,10 +4012,10 @@ watch(currentMenu, () => {
 
 .table-container {
   margin-bottom: 24px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.12);
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  box-shadow: 0 4px 16px rgba(64, 158, 255, 0.12);
+  border: 1px solid rgba(64, 158, 255, 0.1);
   overflow: hidden;
   position: relative;
 }
@@ -3861,7 +4027,7 @@ watch(currentMenu, () => {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 50%, var(--accent-color) 100%);
 }
 
 .table-container .el-table {
@@ -3871,12 +4037,12 @@ watch(currentMenu, () => {
 }
 
 .table-container .el-table__header-wrapper {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
 }
 
 .table-container .el-table__header th {
   font-weight: 600;
-  color: #ffffff;
+  color: var(--bg-primary);
   background: transparent;
   border: none;
   padding: 16px 12px;
@@ -3892,19 +4058,19 @@ watch(currentMenu, () => {
 }
 
 .table-container .el-table__body tr:hover {
-  background: linear-gradient(90deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.05) 100%);
+  background: linear-gradient(90deg, rgba(64, 158, 255, 0.05) 0%, rgba(230, 162, 60, 0.05) 100%);
   transform: scale(1.005);
 }
 
 .table-container .el-table__body td {
   border: none;
-  border-bottom: 1px solid rgba(102, 126, 234, 0.08);
+  border-bottom: 1px solid rgba(64, 158, 255, 0.08);
   padding: 14px 12px;
   transition: all 0.3s ease;
 }
 
 .table-container .el-table__body tr:hover td {
-  border-bottom-color: rgba(102, 126, 234, 0.15);
+  border-bottom-color: rgba(64, 158, 255, 0.15);
 }
 
 .table-container .el-tag {
@@ -3915,25 +4081,25 @@ watch(currentMenu, () => {
 }
 
 .table-container .el-tag--primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
   border: none;
   color: white;
 }
 
 .table-container .el-tag--success {
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  background: linear-gradient(135deg, var(--success-color) 0%, var(--success-light) 100%);
   border: none;
   color: white;
 }
 
 .table-container .el-tag--warning {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, var(--warning-color) 0%, var(--warning-light) 100%);
   border: none;
   color: white;
 }
 
 .table-container .el-tag--danger {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  background: linear-gradient(135deg, var(--danger-color) 0%, var(--danger-light) 100%);
   border: none;
   color: white;
 }
@@ -3952,20 +4118,20 @@ watch(currentMenu, () => {
 }
 
 .table-container .el-button--primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
   border: none;
 }
 
 .table-container .el-button--danger {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  background: linear-gradient(135deg, var(--danger-color) 0%, var(--danger-light) 100%);
   border: none;
 }
 
 .pagination-container {
   margin-top: 0;
   padding: 20px 24px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
-  border-top: 1px solid rgba(102, 126, 234, 0.1);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+  border-top: 1px solid rgba(64, 158, 255, 0.1);
   text-align: right;
 }
 
@@ -3979,11 +4145,11 @@ watch(currentMenu, () => {
   border-radius: 6px;
   margin: 0 4px;
   transition: all 0.3s ease;
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  border: 1px solid rgba(64, 158, 255, 0.2);
 }
 
 .pagination-container .el-pagination button:hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
   color: white;
   border-color: transparent;
   transform: translateY(-1px);
@@ -3993,78 +4159,20 @@ watch(currentMenu, () => {
   border-radius: 6px;
   margin: 0 4px;
   transition: all 0.3s ease;
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  border: 1px solid rgba(64, 158, 255, 0.2);
 }
 
 .pagination-container .el-pagination .el-pager li:hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
   color: white;
   border-color: transparent;
   transform: translateY(-1px);
 }
 
 .pagination-container .el-pagination .el-pager li.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
   color: white;
   border-color: transparent;
-}
-
-/* 颜色变量定义 */
-:root {
-  /* 主色调 */
-  --primary-color: #409eff;
-  --primary-hover: #66b1ff;
-  --primary-light: #ecf5ff;
-  --primary-dark: #3a8ee6;
-  
-  /* 辅助色 */
-  --success-color: #67c23a;
-  --success-hover: #85ce61;
-  --success-light: #f0f9eb;
-  
-  --warning-color: #e6a23c;
-  --warning-hover: #ebb563;
-  --warning-light: #fdf6ec;
-  
-  --danger-color: #f56c6c;
-  --danger-hover: #f78989;
-  --danger-light: #fef0f0;
-  
-  --info-color: #909399;
-  --info-hover: #a6a9ad;
-  --info-light: #f4f4f5;
-  
-  /* 中性色 */
-  --text-primary: #303133;
-  --text-secondary: #606266;
-  --text-tertiary: #909399;
-  --text-quaternary: #c0c4cc;
-  
-  --bg-primary: #ffffff;
-  --bg-secondary: #f5f7fa;
-  --bg-tertiary: #fafafa;
-  --bg-quaternary: #f0f2f5;
-  
-  /* 边框色 */
-  --border-light: #e4e7ed;
-  --border-medium: #dcdfe6;
-  --border-dark: #c0c4cc;
-  
-  /* 阴影 */
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
-  
-  /* 圆角 */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-  
-  /* 过渡 */
-  --transition-fast: 0.2s ease;
-  --transition-normal: 0.3s ease;
-  --transition-slow: 0.5s ease;
 }
 
 /* 按钮样式优化 */
@@ -4370,7 +4478,7 @@ watch(currentMenu, () => {
 
 /* 卡片样式 */
 .card {
-  background-color: #ffffff;
+  background-color: var(--bg-primary);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   padding: 20px;
@@ -4387,7 +4495,7 @@ watch(currentMenu, () => {
 /* 课程详情样式 */
 .course-detail {
   padding: 24px;
-  background-color: #ffffff;
+  background-color: var(--bg-primary);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
@@ -4395,14 +4503,14 @@ watch(currentMenu, () => {
 .detail-header {
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #e6e6e6;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .detail-header h3 {
   margin: 0 0 8px 0;
   font-size: 20px;
   font-weight: bold;
-  color: #303133;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -4416,7 +4524,7 @@ watch(currentMenu, () => {
 .detail-header p {
   margin: 0;
   font-size: 14px;
-  color: #606266;
+  color: var(--text-secondary);
 }
 
 .detail-stats {
@@ -4428,14 +4536,14 @@ watch(currentMenu, () => {
 
 .stat-item {
   padding: 16px;
-  background-color: #f5f7fa;
+  background-color: var(--bg-secondary);
   border-radius: 8px;
   transition: all 0.3s ease;
   text-align: center;
 }
 
 .stat-item:hover {
-  background-color: #ecf5ff;
+  background-color: var(--bg-tertiary);
   transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(64, 158, 255, 0.1);
 }
@@ -4443,7 +4551,7 @@ watch(currentMenu, () => {
 .stat-label {
   display: block;
   font-size: 14px;
-  color: #606266;
+  color: var(--text-secondary);
   margin-bottom: 8px;
   font-weight: normal;
 }
@@ -4452,14 +4560,14 @@ watch(currentMenu, () => {
   display: block;
   font-size: 24px;
   font-weight: bold;
-  color: #409eff;
+  color: var(--primary-color);
   line-height: 1;
 }
 
 /* 图表容器样式 */
 .chart-container {
   padding: 24px;
-  background-color: #ffffff;
+  background-color: var(--bg-primary);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
@@ -4467,13 +4575,13 @@ watch(currentMenu, () => {
 .chart-item {
   margin-bottom: 32px;
   padding: 20px;
-  background-color: #fafafa;
+  background-color: var(--bg-secondary);
   border-radius: 8px;
   transition: all 0.3s ease;
 }
 
 .chart-item:hover {
-  background-color: #f5f7fa;
+  background-color: var(--bg-tertiary);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -4481,7 +4589,7 @@ watch(currentMenu, () => {
   margin-bottom: 20px;
   font-size: 16px;
   font-weight: bold;
-  color: #303133;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -4552,7 +4660,7 @@ watch(currentMenu, () => {
     width: 100%;
     height: auto;
     border-right: none;
-    border-bottom: 1px solid #e6e6e6;
+    border-bottom: 1px solid var(--border-light);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
   

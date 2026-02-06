@@ -4,7 +4,7 @@
     <nav class="navbar">
       <div class="nav-container">
         <div class="logo">
-          <img src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" alt="慧学澄明教育学习平台">
+          <img src="/src/assets/logo.svg" alt="慧学澄明教育学习平台">
           <h1>慧学澄明教育学习平台</h1>
         </div>
         <ul class="nav-menu">
@@ -13,6 +13,7 @@
           <li><a href="#courses" @click="scrollToSection($event, 'courses')">课程中心</a></li>
           <li><a href="#policy" @click="scrollToSection($event, 'policy')">乡村教育政策</a></li>
           <li><a href="#breakthrough" @click="scrollToSection($event, 'breakthrough')">破茧视界</a></li>
+
           <li><a href="#about" @click="scrollToSection($event, 'about')">关于我们</a></li>
           <li><a href="#contact" @click="scrollToSection($event, 'contact')">联系我们</a></li>
         </ul>
@@ -137,6 +138,18 @@
               </div>
             </div>
           </router-link>
+          <router-link to="#herorank" class="feature-card-link" @click="scrollToSection($event, 'herorank')">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="fas fa-trophy"></i>
+              </div>
+              <h3 class="feature-title">鸿鹄榜</h3>
+              <p class="feature-description">激励学习动力，展示学习成果，鸿鹄之志，志在千里。</p>
+              <div class="feature-link">
+                了解详情 <i class="fas fa-arrow-right"></i>
+              </div>
+            </div>
+          </router-link>
         </div>
       </div>
     </section>
@@ -220,6 +233,109 @@
       </div>
     </section>
 
+    <!-- 鸿鹄榜区 -->
+    <section id="herorank" class="herorank-section">
+      <div class="herorank-container">
+        <h2 class="section-title">鸿鹄榜</h2>
+        <p class="section-subtitle">鸿鹄之志，志在千里</p>
+        <div class="herorank-content">
+          <!-- 排行榜标签页 -->
+          <div class="herorank-tabs">
+            <el-tabs v-model="activeHeroRankTab" class="herorank-tabs-container">
+              <el-tab-pane label="总榜" name="total"></el-tab-pane>
+              <el-tab-pane label="周榜" name="weekly"></el-tab-pane>
+              <el-tab-pane label="月榜" name="monthly"></el-tab-pane>
+            </el-tabs>
+          </div>
+
+          <!-- 前三名展示 -->
+          <div class="herorank-top-three" v-if="heroRankTopThree.length > 0">
+            <div class="herorank-item second" v-if="heroRankTopThree[1]">
+              <div class="herorank-number">2</div>
+              <div class="herorank-avatar">
+                <img :src="heroRankTopThree[1].avatar || defaultHeroRankAvatar" :alt="heroRankTopThree[1].name">
+              </div>
+              <div class="herorank-info">
+                <h3 class="herorank-name">{{ heroRankTopThree[1].name }}</h3>
+                <p class="herorank-score">{{ heroRankTopThree[1].score }} 积分</p>
+              </div>
+              <div class="herorank-reward">
+                <span class="reward-icon">🥈</span>
+              </div>
+            </div>
+
+            <div class="herorank-item first" v-if="heroRankTopThree[0]">
+              <div class="herorank-number">1</div>
+              <div class="herorank-avatar">
+                <img :src="heroRankTopThree[0].avatar || defaultHeroRankAvatar" :alt="heroRankTopThree[0].name">
+              </div>
+              <div class="herorank-info">
+                <h3 class="herorank-name">{{ heroRankTopThree[0].name }}</h3>
+                <p class="herorank-score">{{ heroRankTopThree[0].score }} 积分</p>
+                <p class="herorank-level">等级：{{ heroRankTopThree[0].level }}</p>
+              </div>
+              <div class="herorank-reward">
+                <span class="reward-icon">🥇</span>
+              </div>
+            </div>
+
+            <div class="herorank-item third" v-if="heroRankTopThree[2]">
+              <div class="herorank-number">3</div>
+              <div class="herorank-avatar">
+                <img :src="heroRankTopThree[2].avatar || defaultHeroRankAvatar" :alt="heroRankTopThree[2].name">
+              </div>
+              <div class="herorank-info">
+                <h3 class="herorank-name">{{ heroRankTopThree[2].name }}</h3>
+                <p class="herorank-score">{{ heroRankTopThree[2].score }} 积分</p>
+              </div>
+              <div class="herorank-reward">
+                <span class="reward-icon">🥉</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 排行榜列表 -->
+          <div class="herorank-list" v-if="heroRankList.length > 0">
+            <div class="herorank-list-header">
+              <div class="herorank-list-column rank-column">排名</div>
+              <div class="herorank-list-column user-column">用户</div>
+              <div class="herorank-list-column score-column">积分</div>
+              <div class="herorank-list-column level-column">等级</div>
+            </div>
+            <div class="herorank-list-body">
+              <div 
+                v-for="(item, index) in heroRankList" 
+                :key="item.id" 
+                class="herorank-list-item"
+              >
+                <div class="herorank-list-column rank-column">
+                  <span class="herorank-list-number">{{ index + 4 }}</span>
+                </div>
+                <div class="herorank-list-column user-column">
+                  <div class="herorank-list-user">
+                    <img :src="item.avatar || defaultHeroRankAvatar" :alt="item.name" class="herorank-list-avatar">
+                    <span class="herorank-list-name">{{ item.name }}</span>
+                  </div>
+                </div>
+                <div class="herorank-list-column score-column">
+                  <span class="herorank-list-score">{{ item.score }}</span>
+                </div>
+                <div class="herorank-list-column level-column">
+                  <span class="herorank-list-level">{{ item.level }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 查看完整榜单按钮 -->
+          <div class="herorank-action">
+            <router-link to="/login" class="btn btn-primary">登录查看完整榜单</router-link>
+            <p class="herorank-tip">登录后查看个人排名和详细数据</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 关于我们区 -->
     <section id="about" class="about-section">
       <div class="about-container">
@@ -294,6 +410,7 @@
               <li><a href="#courses" @click="scrollToSection($event, 'courses')">课程中心</a></li>
               <li><a href="#policy" @click="scrollToSection($event, 'policy')">乡村教育政策</a></li>
               <li><a href="#breakthrough" @click="scrollToSection($event, 'breakthrough')">破茧视界</a></li>
+
               <li><a href="#about" @click="scrollToSection($event, 'about')">关于我们</a></li>
               <li><a href="#contact" @click="scrollToSection($event, 'contact')">联系我们</a></li>
             </ul>
@@ -329,8 +446,68 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
+
+// 鸿鹄榜相关数据
+const activeHeroRankTab = ref('total')
+const defaultHeroRankAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+
+const heroRankTopThree = ref([
+  {
+    id: 1,
+    name: '张明',
+    score: 12500,
+    level: '学霸',
+    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20smiling&image_size=square'
+  },
+  {
+    id: 2,
+    name: '李华',
+    score: 11200,
+    level: '学神',
+    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20smiling&image_size=square'
+  },
+  {
+    id: 3,
+    name: '王强',
+    score: 9800,
+    level: '学霸',
+    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20confident&image_size=square'
+  }
+])
+
+const heroRankList = ref([
+  {
+    id: 4,
+    name: '陈静',
+    score: 8500,
+    level: '优秀',
+    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20smart&image_size=square'
+  },
+  {
+    id: 5,
+    name: '刘阳',
+    score: 7200,
+    level: '优秀',
+    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20friendly&image_size=square'
+  },
+  {
+    id: 6,
+    name: '赵雨',
+    score: 6800,
+    level: '良好',
+    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20cheerful&image_size=square'
+  },
+  {
+    id: 7,
+    name: '孙伟',
+    score: 6500,
+    level: '良好',
+    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20serious&image_size=square'
+  }
+])
 
 // 滚动动画
 const observeElements = () => {
@@ -566,12 +743,11 @@ const playVideo = (videoId) => {
 const submitForm = () => {
   // 表单验证
   if (!formData.value.name || !formData.value.email || !formData.value.subject || !formData.value.message) {
-    alert('请填写所有必填字段')
+    ElMessage.warning('请填写所有必填字段')
     return
   }
   // 提交逻辑
-  console.log('表单提交：', formData.value)
-  alert('留言提交成功！我们会尽快与您联系。')
+  ElMessage.success('留言提交成功！我们会尽快与您联系。')
   // 重置表单
   formData.value = {
     name: '',
@@ -1895,5 +2071,307 @@ onMounted(() => {
 .video-grid .video-card:nth-child(4).animate-on-scroll { transition-delay: 0.4s; }
 .video-grid .video-card:nth-child(5).animate-on-scroll { transition-delay: 0.5s; }
 .video-grid .video-card:nth-child(6).animate-on-scroll { transition-delay: 0.6s; }
+
+/* 鸿鹄榜区 */
+.herorank-section {
+  padding: 100px 0;
+  background: linear-gradient(180deg, #f5f7fa 0%, #e8f3ff 100%);
+  position: relative;
+}
+
+.herorank-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #409eff, transparent);
+}
+
+.herorank-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.herorank-content {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid transparent;
+}
+
+.herorank-tabs {
+  margin-bottom: 40px;
+}
+
+.herorank-tabs-container {
+  background: rgba(64, 158, 255, 0.05);
+  border-radius: 8px;
+  padding: 5px;
+}
+
+.herorank-tabs-container .el-tabs__nav {
+  border-bottom: none;
+}
+
+.herorank-tabs-container .el-tabs__active-bar {
+  background-color: #409eff;
+}
+
+.herorank-tabs-container .el-tab-pane {
+  padding: 0;
+}
+
+.herorank-tabs-container .el-tabs__item {
+  color: #606266;
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 6px;
+  margin: 0 5px;
+  transition: all 0.3s ease;
+}
+
+.herorank-tabs-container .el-tabs__item:hover {
+  color: #409eff;
+  background: rgba(64, 158, 255, 0.1);
+}
+
+.herorank-tabs-container .el-tabs__item.is-active {
+  color: #fff;
+  background: linear-gradient(135deg, #409eff 0%, #69c0ff 100%);
+  font-weight: 600;
+}
+
+/* 前三名展示 */
+.herorank-top-three {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 30px;
+  margin-bottom: 40px;
+  padding: 30px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.herorank-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border-radius: 12px;
+  transition: all 0.4s ease;
+  min-width: 180px;
+}
+
+.herorank-item:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 24px rgba(64, 158, 255, 0.2);
+}
+
+.herorank-item.first {
+  order: 2;
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);
+  border: 2px solid #ffc107;
+  transform: scale(1.1);
+}
+
+.herorank-item.second {
+  order: 1;
+  background: linear-gradient(135deg, #e2e3e5 0%, #d6d8db 100%);
+  border: 2px solid #6c757d;
+}
+
+.herorank-item.third {
+  order: 3;
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  border: 2px solid #dc3545;
+}
+
+.herorank-number {
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  opacity: 0.2;
+}
+
+.herorank-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 15px;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.herorank-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.herorank-info {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.herorank-name {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0 0 5px 0;
+  color: #303133;
+}
+
+.herorank-score {
+  font-size: 16px;
+  color: #606266;
+  margin: 0 0 5px 0;
+}
+
+.herorank-level {
+  font-size: 14px;
+  color: #909399;
+  margin: 0;
+}
+
+.herorank-reward {
+  font-size: 32px;
+}
+
+/* 排行榜列表 */
+.herorank-list {
+  margin-bottom: 40px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.herorank-list-header {
+  display: flex;
+  background: linear-gradient(135deg, #409eff 0%, #69c0ff 100%);
+  padding: 15px 20px;
+  font-weight: bold;
+  color: #fff;
+  font-size: 14px;
+}
+
+.herorank-list-column {
+  display: flex;
+  align-items: center;
+}
+
+.herorank-list .rank-column {
+  width: 100px;
+}
+
+.herorank-list .user-column {
+  flex: 2;
+  min-width: 200px;
+}
+
+.herorank-list .score-column {
+  width: 120px;
+}
+
+.herorank-list .level-column {
+  width: 100px;
+}
+
+.herorank-list-body {
+  padding: 0 20px;
+}
+
+.herorank-list-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #e4e7ed;
+  transition: all 0.3s ease;
+}
+
+.herorank-list-item:hover {
+  background-color: rgba(64, 158, 255, 0.05);
+}
+
+.herorank-list-number {
+  font-size: 16px;
+  font-weight: bold;
+  color: #606266;
+}
+
+.herorank-list-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.herorank-list-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.herorank-list-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.herorank-list-name {
+  font-size: 14px;
+  color: #303133;
+  font-weight: 500;
+}
+
+.herorank-list-score {
+  font-size: 14px;
+  font-weight: 500;
+  color: #606266;
+}
+
+.herorank-list-level {
+  font-size: 14px;
+  color: #909399;
+}
+
+/* 操作按钮 */
+.herorank-action {
+  text-align: center;
+  padding: 30px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%);
+  border-radius: 12px;
+  border: 1px solid #bae6fd;
+}
+
+.herorank-action .btn {
+  font-size: 16px;
+  padding: 12px 30px;
+  margin-bottom: 15px;
+}
+
+.herorank-tip {
+  font-size: 14px;
+  color: #606266;
+  margin: 0;
+}
+
+/* 鸿鹄榜动画 */
+.herorank-item.animate-on-scroll {
+  transition-delay: 0.2s;
+}
+
+.herorank-list-item.animate-on-scroll {
+  transition-delay: 0.1s;
+}
 
 </style>

@@ -5,7 +5,7 @@
       <div class="nav-bg"></div>
       <div class="nav-content">
         <div class="nav-left">
-          <el-avatar :size="40" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" class="nav-logo"></el-avatar>
+          <el-avatar :size="40" src="/src/assets/logo.svg" class="nav-logo"></el-avatar>
           <h1 class="platform-name">慧学澄明学习教育平台-学生端</h1>
         </div>
         <div class="nav-right">
@@ -20,8 +20,22 @@
             </div>
           </div>
           <div class="user-info">
-            <el-avatar :size="36" :src="userInfo.avatar || defaultAvatar" class="user-avatar"></el-avatar>
-            <span class="user-name">欢迎回来：{{ userInfo.name }}</span>
+            <el-dropdown trigger="click" @command="handleUserMenuCommand">
+              <div class="user-avatar-wrapper">
+                <el-avatar :size="36" :src="userInfo.avatar || defaultAvatar" class="user-avatar"></el-avatar>
+                <span class="user-name">欢迎回来：{{ userInfo.name }}</span>
+              </div>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="profile">
+                    <i class="el-icon-user"></i> 个人信息
+                  </el-dropdown-item>
+                  <el-dropdown-item command="settings">
+                    <i class="el-icon-setting"></i> 个人设置
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </div>
           <el-button 
             type="primary" 
@@ -48,9 +62,9 @@
         <el-menu
           :default-active="currentMenu"
           class="sidebar-menu"
-          background-color="#f5f7fa"
-          text-color="#303133"
-          active-text-color="#409eff"
+          :background-color="'var(--bg-secondary)'"
+          :text-color="'var(--text-primary)'"
+          :active-text-color="'var(--bg-primary)'"
           :collapse="isCollapse"
           @select="handleMenuSelect"
         >
@@ -111,6 +125,12 @@
             <template #title>
               <i class="el-icon-video-camera"></i>
               <span>破茧视界</span>
+            </template>
+          </el-menu-item>
+          <el-menu-item index="9">
+            <template #title>
+              <i class="el-icon-trophy"></i>
+              <span>鸿鹄榜</span>
             </template>
           </el-menu-item>
         </el-menu>
@@ -188,7 +208,7 @@
                     <el-progress :percentage="course.progress" :stroke-width="8"></el-progress>
                     <span class="progress-text">{{ course.progress }}%</span>
                   </div>
-                  <el-button type="primary" size="small" class="course-btn">继续学习</el-button>
+                  <el-button type="primary" size="small" class="course-btn" @click="continueLearning(course)">继续学习</el-button>
                 </el-card>
               </div>
             </div>
@@ -279,6 +299,7 @@ import Notes from './Notes.vue'
 import Cloud from './Cloud.vue'
 import AiSummary from './AiSummary.vue'
 import SmartPractice from './SmartPractice.vue'
+import HeroRank from './HeroRank.vue'
 
 const router = useRouter()
 // 核心：从localStorage读取登录用户信息（优先）
@@ -298,7 +319,8 @@ const menuMap = {
   '4': Notes,
   '5': Cloud,
   '6': AiSummary,
-  '7': SmartPractice
+  '7': SmartPractice,
+  '9': HeroRank
 }
 
 // 菜单与标题映射
@@ -311,7 +333,8 @@ const menuTitleMap = {
   '5': '智存云空间',
   '6': '灵智知识集',
   '7': '智适应练场',
-  '8': '破茧视界'
+  '8': '破茧视界',
+  '9': '鸿鹄榜'
 }
 
 // 获取页面标题
@@ -437,7 +460,7 @@ onMounted(async () => {
     //   userInfo.value = res.data
     // }
   } catch (error) {
-    console.error('获取用户信息失败:', error)
+    ElMessage.error('获取用户信息失败')
   }
 })
 
@@ -456,11 +479,9 @@ const handleTeacherSwitch = () => {
         const userInfoObj = JSON.parse(userInfoStr)
         roleType = userInfoObj.role_type || 0
       } catch (e) {
-        console.error('解析用户信息失败:', e)
+        ElMessage.error('解析用户信息失败')
       }
     }
-    
-    console.log('当前角色类型:', roleType)
     
     // 明确检查只有角色类型为2的用户才能切换到教师端
     if (roleType === 2) {
@@ -472,6 +493,26 @@ const handleTeacherSwitch = () => {
   }).catch(() => {
     ElMessage.info('取消切换')
   })
+}
+
+// 继续学习
+const continueLearning = (course) => {
+  // 导航到智学课栈页面
+  currentMenu.value = '1'
+  currentView.value = Course
+  // 触发课程学习功能
+  ElMessage.success(`正在继续学习课程：${course.title}`)
+}
+
+// 处理用户菜单命令
+const handleUserMenuCommand = (command) => {
+  if (command === 'profile') {
+    ElMessage.success('跳转到个人信息页面')
+    // 这里可以添加跳转到个人信息页面的逻辑
+  } else if (command === 'settings') {
+    ElMessage.success('跳转到个人设置页面')
+    // 这里可以添加跳转到个人设置页面的逻辑
+  }
 }
 
 // 退出登录
@@ -492,18 +533,73 @@ const handleLogout = () => {
 </script>
 
 <style scoped>
+/* 学生端绿色主题样式 */
 .student-home-container {
+  /* 主色：草绿/蒲荷绿 */
+  --primary-color: #67c23a;
+  --primary-light: #85ce61;
+  --primary-lighter: #a5d881;
+  --primary-dark: #529b2e;
+  
+  /* 辅色：木色/浅卡其 */
+  --secondary-color: #d4a76a;
+  --secondary-light: #e6c998;
+  --secondary-lighter: #f0d9b5;
+  --secondary-dark: #b88a46;
+  
+  /* 点缀色：黄色（阳光） */
+  --accent-color: #e6a23c;
+  --accent-light: #ebb563;
+  --accent-lighter: #f0c48c;
+  
+  /* 功能色 */
+  --success-color: #67c23a;
+  --success-light: #85ce61;
+  --warning-color: #e6a23c;
+  --warning-light: #ebb563;
+  --danger-color: #f56c6c;
+  --danger-light: #f78989;
+  
+  /* 文字色 */
+  --text-primary: #303133;
+  --text-secondary: #606266;
+  --text-light: #909399;
+  --text-lighter: #c0c4cc;
+  
+  /* 背景色 */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f7fa;
+  --bg-tertiary: #f0f9eb;
+  --bg-quaternary: #f9f2e9;
+  
+  /* 边框色 */
+  --border-color: #e4e7ed;
+  --border-light: #ebeef5;
+  --border-dark: #dcdfe6;
+  
+  /* 阴影 */
+  --shadow-sm: 0 2px 12px 0 rgba(103, 194, 58, 0.1);
+  --shadow-md: 0 10px 20px rgba(103, 194, 58, 0.15);
+  --shadow-lg: 0 20px 30px rgba(103, 194, 58, 0.2);
+  
+  /* 其他 */
+  --border-radius: 8px;
+  --transition: all 0.3s ease;
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background-color: var(--bg-tertiary);
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(103, 194, 58, 0.1) 0%, transparent 20%),
+    radial-gradient(circle at 90% 80%, rgba(212, 167, 106, 0.1) 0%, transparent 20%);
 }
 
 /* 导航栏样式 */
 .navbar {
   position: relative;
   height: 70px;
-  background-color: #ffffff;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  background-color: var(--bg-primary);
+  box-shadow: var(--shadow-sm);
   z-index: 100;
+  backdrop-filter: blur(10px);
 }
 
 .nav-bg {
@@ -512,7 +608,7 @@ const handleLogout = () => {
   left: 0;
   right: 0;
   height: 70px;
-  background: linear-gradient(90deg, #409eff, #69c0ff);
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
   opacity: 0.1;
   z-index: -1;
 }
@@ -532,13 +628,23 @@ const handleLogout = () => {
 
 .nav-logo {
   margin-right: 15px;
+  transition: transform 0.3s ease;
+}
+
+.nav-logo:hover {
+  transform: scale(1.1);
 }
 
 .platform-name {
   font-size: 18px;
   font-weight: bold;
-  color: #303133;
+  color: var(--text-primary);
   margin: 0;
+  transition: color 0.3s ease;
+}
+
+.platform-name:hover {
+  color: var(--primary-dark);
 }
 
 .nav-right {
@@ -549,24 +655,40 @@ const handleLogout = () => {
 .nav-stats {
   display: flex;
   margin-right: 30px;
+  gap: 20px;
 }
 
 .stat-item {
-  margin-right: 20px;
   text-align: center;
+  padding: 8px 16px;
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+}
+
+.stat-item:hover {
+  background-color: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.stat-item:hover .stat-label,
+.stat-item:hover .stat-value {
+  color: var(--bg-primary);
 }
 
 .stat-label {
   display: block;
   font-size: 12px;
-  color: #909399;
+  color: var(--text-light);
+  transition: var(--transition);
 }
 
 .stat-value {
   display: block;
   font-size: 14px;
   font-weight: bold;
-  color: #303133;
+  color: var(--text-primary);
+  transition: var(--transition);
 }
 
 .user-info {
@@ -575,17 +697,52 @@ const handleLogout = () => {
   margin-right: 20px;
 }
 
+.user-avatar-wrapper {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 25px;
+  transition: var(--transition);
+  background-color: var(--bg-secondary);
+}
+
+.user-avatar-wrapper:hover {
+  background-color: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.user-avatar-wrapper:hover .user-name {
+  color: var(--bg-primary);
+}
+
 .user-avatar {
   margin-right: 10px;
+  border: 2px solid var(--primary-light);
+  transition: var(--transition);
+}
+
+.user-avatar-wrapper:hover .user-avatar {
+  border-color: var(--bg-primary);
+  transform: scale(1.05);
 }
 
 .user-name {
   font-size: 14px;
-  color: #303133;
+  color: var(--text-primary);
+  transition: var(--transition);
+  font-weight: 500;
 }
 
 .interactive-btn {
   margin-left: 10px;
+  transition: var(--transition);
+}
+
+.interactive-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
 /* 主体布局 */
@@ -597,9 +754,10 @@ const handleLogout = () => {
 /* 侧边栏样式 */
 .sidebar {
   width: 220px;
-  background-color: #f5f7fa;
-  border-right: 1px solid #e4e7ed;
-  transition: width 0.3s;
+  background-color: var(--bg-primary);
+  border-right: 1px solid var(--border-color);
+  transition: var(--transition);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
 }
 
 .sidebar.is-collapse {
@@ -616,16 +774,51 @@ const handleLogout = () => {
   justify-content: space-between;
   padding: 20px 15px;
   cursor: pointer;
+  transition: var(--transition);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.logo-container:hover {
+  background-color: var(--bg-secondary);
 }
 
 .collapse-text {
   font-size: 14px;
-  color: #606266;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.logo-container:hover .collapse-text {
+  color: var(--primary-color);
 }
 
 .rotate-icon {
   transform: rotate(180deg);
-  transition: transform 0.3s;
+  transition: var(--transition);
+}
+
+/* 侧边栏菜单项样式 */
+.sidebar-menu .el-menu-item {
+  transition: var(--transition);
+  height: 60px;
+  line-height: 60px;
+  margin: 5px 10px;
+  border-radius: var(--border-radius);
+}
+
+.sidebar-menu .el-menu-item:hover {
+  background-color: rgba(103, 194, 58, 0.1);
+  transform: translateX(5px);
+}
+
+.sidebar-menu .el-menu-item.is-active {
+  background-color: var(--primary-light);
+  color: var(--bg-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.sidebar-menu .el-menu-item.is-active:hover {
+  background-color: var(--primary-color);
 }
 
 /* 内容区样式 */
@@ -633,10 +826,23 @@ const handleLogout = () => {
   flex: 1;
   padding: 30px;
   overflow-y: auto;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .page-header {
   margin-bottom: 30px;
+  position: relative;
 }
 
 .page-header-top {
@@ -648,27 +854,43 @@ const handleLogout = () => {
 
 .breadcrumb {
   font-size: 14px;
+  color: var(--text-light);
 }
 
 .header-decoration {
-  width: 100px;
-  height: 3px;
-  background: linear-gradient(90deg, #409eff, #69c0ff);
-  border-radius: 3px;
+  width: 120px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+  border-radius: 2px;
+  transition: var(--transition);
+}
+
+.page-header:hover .header-decoration {
+  width: 150px;
 }
 
 .page-title {
   font-size: 24px;
   font-weight: bold;
-  color: #303133;
-  margin: 0;
+  color: var(--text-primary);
+  margin: 0 0 10px 0;
+  transition: var(--transition);
+}
+
+.page-header:hover .page-title {
+  color: var(--primary-color);
 }
 
 .main-content {
-  background-color: #ffffff;
-  border-radius: 8px;
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius);
   padding: 30px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.main-content:hover {
+  box-shadow: var(--shadow-md);
 }
 
 /* 首页内容样式 */
@@ -679,10 +901,17 @@ const handleLogout = () => {
 /* 欢迎横幅 */
 .welcome-banner {
   position: relative;
-  height: 200px;
-  border-radius: 8px;
+  height: 220px;
+  border-radius: var(--border-radius);
   overflow: hidden;
   margin-bottom: 30px;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+}
+
+.welcome-banner:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-5px);
 }
 
 .banner-bg {
@@ -691,9 +920,14 @@ const handleLogout = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, #409eff, #69c0ff);
-  opacity: 0.9;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  opacity: 0.95;
   z-index: 1;
+  transition: var(--transition);
+}
+
+.welcome-banner:hover .banner-bg {
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
 }
 
 .banner-content {
@@ -704,20 +938,68 @@ const handleLogout = () => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #ffffff;
+  color: var(--bg-primary);
   text-align: center;
   padding: 0 30px;
+  animation: bannerSlideIn 1s ease-out;
+}
+
+@keyframes bannerSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .banner-content h3 {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  transition: var(--transition);
 }
 
 .banner-content p {
-  font-size: 16px;
+  font-size: 18px;
   margin: 0;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+  transition: var(--transition);
+}
+
+.welcome-banner:hover .banner-content h3 {
+  transform: scale(1.05);
+}
+
+.welcome-banner:hover .banner-content p {
+  transform: scale(1.05);
+}
+
+/* 装饰元素 */
+.banner-bg::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: 
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
 }
 
 /* 概览卡片 */
@@ -730,54 +1012,118 @@ const handleLogout = () => {
 
 .overview-card {
   text-align: center;
-  padding: 20px;
-  transition: transform 0.3s, box-shadow 0.3s;
+  padding: 30px;
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.overview-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+  transform: scaleX(0);
+  transition: var(--transition);
+}
+
+.overview-card:hover::before {
+  transform: scaleX(1);
 }
 
 .overview-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-md);
 }
 
 .card-icon {
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 auto 15px;
-  font-size: 24px;
-  color: #ffffff;
+  margin: 0 auto 20px;
+  font-size: 28px;
+  color: var(--bg-primary);
+  transition: var(--transition);
+  position: relative;
+  z-index: 1;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-icon::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  transition: var(--transition);
+}
+
+.overview-card:hover .card-icon {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: var(--shadow-md);
 }
 
 .study-icon {
-  background: linear-gradient(135deg, #409eff, #69c0ff);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
 }
 
 .practice-icon {
-  background: linear-gradient(135deg, #67c23a, #85ce61);
+  background: linear-gradient(135deg, var(--success-color), var(--success-light));
 }
 
 .create-icon {
-  background: linear-gradient(135deg, #e6a23c, #ebb563);
+  background: linear-gradient(135deg, var(--warning-color), var(--warning-light));
 }
 
 .break-icon {
-  background: linear-gradient(135deg, #f56c6c, #f78989);
+  background: linear-gradient(135deg, var(--danger-color), var(--danger-light));
 }
 
 .overview-card h4 {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
-  margin-bottom: 10px;
-  color: #303133;
+  margin-bottom: 15px;
+  color: var(--text-primary);
+  transition: var(--transition);
+}
+
+.overview-card:hover h4 {
+  color: var(--primary-color);
 }
 
 .overview-card p {
   font-size: 14px;
-  color: #606266;
-  margin-bottom: 20px;
+  color: var(--text-secondary);
+  margin-bottom: 25px;
+  line-height: 1.6;
+  transition: var(--transition);
+}
+
+.overview-card:hover p {
+  color: var(--text-primary);
+}
+
+.overview-card .el-button {
+  transition: var(--transition);
+  border-radius: 20px;
+  padding: 8px 24px;
+}
+
+.overview-card .el-button:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-sm);
 }
 
 /* 推荐课程 */
@@ -788,52 +1134,117 @@ const handleLogout = () => {
 .section-title {
   font-size: 20px;
   font-weight: bold;
-  color: #303133;
+  color: var(--text-primary);
   margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #e4e7ed;
+  padding-bottom: 15px;
+  border-bottom: 3px solid var(--border-color);
+  position: relative;
+  transition: var(--transition);
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+  transition: var(--transition);
+}
+
+.section-title:hover::after {
+  width: 120px;
+}
+
+.section-title:hover {
+  color: var(--primary-color);
 }
 
 .section-subtitle {
   font-size: 14px;
-  color: #606266;
-  margin-bottom: 20px;
+  color: var(--text-light);
+  margin-bottom: 25px;
+  transition: var(--transition);
+}
+
+.section-title:hover + .section-subtitle {
+  color: var(--text-secondary);
 }
 
 .course-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  gap: 25px;
 }
 
 .course-card {
-  transition: transform 0.3s, box-shadow 0.3s;
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  position: relative;
+}
+
+.course-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+  transform: scaleX(0);
+  transition: var(--transition);
+}
+
+.course-card:hover::before {
+  transform: scaleX(1);
 }
 
 .course-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-md);
 }
 
 .course-cover {
   width: 100%;
   height: 180px;
   object-fit: cover;
-  border-radius: 8px 8px 0 0;
-  margin-bottom: 15px;
+  transition: var(--transition);
+}
+
+.course-card:hover .course-cover {
+  transform: scale(1.05);
+}
+
+.course-info {
+  padding: 20px;
 }
 
 .course-title {
   font-size: 16px;
   font-weight: bold;
-  color: #303133;
+  color: var(--text-primary);
   margin-bottom: 10px;
+  transition: var(--transition);
+  line-height: 1.4;
+}
+
+.course-card:hover .course-title {
+  color: var(--primary-color);
 }
 
 .course-teacher {
   font-size: 14px;
-  color: #606266;
+  color: var(--text-light);
   margin-bottom: 15px;
+  transition: var(--transition);
+}
+
+.course-card:hover .course-teacher {
+  color: var(--text-secondary);
 }
 
 .course-progress {
@@ -842,13 +1253,31 @@ const handleLogout = () => {
 
 .progress-text {
   font-size: 12px;
-  color: #909399;
+  color: var(--text-light);
   float: right;
   margin-top: 5px;
+  transition: var(--transition);
+}
+
+.course-card:hover .progress-text {
+  color: var(--primary-color);
+}
+
+.el-progress-bar__inner {
+  transition: var(--transition);
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
 }
 
 .course-btn {
   width: 100%;
+  transition: var(--transition);
+  border-radius: 20px;
+  padding: 10px 0;
+}
+
+.course-btn:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-sm);
 }
 
 /* 破茧视界 */
@@ -859,29 +1288,60 @@ const handleLogout = () => {
 .video-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  gap: 25px;
 }
 
 .video-card {
-  transition: transform 0.3s, box-shadow 0.3s;
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  position: relative;
+}
+
+.video-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--success-color), var(--success-light));
+  transform: scaleX(0);
+  transition: var(--transition);
+}
+
+.video-card:hover::before {
+  transform: scaleX(1);
 }
 
 .video-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-md);
 }
 
 .video-thumbnail {
   position: relative;
   margin-bottom: 15px;
-  border-radius: 8px;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
   overflow: hidden;
+  transition: var(--transition);
+}
+
+.video-card:hover .video-thumbnail {
+  transform: scale(1.02);
 }
 
 .thumbnail-img {
   width: 100%;
   height: 180px;
   object-fit: cover;
+  transition: var(--transition);
+}
+
+.video-card:hover .thumbnail-img {
+  transform: scale(1.05);
 }
 
 .play-icon {
@@ -897,32 +1357,63 @@ const handleLogout = () => {
   justify-content: center;
   align-items: center;
   font-size: 24px;
-  color: #ffffff;
+  color: var(--bg-primary);
   cursor: pointer;
-  transition: transform 0.3s;
+  transition: var(--transition);
+  z-index: 1;
+  box-shadow: var(--shadow-md);
 }
 
 .play-icon:hover {
-  transform: translate(-50%, -50%) scale(1.1);
+  transform: translate(-50%, -50%) scale(1.2);
+  background-color: var(--primary-color);
+  box-shadow: var(--shadow-lg);
+}
+
+.video-info {
+  padding: 20px;
 }
 
 .video-title {
   font-size: 16px;
   font-weight: bold;
-  color: #303133;
+  color: var(--text-primary);
   margin-bottom: 10px;
+  transition: var(--transition);
+  line-height: 1.4;
+}
+
+.video-card:hover .video-title {
+  color: var(--primary-color);
 }
 
 .video-description {
   font-size: 14px;
-  color: #606266;
+  color: var(--text-light);
   margin-bottom: 15px;
   line-height: 1.5;
+  transition: var(--transition);
+}
+
+.video-card:hover .video-description {
+  color: var(--text-secondary);
 }
 
 .video-link {
   display: block;
   text-align: center;
+  transition: var(--transition);
+}
+
+.video-link .el-button {
+  border-radius: 20px;
+  padding: 8px 24px;
+  transition: var(--transition);
+}
+
+.video-link .el-button:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-sm);
 }
 
 /* 破茧视界页面样式 */
@@ -932,40 +1423,76 @@ const handleLogout = () => {
 
 .breakthrough-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+  padding: 30px;
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.breakthrough-header:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-5px);
 }
 
 .breakthrough-header h3 {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
-  color: #303133;
-  margin-bottom: 10px;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+  transition: var(--transition);
+}
+
+.breakthrough-header:hover h3 {
+  color: var(--primary-color);
 }
 
 .breakthrough-header p {
   font-size: 16px;
-  color: #606266;
+  color: var(--text-secondary);
   margin: 0;
+  transition: var(--transition);
+}
+
+.breakthrough-header:hover p {
+  color: var(--text-primary);
 }
 
 .video-categories {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 30px;
   justify-content: center;
 }
 
 .category-tag {
-  padding: 8px 16px;
-  border-radius: 20px;
+  padding: 10px 20px;
+  border-radius: 25px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: var(--transition);
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.category-tag:hover {
+  background-color: rgba(103, 194, 58, 0.1);
+  color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
 .category-tag.active {
-  background-color: #409eff;
-  color: #ffffff;
+  background-color: var(--primary-light);
+  color: var(--bg-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.category-tag.active:hover {
+  background-color: var(--primary-color);
 }
 
 .video-grid {
@@ -975,25 +1502,56 @@ const handleLogout = () => {
 }
 
 .video-card-large {
-  transition: transform 0.3s, box-shadow 0.3s;
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  position: relative;
+}
+
+.video-card-large::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--success-color), var(--success-light));
+  transform: scaleX(0);
+  transition: var(--transition);
+}
+
+.video-card-large:hover::before {
+  transform: scaleX(1);
 }
 
 .video-card-large:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-md);
 }
 
 .video-thumbnail-large {
   position: relative;
   margin-bottom: 20px;
-  border-radius: 8px;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
   overflow: hidden;
+  transition: var(--transition);
+}
+
+.video-card-large:hover .video-thumbnail-large {
+  transform: scale(1.02);
 }
 
 .thumbnail-img-large {
   width: 100%;
   height: 200px;
   object-fit: cover;
+  transition: var(--transition);
+}
+
+.video-card-large:hover .thumbnail-img-large {
+  transform: scale(1.05);
 }
 
 .play-icon-large {
@@ -1009,45 +1567,34 @@ const handleLogout = () => {
   justify-content: center;
   align-items: center;
   font-size: 32px;
-  color: #ffffff;
+  color: var(--bg-primary);
   cursor: pointer;
-  transition: transform 0.3s;
+  transition: var(--transition);
+  z-index: 1;
+  box-shadow: var(--shadow-md);
 }
 
 .play-icon-large:hover {
-  transform: translate(-50%, -50%) scale(1.1);
+  transform: translate(-50%, -50%) scale(1.2);
+  background-color: var(--primary-color);
+  box-shadow: var(--shadow-lg);
+}
+
+.video-info-large {
+  padding: 25px;
 }
 
 .video-title-large {
   font-size: 18px;
   font-weight: bold;
-  color: #303133;
+  color: var(--text-primary);
   margin-bottom: 15px;
+  transition: var(--transition);
+  line-height: 1.4;
 }
 
-.video-description-large {
-  font-size: 14px;
-  color: #606266;
-  margin-bottom: 15px;
-  line-height: 1.5;
-}
-
-.video-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  font-size: 14px;
-  color: #909399;
-}
-
-.video-link-large {
-  display: block;
-  text-align: center;
-}
-
-.watch-btn {
-  width: 100%;
+.video-card-large:hover .video-title-large {
+  color: var(--primary-color);
 }
 
 /* 响应式设计 */
@@ -1055,37 +1602,148 @@ const handleLogout = () => {
   .nav-content {
     padding: 0 15px;
   }
-
+  
   .platform-name {
     font-size: 16px;
   }
-
+  
   .nav-stats {
     display: none;
   }
-
-  .content-area {
-    padding: 15px;
+  
+  .user-name {
+    display: none;
   }
-
-  .main-content {
+  
+  .content-area {
     padding: 20px;
   }
-
+  
   .overview-cards {
     grid-template-columns: 1fr;
   }
-
-  .course-list {
-    grid-template-columns: 1fr;
-  }
-
-  .video-list {
-    grid-template-columns: 1fr;
-  }
-
+  
+  .course-list,
+  .video-list,
   .video-grid {
     grid-template-columns: 1fr;
   }
+  
+  .sidebar {
+    position: fixed;
+    left: -220px;
+    top: 70px;
+    height: calc(100vh - 70px);
+    z-index: 99;
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .sidebar.is-collapse {
+    left: 0;
+    width: 220px;
+  }
+}
+
+/* 滚动条样式 */
+.content-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.content-area::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.content-area::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 4px;
+  transition: var(--transition);
+}
+
+.content-area::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+/* 加载动画 */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--bg-secondary);
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 卡片悬浮效果增强 */
+.overview-card,
+.course-card,
+.video-card,
+.video-card-large {
+  perspective: 1000px;
+}
+
+.overview-card:hover,
+.course-card:hover,
+.video-card:hover,
+.video-card-large:hover {
+  transform: translateY(-10px) rotateX(5deg);
+}
+
+/* 按钮样式增强 */
+.el-button {
+  transition: var(--transition);
+}
+
+.el-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.el-button--primary {
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+  border: none;
+}
+
+.el-button--primary:hover {
+  background: linear-gradient(90deg, var(--primary-light), var(--primary-color));
+}
+
+.el-button--success {
+  background: linear-gradient(90deg, var(--success-color), var(--success-light));
+  border: none;
+}
+
+.el-button--success:hover {
+  background: linear-gradient(90deg, var(--success-light), var(--success-color));
+}
+
+.el-button--warning {
+  background: linear-gradient(90deg, var(--warning-color), var(--warning-light));
+  border: none;
+}
+
+.el-button--warning:hover {
+  background: linear-gradient(90deg, var(--warning-light), var(--warning-color));
+}
+
+.el-button--danger {
+  background: linear-gradient(90deg, var(--danger-color), var(--danger-light));
+  border: none;
+}
+
+.el-button--danger:hover {
+  background: linear-gradient(90deg, var(--danger-light), var(--danger-color));
 }
 </style>

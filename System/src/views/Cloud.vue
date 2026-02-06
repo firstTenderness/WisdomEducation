@@ -15,6 +15,9 @@
           <el-button type="primary" @click="createFolder">
             <i class="el-icon-plus"></i> 新建文件夹
           </el-button>
+          <el-button @click="refreshFiles">
+            <i class="el-icon-refresh"></i> 刷新
+          </el-button>
           <el-button @click="deleteSelectedFiles" :disabled="selectedFiles.length === 0">
             <i class="el-icon-delete"></i> 删除选中
           </el-button>
@@ -117,7 +120,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="updateTime" label="修改时间" width="180" />
-      <el-table-column label="操作" width="200" fixed="right">
+      <el-table-column label="操作" width="280" fixed="right">
         <template #default="scope">
           <el-button size="small" @click="downloadFile(scope.row)" round>
             <i class="el-icon-download"></i> 下载
@@ -125,9 +128,30 @@
           <el-button size="small" @click="previewFile(scope.row)" round>
             <i class="el-icon-view"></i> 预览
           </el-button>
-          <el-button size="small" type="danger" @click="deleteFile(scope.row)" round>
-            <i class="el-icon-delete"></i> 删除
-          </el-button>
+          <el-dropdown @command="(command) => handleCommand(command, scope.row)">
+            <el-button size="small" round>
+              更多<i class="el-icon-arrow-down el-icon--right"></i>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="rename">
+                  <i class="el-icon-edit"></i> 重命名
+                </el-dropdown-item>
+                <el-dropdown-item command="copy">
+                  <i class="el-icon-document-copy"></i> 复制
+                </el-dropdown-item>
+                <el-dropdown-item command="move">
+                  <i class="el-icon-folder-opened"></i> 移动
+                </el-dropdown-item>
+                <el-dropdown-item command="share">
+                  <i class="el-icon-share"></i> 分享
+                </el-dropdown-item>
+                <el-dropdown-item command="delete" divided>
+                  <i class="el-icon-delete"></i> 删除
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
@@ -147,16 +171,110 @@
         </div>
       </div>
     </div>
+    
+    <!-- 上传文件对话框 -->
+    <el-dialog v-model="showUploadDialog" title="上传文件" width="500px">
+      <el-upload
+        class="upload-demo"
+        drag
+        action="#"
+        :auto-upload="false"
+        :on-change="handleFileChange"
+        :on-progress="handleUploadProgress"
+        :on-success="handleUploadSuccess"
+        :on-error="handleUploadError"
+        multiple
+        :file-list="uploadFiles"
+      >
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        <template #tip>
+          <div class="el-upload__tip">
+            支持上传任意类型文件，单个文件大小不超过100MB
+          </div>
+        </template>
+      </el-upload>
+      <div v-if="uploadProgress > 0" class="upload-progress">
+        <el-progress :percentage="uploadProgress" :status="uploadProgress === 100 ? 'success' : ''"></el-progress>
+      </div>
+      <template #footer>
+        <el-button @click="showUploadDialog = false">取消</el-button>
+        <el-button type="primary" @click="handleUploadSuccess(null, uploadFiles[0])">确定上传</el-button>
+      </template>
+    </el-dialog>
+    
+    <!-- 新建文件夹对话框 -->
+    <el-dialog v-model="showFolderDialog" title="新建文件夹" width="400px">
+      <el-form :model="{ name: newFolderName }" label-width="80px">
+        <el-form-item label="文件夹名称">
+          <el-input v-model="newFolderName" placeholder="请输入文件夹名称" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="showFolderDialog = false">取消</el-button>
+        <el-button type="primary" @click="saveFolder">确定</el-button>
+      </template>
+    </el-dialog>
+    
+    <!-- 文件预览对话框 -->
+    <el-dialog v-model="showPreviewDialog" :title="`预览文件：${currentPreviewFile?.name || ''}`" width="600px">
+      <div v-if="currentPreviewFile" class="file-preview-content">
+        <div class="preview-icon">
+          <i v-if="currentPreviewFile.type === 'folder'" class="el-icon-folder" style="font-size: 48px; color: #409eff;"></i>
+          <i v-else-if="currentPreviewFile.extension === 'doc' || currentPreviewFile.extension === 'docx'" class="el-icon-document" style="font-size: 48px; color: #2196f3;"></i>
+          <i v-else-if="currentPreviewFile.extension === 'xls' || currentPreviewFile.extension === 'xlsx'" class="el-icon-data-analysis" style="font-size: 48px; color: #4caf50;"></i>
+          <i v-else-if="currentPreviewFile.extension === 'ppt' || currentPreviewFile.extension === 'pptx'" class="el-icon-picture-outline-round" style="font-size: 48px; color: #ff9800;"></i>
+          <i v-else-if="currentPreviewFile.extension === 'pdf'" class="el-icon-document-copy" style="font-size: 48px; color: #f44336;"></i>
+          <i v-else-if="currentPreviewFile.extension === 'txt'" class="el-icon-notebook-2" style="font-size: 48px; color: #607d8b;"></i>
+          <i v-else-if="currentPreviewFile.extension === 'jpg' || currentPreviewFile.extension === 'jpeg' || currentPreviewFile.extension === 'png' || currentPreviewFile.extension === 'gif'" class="el-icon-picture" style="font-size: 48px; color: #9c27b0;"></i>
+          <i v-else-if="currentPreviewFile.extension === 'mp3' || currentPreviewFile.extension === 'mp4'" class="el-icon-video-camera" style="font-size: 48px; color: #e91e63;"></i>
+          <i v-else class="el-icon-document" style="font-size: 48px; color: #606266;"></i>
+        </div>
+        <div class="preview-info">
+          <div class="info-item">
+            <span class="info-label">文件名：</span>
+            <span class="info-value">{{ currentPreviewFile.name }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">文件类型：</span>
+            <span class="info-value">{{ currentPreviewFile.type === 'folder' ? '文件夹' : currentPreviewFile.extension?.toUpperCase() }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">文件大小：</span>
+            <span class="info-value">{{ currentPreviewFile.type === 'folder' ? '--' : (currentPreviewFile.size / 1024).toFixed(2) + ' KB' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">修改时间：</span>
+            <span class="info-value">{{ currentPreviewFile.updateTime }}</span>
+          </div>
+        </div>
+        <div class="preview-actions">
+          <el-button type="primary" @click="downloadFile(currentPreviewFile)">
+            <i class="el-icon-download"></i> 下载文件
+          </el-button>
+          <el-button type="danger" @click="deleteFile(currentPreviewFile); closePreviewDialog()">
+            <i class="el-icon-delete"></i> 删除文件
+          </el-button>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const searchKeyword = ref('')
 const fileFilter = ref('all')
 const selectedFiles = ref([])
+const showUploadDialog = ref(false)
+const showFolderDialog = ref(false)
+const showPreviewDialog = ref(false)
+const currentPreviewFile = ref(null)
+const uploadProgress = ref(0)
+const newFolderName = ref('')
+const uploadFiles = ref([])
 const files = ref([
   {
     id: 1,
@@ -293,23 +411,99 @@ const handleRowDblclick = (row) => {
 }
 
 const uploadFile = () => {
-  ElMessage.success('上传文件功能已触发')
-  // 这里可以添加打开文件上传对话框的逻辑
+  uploadFiles.value = []
+  uploadProgress.value = 0
+  showUploadDialog.value = true
+}
+
+const handleFileChange = (file) => {
+  uploadFiles.value.push(file)
+}
+
+const handleUploadProgress = (event) => {
+  uploadProgress.value = Math.floor(event.percent)
+}
+
+const handleUploadSuccess = (response, file) => {
+  const newFile = {
+    id: files.value.length + 1,
+    name: file.name,
+    type: 'file',
+    extension: file.name.split('.').pop().toLowerCase(),
+    size: file.size || Math.floor(Math.random() * 50000) + 5000,
+    updateTime: new Date().toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })
+  }
+  files.value.unshift(newFile)
+  ElMessage.success(`文件 ${file.name} 上传成功`)
+  showUploadDialog.value = false
+  uploadFiles.value = []
+  uploadProgress.value = 0
+}
+
+const handleUploadError = () => {
+  ElMessage.error('文件上传失败')
+  uploadProgress.value = 0
 }
 
 const createFolder = () => {
-  ElMessage.success('新建文件夹功能已触发')
-  // 这里可以添加打开新建文件夹对话框的逻辑
+  newFolderName.value = ''
+  showFolderDialog.value = true
+}
+
+const saveFolder = () => {
+  if (!newFolderName.value.trim()) {
+    ElMessage.warning('文件夹名称不能为空')
+    return
+  }
+  
+  const newFolder = {
+    id: files.value.length + 1,
+    name: newFolderName.value,
+    type: 'folder',
+    size: 0,
+    updateTime: new Date().toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })
+  }
+  files.value.unshift(newFolder)
+  ElMessage.success('文件夹创建成功')
+  showFolderDialog.value = false
+  newFolderName.value = ''
 }
 
 const downloadFile = (row) => {
-  ElMessage.success(`下载文件：${row.name}`)
-  // 这里可以添加文件下载的逻辑
+  ElMessage.success(`开始下载文件：${row.name}`)
+  // 模拟下载进度
+  setTimeout(() => {
+    ElMessage.success(`文件 ${row.name} 下载完成`)
+  }, 2000)
 }
 
 const previewFile = (row) => {
+  if (row.type === 'folder') {
+    ElMessage.info(`打开文件夹：${row.name}`)
+    return
+  }
+  currentPreviewFile.value = row
+  showPreviewDialog.value = true
   ElMessage.success(`预览文件：${row.name}`)
-  // 这里可以添加文件预览的逻辑
+}
+
+const closePreviewDialog = () => {
+  showPreviewDialog.value = false
+  currentPreviewFile.value = null
 }
 
 const deleteFile = (row) => {
@@ -321,14 +515,109 @@ const deleteFile = (row) => {
 }
 
 const deleteSelectedFiles = () => {
-  selectedFiles.value.forEach(file => {
-    const index = files.value.findIndex(f => f.id === file.id)
-    if (index !== -1) {
-      files.value.splice(index, 1)
-    }
+  if (selectedFiles.value.length === 0) {
+    ElMessage.warning('请先选择要删除的文件')
+    return
+  }
+  
+  ElMessageBox.confirm(`确定要删除选中的 ${selectedFiles.value.length} 个文件吗？`, '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    selectedFiles.value.forEach(file => {
+      const index = files.value.findIndex(f => f.id === file.id)
+      if (index !== -1) {
+        files.value.splice(index, 1)
+      }
+    })
+    selectedFiles.value = []
+    ElMessage.success('选中的文件已删除')
+  }).catch(() => {
+    ElMessage.info('已取消删除')
   })
-  selectedFiles.value = []
-  ElMessage.success('选中的文件已删除')
+}
+
+// 刷新文件列表
+const refreshFiles = () => {
+  ElMessage.loading('正在刷新文件列表...')
+  setTimeout(() => {
+    ElMessage.success('文件列表已刷新')
+  }, 1000)
+}
+
+// 重命名文件
+const renameFile = (row) => {
+  ElMessageBox.prompt('请输入新的文件名', '重命名文件', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    inputValue: row.name
+  }).then(({ value }) => {
+    if (value && value.trim()) {
+      const file = files.value.find(f => f.id === row.id)
+      if (file) {
+        file.name = value.trim()
+        ElMessage.success('文件重命名成功')
+      }
+    } else {
+      ElMessage.warning('文件名不能为空')
+    }
+  }).catch(() => {
+    ElMessage.info('已取消重命名')
+  })
+}
+
+// 复制文件
+const copyFile = (row) => {
+  const newFile = {
+    ...row,
+    id: files.value.length + 1,
+    name: `${row.name} (副本)`,
+    updateTime: new Date().toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })
+  }
+  files.value.unshift(newFile)
+  ElMessage.success('文件已复制')
+}
+
+// 移动文件
+const moveFile = (row) => {
+  ElMessage.info('移动文件功能开发中...')
+}
+
+// 分享文件
+const shareFile = (row) => {
+  ElMessage.success(`文件 ${row.name} 分享链接已复制到剪贴板`)
+  setTimeout(() => {
+    ElMessage.info('链接有效期：7天')
+  }, 1000)
+}
+
+// 处理下拉菜单命令
+const handleCommand = (command, row) => {
+  switch (command) {
+    case 'rename':
+      renameFile(row)
+      break
+    case 'copy':
+      copyFile(row)
+      break
+    case 'move':
+      moveFile(row)
+      break
+    case 'share':
+      shareFile(row)
+      break
+    case 'delete':
+      deleteFile(row)
+      break
+  }
 }
 </script>
 
@@ -648,6 +937,101 @@ const deleteSelectedFiles = () => {
   .empty-actions {
     flex-direction: column;
     align-items: center;
+  }
+}
+
+/* 上传对话框样式 */
+.upload-demo {
+  margin-bottom: 20px;
+}
+
+.upload-progress {
+  margin-top: 20px;
+}
+
+/* 文件预览对话框样式 */
+.file-preview-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.preview-header {
+  display: flex;
+  gap: 30px;
+  padding: 20px;
+  background-color: #f5f7fa;
+  border-radius: 8px;
+}
+
+.preview-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.preview-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.info-label {
+  font-size: 14px;
+  color: #606266;
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.info-value {
+  font-size: 14px;
+  color: #303133;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 20px;
+  border-top: 1px solid #e4e7ed;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .preview-header {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .preview-icon {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .preview-icon i {
+    font-size: 40px !important;
+  }
+  
+  .preview-info {
+    width: 100%;
+  }
+  
+  .preview-actions {
+    flex-wrap: wrap;
+    gap: 8px;
   }
 }
 </style>

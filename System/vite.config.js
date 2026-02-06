@@ -15,8 +15,24 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
-    server: {
-    port: 5173,        // 固定使用 5173 端口
-    strictPort: true   // 如果 5173 被占用，直接报错退出（不再自动换端口）
-  }
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false,
+    // 生成相对路径
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+        // 确保所有资源都使用相对路径
+        assetFileNames: 'assets/[name]-[hash].[ext]',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js'
+      }
+    }
+  },
+  server: {
+    port: 5173        // 使用 5173 端口
+  },
+  // 基础路径设置为相对路径
+  base: './'
 })

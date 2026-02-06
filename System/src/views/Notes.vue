@@ -77,58 +77,141 @@
       />
     </div>
     
-    <el-table 
-      :data="filteredNotes" 
-      border 
-      style="width: 100%; margin-top: 20px;"
-      stripe
-      :row-class-name="rowClassName"
-    >
-      <el-table-column prop="title" label="标题" min-width="200">
-        <template #default="scope">
-          <div class="note-title-cell">
-            <i class="el-icon-document" :class="getCategoryIcon(scope.row.category)"></i>
-            <span class="note-title">{{ scope.row.title }}</span>
+    <div class="notes-content-wrapper">
+      <!-- 笔记列表页面 -->
+      <div v-if="!showNoteDetail && !showEditForm" class="notes-list">
+        <el-table 
+          :data="filteredNotes" 
+          border 
+          style="width: 100%; margin-top: 20px;"
+          stripe
+          :row-class-name="rowClassName"
+        >
+          <el-table-column prop="title" label="标题" min-width="200">
+            <template #default="scope">
+              <div class="note-title-cell">
+                <i class="el-icon-document" :class="getCategoryIcon(scope.row.category)"></i>
+                <span class="note-title">{{ scope.row.title }}</span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="category" label="分类" width="120">
+            <template #default="scope">
+              <el-tag :type="getCategoryType(scope.row.category)" effect="dark">
+                {{ getCategoryName(scope.row.category) }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="content" label="内容" min-width="300">
+            <template #default="scope">
+              <span class="note-content">{{ scope.row.content }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="createdAt" label="创建时间" width="180" />
+          <el-table-column prop="updatedAt" label="更新时间" width="180" />
+          <el-table-column label="操作" width="200" fixed="right">
+            <template #default="scope">
+              <el-button type="primary" size="small" @click="editNote(scope.row)" round>
+                编辑
+              </el-button>
+              <el-button size="small" @click="viewNote(scope.row)" round>
+                查看
+              </el-button>
+              <el-button size="small" type="danger" @click="deleteNote(scope.row)" round>
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        
+        <div v-if="filteredNotes.length === 0" class="empty-notes">
+          <div class="empty-container">
+            <div class="empty-icon"><i class="el-icon-document-copy"></i></div>
+            <h3 class="empty-title">暂无笔记</h3>
+            <p class="empty-description">开始创建你的第一条笔记吧，记录学习的每一个瞬间</p>
+            <el-button type="primary" @click="createNewNote">
+              <i class="el-icon-plus"></i> 新建笔记
+            </el-button>
           </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="category" label="分类" width="120">
-        <template #default="scope">
-          <el-tag :type="getCategoryType(scope.row.category)" effect="dark">
-            {{ getCategoryName(scope.row.category) }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="content" label="内容" min-width="300">
-        <template #default="scope">
-          <span class="note-content">{{ scope.row.content }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="createdAt" label="创建时间" width="180" />
-      <el-table-column prop="updatedAt" label="更新时间" width="180" />
-      <el-table-column label="操作" width="200" fixed="right">
-        <template #default="scope">
-          <el-button type="primary" size="small" @click="editNote(scope.row)" round>
-            编辑
+        </div>
+      </div>
+      
+      <!-- 笔记详情页面 -->
+      <div v-if="showNoteDetail && selectedNote" class="note-detail-page">
+        <div class="note-detail-header">
+          <el-button type="info" @click="closeNoteDetail">
+            <i class="el-icon-arrow-left"></i> 返回列表
           </el-button>
-          <el-button size="small" @click="viewNote(scope.row)" round>
-            查看
+          <h2>{{ selectedNote.title }}</h2>
+        </div>
+        <div class="note-detail-content">
+          <div class="note-category">
+            <el-tag :type="getCategoryType(selectedNote.category)" effect="dark">
+              {{ getCategoryName(selectedNote.category) }}
+            </el-tag>
+          </div>
+          <div class="note-detail-body">
+            <h3>笔记内容</h3>
+            <p>{{ selectedNote.content }}</p>
+          </div>
+          <div class="note-detail-meta">
+            <div class="meta-item">
+              <i class="el-icon-time"></i>
+              <span>创建时间：{{ selectedNote.createdAt }}</span>
+            </div>
+            <div class="meta-item">
+              <i class="el-icon-refresh"></i>
+              <span>更新时间：{{ selectedNote.updatedAt }}</span>
+            </div>
+          </div>
+          <div class="note-detail-actions">
+            <el-button type="primary" @click="editNote(selectedNote)">
+              <i class="el-icon-edit"></i> 编辑
+            </el-button>
+            <el-button type="danger" @click="deleteNote(selectedNote)">
+              <i class="el-icon-delete"></i> 删除
+            </el-button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 编辑/新建笔记页面 -->
+      <div v-if="showEditForm" class="note-edit-page">
+        <div class="note-edit-header">
+          <el-button type="info" @click="closeEditForm">
+            <i class="el-icon-arrow-left"></i> {{ editingNote ? '返回详情' : '返回列表' }}
           </el-button>
-          <el-button size="small" type="danger" @click="deleteNote(scope.row)" round>
-            删除
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    
-    <div v-if="filteredNotes.length === 0" class="empty-notes">
-      <div class="empty-container">
-        <div class="empty-icon"><i class="el-icon-document-copy"></i></div>
-        <h3 class="empty-title">暂无笔记</h3>
-        <p class="empty-description">开始创建你的第一条笔记吧，记录学习的每一个瞬间</p>
-        <el-button type="primary" @click="createNewNote">
-          <i class="el-icon-plus"></i> 新建笔记
-        </el-button>
+          <h2>{{ editingNote ? '编辑笔记' : '新建笔记' }}</h2>
+        </div>
+        <div class="note-edit-content">
+          <el-form :model="noteForm" label-width="100px">
+            <el-form-item label="笔记标题">
+              <el-input v-model="noteForm.title" placeholder="请输入笔记标题" style="width: 100%;" />
+            </el-form-item>
+            <el-form-item label="笔记分类">
+              <el-select v-model="noteForm.category" placeholder="请选择笔记分类" style="width: 100%;">
+                <el-option label="科学实验" value="experiment" />
+                <el-option label="自然观察" value="nature" />
+                <el-option label="天文观测" value="astronomy" />
+                <el-option label="气象观测" value="weather" />
+                <el-option label="环保知识" value="environmental" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="笔记内容">
+              <el-input
+                v-model="noteForm.content"
+                type="textarea"
+                rows="6"
+                placeholder="请输入笔记内容"
+                style="width: 100%;"
+              />
+            </el-form-item>
+          </el-form>
+          <div class="note-edit-actions">
+            <el-button @click="closeEditForm">取消</el-button>
+            <el-button type="primary" @click="saveNote">保存</el-button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -140,6 +223,15 @@ import { ElMessage } from 'element-plus'
 
 const searchKeyword = ref('')
 const noteFilter = ref('all')
+const showNoteDetail = ref(false)
+const selectedNote = ref(null)
+const showEditForm = ref(false)
+const editingNote = ref(null)
+const noteForm = ref({
+  title: '',
+  content: '',
+  category: ''
+})
 const notes = ref([
   {
     id: 1,
@@ -249,24 +341,43 @@ const rowClassName = ({ row, rowIndex }) => {
 }
 
 const createNewNote = () => {
+  editingNote.value = null
+  noteForm.value = {
+    title: '',
+    content: '',
+    category: 'experiment'
+  }
+  showEditForm.value = true
   ElMessage.success('新建笔记功能已触发')
-  // 这里可以添加打开新建笔记对话框的逻辑
 }
 
 const editNote = (note) => {
+  editingNote.value = note
+  noteForm.value = {
+    title: note.title,
+    content: note.content,
+    category: note.category
+  }
+  showEditForm.value = true
+  showNoteDetail.value = false
   ElMessage.info(`编辑笔记：${note.title}`)
-  // 这里可以添加打开编辑笔记对话框的逻辑
 }
 
 const viewNote = (note) => {
+  selectedNote.value = note
+  showNoteDetail.value = true
+  showEditForm.value = false
   ElMessage.success(`查看笔记：${note.title}`)
-  // 这里可以添加打开笔记详情对话框的逻辑
 }
 
 const deleteNote = (note) => {
   const index = notes.value.findIndex(n => n.id === note.id)
   if (index !== -1) {
     notes.value.splice(index, 1)
+    showNoteDetail.value = false
+    showEditForm.value = false
+    selectedNote.value = null
+    editingNote.value = null
     ElMessage.success('笔记已删除')
   }
 }
@@ -274,6 +385,64 @@ const deleteNote = (note) => {
 const exportNotes = () => {
   ElMessage.success('笔记导出功能已触发')
   // 这里可以添加导出笔记的逻辑
+}
+
+const closeNoteDetail = () => {
+  showNoteDetail.value = false
+  selectedNote.value = null
+}
+
+const closeEditForm = () => {
+  showEditForm.value = false
+  editingNote.value = null
+  if (selectedNote.value) {
+    showNoteDetail.value = true
+  }
+}
+
+const saveNote = () => {
+  if (!noteForm.value.title.trim()) {
+    ElMessage.warning('笔记标题不能为空')
+    return
+  }
+  
+  if (!noteForm.value.content.trim()) {
+    ElMessage.warning('笔记内容不能为空')
+    return
+  }
+  
+  if (!noteForm.value.category) {
+    ElMessage.warning('请选择笔记分类')
+    return
+  }
+  
+  if (editingNote.value) {
+    // 编辑现有笔记
+    editingNote.value.title = noteForm.value.title
+    editingNote.value.content = noteForm.value.content
+    editingNote.value.category = noteForm.value.category
+    editingNote.value.updatedAt = new Date().toISOString().split('T')[0]
+    ElMessage.success('笔记编辑成功')
+  } else {
+    // 创建新笔记
+    const newNote = {
+      id: notes.value.length + 1,
+      title: noteForm.value.title,
+      content: noteForm.value.content,
+      category: noteForm.value.category,
+      createdAt: new Date().toISOString().split('T')[0],
+      updatedAt: new Date().toISOString().split('T')[0]
+    }
+    notes.value.unshift(newNote)
+    ElMessage.success('笔记创建成功')
+  }
+  
+  showEditForm.value = false
+  editingNote.value = null
+  if (editingNote.value) {
+    selectedNote.value = editingNote.value
+    showNoteDetail.value = true
+  }
 }
 </script>
 
@@ -583,6 +752,159 @@ const exportNotes = () => {
   .notes-filters .el-input {
     width: 100% !important;
     margin-left: 0 !important;
+  }
+}
+
+/* 笔记详情页面 */
+.note-detail-page {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.note-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e4e7ed;
+}
+
+.note-detail-header h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #303133;
+  margin: 0;
+}
+
+.note-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.note-category {
+  align-self: flex-start;
+}
+
+.note-detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.note-detail-body h3 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #303133;
+  margin: 0;
+}
+
+.note-detail-body p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #606266;
+  margin: 0;
+  white-space: pre-line;
+}
+
+.note-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e4e7ed;
+}
+
+.note-detail-meta .meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #909399;
+}
+
+.note-detail-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-start;
+  padding-top: 20px;
+  border-top: 1px solid #e4e7ed;
+}
+
+/* 编辑笔记页面 */
+.note-edit-page {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.note-edit-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e4e7ed;
+}
+
+.note-edit-header h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #303133;
+  margin: 0;
+}
+
+.note-edit-content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.note-edit-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 20px;
+  border-top: 1px solid #e4e7ed;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .note-detail-page,
+  .note-edit-page {
+    padding: 15px;
+    margin-top: 10px;
+  }
+  
+  .note-detail-header,
+  .note-edit-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding-bottom: 15px;
+  }
+  
+  .note-detail-header h2,
+  .note-edit-header h2 {
+    font-size: 20px;
+  }
+  
+  .note-detail-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .note-detail-actions,
+  .note-edit-actions {
+    flex-wrap: wrap;
+    gap: 8px;
   }
 }
 </style>

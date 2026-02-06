@@ -277,9 +277,189 @@
           <el-button type="success" @click="viewExplanation">
             <i class="el-icon-view"></i> 查看解析
           </el-button>
+          <el-button type="info" @click="showDialectExplanation = true">
+            <i class="el-icon-microphone"></i> 乡音辅导解析
+          </el-button>
         </div>
       </el-card>
     </div>
+    
+    <!-- 查看解析弹窗 -->
+    <el-dialog
+      v-model="showExplanation"
+      title="题目详细解析"
+      width="800px"
+      class="explanation-dialog"
+    >
+      <div class="explanation-content">
+        <div class="explanation-header">
+          <h3>练习题目解析</h3>
+          <p class="explanation-subtitle">详细的题目解析和知识点讲解</p>
+        </div>
+        
+        <div class="explanation-interface">
+          <el-card shadow="hover" v-for="(question, index) in currentPractice.questions" :key="question.id" class="explanation-card">
+            <div class="explanation-question">
+              <h4 class="question-title">第 {{ index + 1 }} 题：{{ question.title }}</h4>
+              <el-tag :type="getQuestionTypeTag(question.type)">{{ getQuestionTypeText(question.type) }}</el-tag>
+            </div>
+            
+            <!-- 显示选项（如果是选择题） -->
+            <div v-if="question.type === 'single' || question.type === 'multiple'" class="explanation-options">
+              <div 
+                v-for="(option, optIndex) in question.options" 
+                :key="optIndex" 
+                class="option-item"
+                :class="{ 'correct': option.label === question.correctAnswer, 'selected': answers[question.id] === option.label || (Array.isArray(answers[question.id]) && answers[question.id].includes(option.label)) }"
+              >
+                <span class="option-label">{{ option.label }}.</span>
+                <span class="option-content">{{ option.content }}</span>
+                <el-tag v-if="option.label === question.correctAnswer" type="success" size="small" class="correct-tag">正确答案</el-tag>
+              </div>
+            </div>
+            
+            <!-- 显示正确答案 -->
+            <div class="explanation-correct-answer">
+              <h5>正确答案：</h5>
+              <p>{{ getCorrectAnswerText(question) }}</p>
+            </div>
+            
+            <!-- 显示解析 -->
+            <div class="explanation-detail">
+              <h5>解析：</h5>
+              <p>{{ question.explanation }}</p>
+            </div>
+            
+            <!-- 显示知识点 -->
+            <div class="explanation-knowledge">
+              <h5>知识点：</h5>
+              <el-tag size="small" effect="plain" v-for="(knowledge, kIndex) in getKnowledgePoints(question)" :key="kIndex" class="knowledge-tag">
+                {{ knowledge }}
+              </el-tag>
+            </div>
+          </el-card>
+        </div>
+        
+        <div class="explanation-tips">
+          <el-alert
+            title="学习提示"
+            type="info"
+            :closable="false"
+            show-icon
+          >
+            <div class="tips-content">
+              <p>1. 仔细阅读解析，理解题目考查的知识点</p>
+              <p>2. 关注自己做错的题目，加强相关知识点的学习</p>
+              <p>3. 可以使用乡音辅导解析功能，通过方言获取更亲切的讲解</p>
+              <p>4. 定期复习错题，巩固学习成果</p>
+            </div>
+          </el-alert>
+        </div>
+      </div>
+      
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="showExplanation = false">关闭</el-button>
+          <el-button type="primary" @click="showExplanation = false; showDialectExplanation = true">切换到乡音辅导解析</el-button>
+        </span>
+      </template>
+    </el-dialog>
+    
+    <!-- 乡音辅导解析弹窗 -->
+    <el-dialog
+      v-model="showDialectExplanation"
+      title="乡音辅导解析"
+      width="800px"
+      class="dialect-explanation-dialog"
+    >
+      <div class="dialect-explanation-content">
+        <div class="dialect-header">
+          <h3>语音识别与方言解析</h3>
+          <p class="dialect-subtitle">通过语音识别，为您提供方言版的题目解析</p>
+        </div>
+        
+        <div class="dialect-interface">
+          <div class="dialect-steps">
+            <div class="step-item active">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h4>选择方言</h4>
+                <el-select v-model="selectedDialect" placeholder="请选择方言" style="width: 200px;">
+                  <el-option label="普通话" value="mandarin"></el-option>
+                  <el-option label="粤语" value="cantonese"></el-option>
+                  <el-option label="四川话" value="sichuan"></el-option>
+                  <el-option label="东北话" value="northeast"></el-option>
+                  <el-option label="上海话" value="shanghai"></el-option>
+                </el-select>
+              </div>
+            </div>
+            
+            <div class="step-item">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h4>开始录音</h4>
+                <div class="recording-controls">
+                  <el-button 
+                    type="primary" 
+                    circle 
+                    size="large"
+                    :class="{ 'recording': isRecording }"
+                    @click="toggleRecording"
+                  >
+                    <i class="el-icon-microphone"></i>
+                  </el-button>
+                  <p v-if="isRecording" class="recording-status">正在录音...</p>
+                  <p v-else class="recording-tip">点击开始录音，读出题目内容</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="step-item">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h4>解析结果</h4>
+                <div class="explanation-result" v-if="recordingResult">
+                  <el-card shadow="hover">
+                    <h5>识别结果</h5>
+                    <p>{{ recordingResult.recognizedText }}</p>
+                    <h5>方言解析</h5>
+                    <p>{{ recordingResult.dialectExplanation }}</p>
+                    <h5>标准解析</h5>
+                    <p>{{ recordingResult.standardExplanation }}</p>
+                  </el-card>
+                </div>
+                <div class="explanation-placeholder" v-else>
+                  <p>录音完成后，将显示解析结果</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="dialect-tips">
+          <el-alert
+            title="使用提示"
+            type="info"
+            :closable="false"
+            show-icon
+          >
+            <div class="tips-content">
+              <p>1. 请在安静的环境中进行录音</p>
+              <p>2. 清晰读出题目内容，以便系统准确识别</p>
+              <p>3. 系统将根据您选择的方言提供相应的解析</p>
+              <p>4. 支持多种方言的解析服务</p>
+            </div>
+          </el-alert>
+        </div>
+      </div>
+      
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="showDialectExplanation = false">关闭</el-button>
+          <el-button type="primary" @click="playExplanation" v-if="recordingResult">播放解析</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -293,6 +473,15 @@ const isPracticing = ref(false)
 const showResult = ref(false)
 const selectedMode = ref('')
 const answers = reactive({})
+
+// 解析相关状态
+const showExplanation = ref(false)
+
+// 乡音辅导解析相关状态
+const showDialectExplanation = ref(false)
+const selectedDialect = ref('mandarin')
+const isRecording = ref(false)
+const recordingResult = ref(null)
 
 // 练习模式数据
 const practiceModes = {
@@ -569,8 +758,7 @@ const restartPractice = () => {
 
 // 查看解析
 const viewExplanation = () => {
-  ElMessage.success('解析已显示')
-  // 这里可以添加查看解析的逻辑
+  showExplanation.value = true
 }
 
 // 获取题目类型标签
@@ -623,6 +811,82 @@ const getResultType = (score) => {
 const viewHistory = () => {
   ElMessage.info('练习历史功能已触发')
   // 这里可以添加查看练习历史的逻辑
+}
+
+// 切换录音状态
+const toggleRecording = () => {
+  if (isRecording.value) {
+    // 停止录音，模拟识别结果
+    isRecording.value = false
+    simulateRecordingResult()
+  } else {
+    // 开始录音
+    isRecording.value = true
+    ElMessage.info('开始录音，请读出题目内容')
+  }
+}
+
+// 模拟录音结果
+const simulateRecordingResult = () => {
+  // 模拟识别过程
+  setTimeout(() => {
+    // 模拟识别结果
+    recordingResult.value = {
+      recognizedText: '以下哪个是童话故事中的角色？A. 孙悟空 B. 小红帽 C. 哪吒 D. 葫芦娃',
+      dialectExplanation: getDialectExplanation(),
+      standardExplanation: '小红帽是经典童话故事《小红帽》中的角色，其他选项都是中国神话或动画中的角色。'
+    }
+    ElMessage.success('录音识别完成，已生成解析结果')
+  }, 2000)
+}
+
+// 根据选择的方言生成解析
+const getDialectExplanation = () => {
+  const dialects = {
+    mandarin: '小红帽是经典童话故事《小红帽》中的角色，其他选项都是中国神话或动画中的角色。',
+    cantonese: '小红帽系经典童话故事《小红帽》入面嘅角色，其他选项都系中国神话或者动画入面嘅角色。',
+    sichuan: '小红帽是经典童话故事《小红帽》头的角色，其他选项都是中国神话或者动画头的角色。',
+    northeast: '小红帽是经典童话故事《小红帽》里的角色，其他选项都是中国神话或动画里的角色。',
+    shanghai: '小红帽是经典童话故事《小红帽》里向个角色，其他选项侪是中国神话或者动画里向个角色。'
+  }
+  return dialects[selectedDialect.value] || dialects.mandarin
+}
+
+// 播放解析
+const playExplanation = () => {
+  ElMessage.info('开始播放解析')
+  // 模拟播放解析
+  setTimeout(() => {
+    ElMessage.success('解析播放完成')
+  }, 3000)
+}
+
+// 获取正确答案文本
+const getCorrectAnswerText = (question) => {
+  if (question.type === 'single' || question.type === 'fill') {
+    return question.correctAnswer
+  } else if (question.type === 'multiple') {
+    return question.correctAnswer.join(', ')
+  }
+  return ''
+}
+
+// 获取知识点
+const getKnowledgePoints = (question) => {
+  // 模拟知识点数据
+  const knowledgeMap = {
+    1: ['童话故事', '文学常识'],
+    2: ['数学运算', '四则混合运算'],
+    3: ['自然现象', '科学常识'],
+    4: ['英语词汇', '基础单词'],
+    5: ['色彩理论', '美术基础'],
+    6: ['传统节日', '文化常识'],
+    7: ['植物结构', '生物学'],
+    8: ['季节变化', '自然常识'],
+    9: ['太阳系', '天文学'],
+    10: ['偶数概念', '数学基础']
+  }
+  return knowledgeMap[question.id] || ['知识点解析']
 }
 </script>
 
@@ -1055,6 +1319,302 @@ const viewHistory = () => {
   border-top: 1px solid #e4e7ed;
 }
 
+/* 查看解析弹窗样式 */
+.explanation-dialog {
+  .el-dialog__body {
+    padding: 30px;
+  }
+}
+
+.explanation-content {
+  .explanation-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e4e7ed;
+    
+    h3 {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 0 0 10px 0;
+      color: #303133;
+    }
+    
+    .explanation-subtitle {
+      color: #606266;
+      margin: 0;
+    }
+  }
+  
+  .explanation-interface {
+    margin-bottom: 30px;
+  }
+  
+  .explanation-card {
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .explanation-question {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      
+      .question-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin: 0;
+        color: #303133;
+      }
+    }
+    
+    .explanation-options {
+      margin-bottom: 20px;
+      
+      .option-item {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background-color: #f5f7fa;
+        }
+        
+        &.correct {
+          background-color: rgba(103, 194, 58, 0.1);
+          border-left: 4px solid #67c23a;
+        }
+        
+        &.selected {
+          background-color: rgba(64, 158, 255, 0.1);
+        }
+        
+        .option-label {
+          font-weight: bold;
+          margin-right: 10px;
+          min-width: 20px;
+        }
+        
+        .option-content {
+          flex: 1;
+        }
+        
+        .correct-tag {
+          margin-left: 10px;
+        }
+      }
+    }
+    
+    .explanation-correct-answer,
+    .explanation-detail,
+    .explanation-knowledge {
+      margin-bottom: 20px;
+      
+      h5 {
+        font-size: 14px;
+        font-weight: bold;
+        margin: 0 0 10px 0;
+        color: #303133;
+      }
+      
+      p {
+        margin: 0;
+        color: #606266;
+        line-height: 1.5;
+      }
+    }
+    
+    .explanation-knowledge {
+      .knowledge-tag {
+        margin-right: 10px;
+        margin-bottom: 10px;
+      }
+    }
+  }
+  
+  .explanation-tips {
+    margin-top: 30px;
+    
+    .tips-content {
+      p {
+        margin: 5px 0;
+        font-size: 14px;
+        color: #606266;
+      }
+    }
+  }
+}
+
+/* 乡音辅导解析弹窗样式 */
+.dialect-explanation-dialog {
+  .el-dialog__body {
+    padding: 30px;
+  }
+}
+
+.dialect-explanation-content {
+  .dialect-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e4e7ed;
+    
+    h3 {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 0 0 10px 0;
+      color: #303133;
+    }
+    
+    .dialect-subtitle {
+      color: #606266;
+      margin: 0;
+    }
+  }
+  
+  .dialect-interface {
+    margin-bottom: 30px;
+  }
+  
+  .dialect-steps {
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 30px;
+      padding: 20px;
+      background-color: #f5f7fa;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      
+      &.active {
+        background-color: #ecf5ff;
+        border-left: 4px solid #409eff;
+      }
+      
+      .step-number {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #409eff;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 20px;
+        flex-shrink: 0;
+      }
+      
+      .step-content {
+        flex: 1;
+        
+        h4 {
+          font-size: 16px;
+          font-weight: bold;
+          margin: 0 0 15px 0;
+          color: #303133;
+        }
+      }
+    }
+  }
+  
+  .recording-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    
+    .el-button {
+      width: 80px;
+      height: 80px;
+      font-size: 24px;
+      
+      &.recording {
+        background-color: #f56c6c;
+        border-color: #f56c6c;
+        animation: pulse 1.5s infinite;
+      }
+    }
+    
+    .recording-status {
+      color: #f56c6c;
+      font-weight: 500;
+    }
+    
+    .recording-tip {
+      color: #606266;
+    }
+  }
+  
+  .explanation-result {
+    margin-top: 15px;
+    
+    .el-card {
+      transition: all 0.3s ease;
+      
+      &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      h5 {
+        font-size: 14px;
+        font-weight: bold;
+        margin: 0 0 10px 0;
+        color: #303133;
+      }
+      
+      p {
+        margin: 0 0 15px 0;
+        color: #606266;
+        line-height: 1.5;
+      }
+    }
+  }
+  
+  .explanation-placeholder {
+    padding: 40px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    text-align: center;
+    color: #909399;
+  }
+  
+  .dialect-tips {
+    margin-top: 30px;
+    
+    .tips-content {
+      p {
+        margin: 5px 0;
+        font-size: 14px;
+        color: #606266;
+      }
+    }
+  }
+}
+
+/* 录音按钮动画 */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .practice-modes {
@@ -1074,6 +1634,23 @@ const viewHistory = () => {
   .result-footer {
     flex-direction: column;
     align-items: stretch;
+  }
+  
+  .dialect-explanation-dialog {
+    width: 90% !important;
+  }
+  
+  .dialect-steps {
+    .step-item {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      
+      .step-number {
+        margin-right: 0;
+        margin-bottom: 15px;
+      }
+    }
   }
 }
 </style>

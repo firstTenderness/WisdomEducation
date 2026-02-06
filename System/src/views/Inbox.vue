@@ -144,6 +144,44 @@
         </el-button>
       </div>
     </div>
+    
+    <!-- 消息详情弹窗 -->
+    <el-dialog
+      v-model="showMessageDetail"
+      :title="selectedMessage?.title || '消息详情'"
+      width="600px"
+      class="message-detail-dialog"
+    >
+      <div v-if="selectedMessage" class="message-detail-content">
+        <div class="message-detail-header">
+          <div class="message-detail-icon" :class="getMessageIcon(selectedMessage)">
+            <i :class="getMessageIconClass(selectedMessage)"></i>
+          </div>
+          <div class="message-detail-info">
+            <h4>{{ selectedMessage.title }}</h4>
+            <p class="message-detail-sender">发送者：{{ selectedMessage.sender }}</p>
+            <p class="message-detail-time">发送时间：{{ selectedMessage.time }}</p>
+          </div>
+        </div>
+        <div class="message-detail-body">
+          <h5>消息内容</h5>
+          <p class="message-detail-text">{{ selectedMessage.content }}</p>
+        </div>
+        <div class="message-detail-footer">
+          <el-tag :type="selectedMessage.read ? 'success' : 'danger'" effect="dark">
+            {{ selectedMessage.read ? '已读' : '未读' }}
+          </el-tag>
+        </div>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="closeMessageDetail">关闭</el-button>
+          <el-button type="primary" @click="toggleReadStatus(selectedMessage)">
+            {{ selectedMessage?.read ? '标记为未读' : '标记为已读' }}
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -154,6 +192,8 @@ import { ElMessage } from 'element-plus'
 const searchKeyword = ref('')
 const messageFilter = ref('all')
 const selectedMessages = ref([])
+const showMessageDetail = ref(false)
+const selectedMessage = ref(null)
 const messages = ref([
   {
     id: 1,
@@ -331,9 +371,15 @@ const deleteSelectedMessages = () => {
 const viewMessageDetail = (row) => {
   if (!row.read) {
     row.read = true
+    ElMessage.success('消息已标记为已读')
   }
-  ElMessage.info(`查看消息详情：${row.title}`)
-  // 这里可以添加打开消息详情对话框的逻辑
+  selectedMessage.value = row
+  showMessageDetail.value = true
+}
+
+const closeMessageDetail = () => {
+  showMessageDetail.value = false
+  selectedMessage.value = null
 }
 
 const handleFilterChange = () => {
@@ -689,6 +735,101 @@ const handleFilterChange = () => {
   
   .empty-messages {
     margin: 30px 20px;
+  }
+  
+  /* 消息详情弹窗样式 */
+  .message-detail-dialog {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  
+  .message-detail-content {
+    padding: 20px 0;
+  }
+  
+  .message-detail-header {
+    display: flex;
+    gap: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e4e7ed;
+    margin-bottom: 20px;
+  }
+  
+  .message-detail-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    flex-shrink: 0;
+  }
+  
+  .message-detail-icon.system-icon {
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  }
+  
+  .message-detail-icon.admin-icon {
+    background: linear-gradient(135deg, #e6a23c, #ebb563);
+  }
+  
+  .message-detail-icon.helper-icon {
+    background: linear-gradient(135deg, #909399, #c0c4cc);
+  }
+  
+  .message-detail-icon.teacher-icon {
+    background: linear-gradient(135deg, #67c23a, #85ce61);
+  }
+  
+  .message-detail-info {
+    flex: 1;
+  }
+  
+  .message-detail-info h4 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #303133;
+    margin: 0 0 10px 0;
+  }
+  
+  .message-detail-sender {
+    font-size: 14px;
+    color: #606266;
+    margin: 0 0 5px 0;
+  }
+  
+  .message-detail-time {
+    font-size: 14px;
+    color: #909399;
+    margin: 0;
+  }
+  
+  .message-detail-body {
+    margin-bottom: 20px;
+  }
+  
+  .message-detail-body h5 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #303133;
+    margin: 0 0 15px 0;
+  }
+  
+  .message-detail-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #606266;
+    margin: 0;
+    white-space: pre-wrap;
+  }
+  
+  .message-detail-footer {
+    padding-top: 15px;
+    border-top: 1px solid #e4e7ed;
+    display: flex;
+    justify-content: flex-end;
   }
 }
 </style>

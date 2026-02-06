@@ -71,66 +71,165 @@
       </div>
     </div>
     
-    <div class="topic-grid">
-      <el-row :gutter="20">
-        <el-col :span="8" v-for="topic in filteredTopics" :key="topic.id">
-          <el-card class="topic-card">
-            <div class="topic-cover">
-              <img :src="topic.cover" alt="专题封面" />
-              <div class="topic-status-badge" :class="topic.status">
-                {{ topic.status === 'published' ? '已发布' : '草稿' }}
+    <div class="topic-content-wrapper">
+      <div class="topic-grid" v-if="!showTopicDetail && !showEditDialog">
+        <el-row :gutter="20">
+          <el-col :span="8" v-for="topic in filteredTopics" :key="topic.id">
+            <el-card class="topic-card">
+              <div class="topic-cover">
+                <img :src="topic.cover" alt="专题封面" />
+                <div class="topic-status-badge" :class="topic.status">
+                  {{ topic.status === 'published' ? '已发布' : '草稿' }}
+                </div>
               </div>
+              <div class="topic-card-header">
+                <h3 class="topic-name">{{ topic.title }}</h3>
+              </div>
+              <p class="topic-description">{{ topic.description }}</p>
+              <div class="topic-meta">
+                <div class="meta-item">
+                  <i class="el-icon-time"></i>
+                  <span>{{ formatDate(topic.createdAt) }}</span>
+                </div>
+                <div class="meta-item">
+                  <i class="el-icon-view"></i>
+                  <span>{{ topic.views }} 浏览</span>
+                </div>
+                <div class="meta-item">
+                  <i class="el-icon-data-analysis"></i>
+                  <span>{{ topic.category }}</span>
+                </div>
+              </div>
+              <div class="topic-footer">
+                <el-button type="primary" size="small" @click="editTopic(topic)">
+                  <i class="el-icon-edit"></i> 编辑
+                </el-button>
+                <el-button size="small" @click="viewTopic(topic)">
+                  <i class="el-icon-view"></i> 查看
+                </el-button>
+                <el-button 
+                  size="small" 
+                  :type="topic.status === 'published' ? 'warning' : 'success'"
+                  @click="togglePublish(topic)"
+                >
+                  <i :class="topic.status === 'published' ? 'el-icon-s-finish' : 'el-icon-s-flag'"></i>
+                  {{ topic.status === 'published' ? '下线' : '发布' }}
+                </el-button>
+                <el-button size="small" type="danger" @click="deleteTopic(topic)">
+                  <i class="el-icon-delete"></i> 删除
+                </el-button>
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+      </div>
+      
+      <!-- 专题详情页面 -->
+      <div v-if="showTopicDetail && selectedTopic" class="topic-detail-page">
+        <div class="topic-detail-header">
+          <el-button type="info" @click="closeTopicDetail">
+            <i class="el-icon-arrow-left"></i> 返回列表
+          </el-button>
+          <h2>{{ selectedTopic.title }}</h2>
+        </div>
+        <div class="topic-detail-content">
+          <div class="topic-detail-cover">
+            <img :src="selectedTopic.cover" alt="专题封面" />
+          </div>
+          <div class="topic-detail-info">
+            <div class="topic-status">
+              <el-tag :type="selectedTopic.status === 'published' ? 'success' : 'warning'">
+                {{ selectedTopic.status === 'published' ? '已发布' : '草稿' }}
+              </el-tag>
             </div>
-            <div class="topic-card-header">
-              <h3 class="topic-name">{{ topic.title }}</h3>
+            <div class="topic-detail-body">
+              <h3>专题介绍</h3>
+              <p>{{ selectedTopic.description }}</p>
             </div>
-            <p class="topic-description">{{ topic.description }}</p>
-            <div class="topic-meta">
+            <div class="topic-detail-meta">
               <div class="meta-item">
                 <i class="el-icon-time"></i>
-                <span>{{ formatDate(topic.createdAt) }}</span>
+                <span>创建时间：{{ formatDate(selectedTopic.createdAt) }}</span>
               </div>
               <div class="meta-item">
                 <i class="el-icon-view"></i>
-                <span>{{ topic.views }} 浏览</span>
+                <span>浏览量：{{ selectedTopic.views }}</span>
               </div>
               <div class="meta-item">
                 <i class="el-icon-data-analysis"></i>
-                <span>{{ topic.category }}</span>
+                <span>分类：{{ selectedTopic.category }}</span>
               </div>
             </div>
-            <div class="topic-footer">
-              <el-button type="primary" size="small" @click="editTopic(topic)">
-                <i class="el-icon-edit"></i> 编辑
-              </el-button>
-              <el-button size="small" @click="viewTopic(topic)">
-                <i class="el-icon-view"></i> 查看
-              </el-button>
-              <el-button 
-                size="small" 
-                :type="topic.status === 'published' ? 'warning' : 'success'"
-                @click="togglePublish(topic)"
-              >
-                <i :class="topic.status === 'published' ? 'el-icon-s-finish' : 'el-icon-s-flag'"></i>
-                {{ topic.status === 'published' ? '下线' : '发布' }}
-              </el-button>
-              <el-button size="small" type="danger" @click="deleteTopic(topic)">
-                <i class="el-icon-delete"></i> 删除
-              </el-button>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-    </div>
-    
-    <div v-if="filteredTopics.length === 0" class="empty-topics">
-      <div class="empty-content">
-        <div class="empty-icon"><i class="el-icon-document"></i></div>
-        <h3 class="empty-title">暂无专题</h3>
-        <p class="empty-description">开始创建您的第一个专题吧！</p>
-        <el-button type="primary" @click="createNewTopic">
-          <i class="el-icon-plus"></i> 新建专题
-        </el-button>
+          </div>
+          <div class="topic-detail-actions">
+            <el-button type="primary" @click="editTopic(selectedTopic)">
+              <i class="el-icon-edit"></i> 编辑
+            </el-button>
+            <el-button :type="selectedTopic.status === 'published' ? 'warning' : 'success'" @click="togglePublish(selectedTopic)">
+              <i :class="selectedTopic.status === 'published' ? 'el-icon-s-finish' : 'el-icon-s-flag'"></i>
+              {{ selectedTopic.status === 'published' ? '下线' : '发布' }}
+            </el-button>
+            <el-button type="danger" @click="deleteTopic(selectedTopic)">
+              <i class="el-icon-delete"></i> 删除
+            </el-button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 编辑专题页面 -->
+      <div v-if="showEditDialog" class="topic-edit-page">
+        <div class="topic-edit-header">
+          <el-button type="info" @click="closeEditDialog">
+            <i class="el-icon-arrow-left"></i> {{ editingTopic ? '返回详情' : '返回列表' }}
+          </el-button>
+          <h2>{{ editingTopic ? '编辑专题' : '新建专题' }}</h2>
+        </div>
+        <div class="topic-edit-content">
+          <el-form :model="topicForm" label-width="100px">
+            <el-form-item label="专题标题">
+              <el-input v-model="topicForm.title" placeholder="请输入专题标题" style="width: 100%;" />
+            </el-form-item>
+            <el-form-item label="专题描述">
+              <el-input
+                v-model="topicForm.description"
+                type="textarea"
+                rows="4"
+                placeholder="请输入专题描述"
+                style="width: 100%;"
+              />
+            </el-form-item>
+            <el-form-item label="专题分类">
+              <el-select v-model="topicForm.category" placeholder="请选择分类" style="width: 100%;">
+                <el-option label="生物科普" value="生物科普" />
+                <el-option label="气象科普" value="气象科普" />
+                <el-option label="实验科普" value="实验科普" />
+                <el-option label="天文科普" value="天文科普" />
+                <el-option label="环保科普" value="环保科普" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="专题状态">
+              <el-radio-group v-model="topicForm.status">
+                <el-radio label="published">已发布</el-radio>
+                <el-radio label="draft">草稿</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-form>
+          <div class="topic-edit-actions">
+            <el-button @click="closeEditDialog">取消</el-button>
+            <el-button type="primary" @click="saveTopic">保存</el-button>
+          </div>
+        </div>
+      </div>
+      
+      <div v-if="filteredTopics.length === 0 && !showTopicDetail && !showEditDialog" class="empty-topics">
+        <div class="empty-content">
+          <div class="empty-icon"><i class="el-icon-document"></i></div>
+          <h3 class="empty-title">暂无专题</h3>
+          <p class="empty-description">开始创建您的第一个专题吧！</p>
+          <el-button type="primary" @click="createNewTopic">
+            <i class="el-icon-plus"></i> 新建专题
+          </el-button>
+        </div>
       </div>
     </div>
   </div>
@@ -142,6 +241,16 @@ import { ElMessage } from 'element-plus'
 
 const searchKeyword = ref('')
 const topicFilter = ref('all')
+const showTopicDetail = ref(false)
+const selectedTopic = ref(null)
+const showEditDialog = ref(false)
+const editingTopic = ref(null)
+const topicForm = ref({
+  title: '',
+  description: '',
+  category: '',
+  status: 'draft'
+})
 const topics = ref([
   {
     id: 1,
@@ -234,19 +343,83 @@ const formatDate = (dateString) => {
 }
 
 const createNewTopic = () => {
-  ElMessage.success('新建专题功能已触发')
-  // 这里可以添加打开新建专题对话框的逻辑
+  editingTopic.value = null
+  topicForm.value = {
+    title: '',
+    description: '',
+    category: '',
+    status: 'draft'
+  }
+  showEditDialog.value = true
 }
 
 const editTopic = (topic) => {
-  ElMessage.info(`编辑专题：${topic.title}`)
-  // 这里可以添加打开编辑专题对话框的逻辑
+  editingTopic.value = topic
+  topicForm.value = {
+    title: topic.title,
+    description: topic.description,
+    category: topic.category,
+    status: topic.status
+  }
+  showEditDialog.value = true
 }
 
 const viewTopic = (topic) => {
   topic.views++
-  ElMessage.success(`查看专题：${topic.title}`)
-  // 这里可以添加跳转到专题详情页的逻辑
+  selectedTopic.value = topic
+  showTopicDetail.value = true
+}
+
+const closeTopicDetail = () => {
+  showTopicDetail.value = false
+  selectedTopic.value = null
+}
+
+const closeEditDialog = () => {
+  showEditDialog.value = false
+  editingTopic.value = null
+}
+
+const saveTopic = () => {
+  if (!topicForm.value.title.trim()) {
+    ElMessage.warning('专题标题不能为空')
+    return
+  }
+  
+  if (!topicForm.value.description.trim()) {
+    ElMessage.warning('专题描述不能为空')
+    return
+  }
+  
+  if (!topicForm.value.category) {
+    ElMessage.warning('请选择专题分类')
+    return
+  }
+  
+  if (editingTopic.value) {
+    // 编辑现有专题
+    editingTopic.value.title = topicForm.value.title
+    editingTopic.value.description = topicForm.value.description
+    editingTopic.value.category = topicForm.value.category
+    editingTopic.value.status = topicForm.value.status
+    ElMessage.success('专题编辑成功')
+  } else {
+    // 创建新专题
+    const newTopic = {
+      id: topics.value.length + 1,
+      title: topicForm.value.title,
+      description: topicForm.value.description,
+      status: topicForm.value.status,
+      createdAt: new Date().toISOString().split('T')[0],
+      views: 0,
+      category: topicForm.value.category,
+      cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=science%20education%20topic%20cover%20with%20colorful%20elements%20for%20children&image_size=square'
+    }
+    topics.value.unshift(newTopic)
+    ElMessage.success('专题创建成功')
+  }
+  
+  closeEditDialog()
 }
 
 const togglePublish = (topic) => {
@@ -444,34 +617,34 @@ const exportTopics = () => {
 }
 
 .topic-cover {
-  position: relative;
-  height: 160px;
-  overflow: hidden;
-}
-
-.topic-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.topic-card:hover .topic-cover img {
-  transform: scale(1.1);
-}
-
-.topic-status-badge {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 6px 14px;
-  border-radius: 16px;
-  font-size: 12px;
-  font-weight: bold;
-  color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-}
+    position: relative;
+    height: 120px;
+    overflow: hidden;
+  }
+  
+  .topic-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  
+  .topic-card:hover .topic-cover img {
+    transform: scale(1.1);
+  }
+  
+  .topic-status-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
 
 .topic-card:hover .topic-status-badge {
   transform: scale(1.05);
@@ -650,10 +823,270 @@ const exportTopics = () => {
   
   .topic-cover {
     height: 140px;
+    position: relative;
+  }
+  
+  .topic-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .topic-status-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  
+  .topic-status-badge.published {
+    background-color: #f0f9eb;
+    color: #67c23a;
+    border: 1px solid #e1f5dc;
+  }
+  
+  .topic-status-badge.draft {
+    background-color: #fdf6ec;
+    color: #e6a23c;
+    border: 1px solid #faecd8;
+  }
+  
+  .topic-card-header {
+    margin: 15px 0 10px;
+  }
+  
+  .topic-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #303133;
+    margin: 0;
+  }
+  
+  .topic-description {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #606266;
+    margin-bottom: 15px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .topic-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .topic-meta .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #909399;
+  }
+  
+  .topic-footer {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
   }
   
   .empty-topics {
     margin: 30px 20px;
+  }
+  
+  /* 专题详情页面样式 */
+  .topic-detail-page {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+  }
+  
+  .topic-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e4e7ed;
+  }
+  
+  .topic-detail-header h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #303133;
+    margin: 0;
+  }
+  
+  .topic-detail-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .topic-detail-cover {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+  
+  .topic-detail-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .topic-detail-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .topic-status {
+    align-self: flex-start;
+  }
+  
+  .topic-detail-body h3 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #303133;
+    margin: 0 0 15px 0;
+  }
+  
+  .topic-detail-body p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #606266;
+    margin: 0;
+  }
+  
+  .topic-detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e4e7ed;
+  }
+  
+  .topic-detail-meta .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #909399;
+  }
+  
+  .topic-detail-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-start;
+    padding-top: 20px;
+    border-top: 1px solid #e4e7ed;
+  }
+  
+  /* 编辑专题页面样式 */
+  .topic-edit-page {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+  }
+  
+  .topic-edit-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e4e7ed;
+  }
+  
+  .topic-edit-header h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #303133;
+    margin: 0;
+  }
+  
+  .topic-edit-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .topic-edit-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding-top: 20px;
+    border-top: 1px solid #e4e7ed;
+  }
+  
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .topic-detail-page,
+    .topic-edit-page {
+      padding: 15px;
+      margin: 10px 0;
+    }
+    
+    .topic-detail-header,
+    .topic-edit-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      padding-bottom: 15px;
+    }
+    
+    .topic-detail-header h2,
+    .topic-edit-header h2 {
+      font-size: 20px;
+    }
+    
+    .topic-detail-cover {
+      max-height: 250px;
+    }
+    
+    .topic-detail-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .topic-detail-actions,
+    .topic-edit-actions {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .topic-footer {
+      flex-direction: column;
+    }
+    
+    .topic-footer .el-button {
+      width: 100%;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .topic-detail-cover {
+      max-height: 200px;
+    }
+    
+    .topic-detail-body p {
+      font-size: 14px;
+    }
   }
 }
 </style>

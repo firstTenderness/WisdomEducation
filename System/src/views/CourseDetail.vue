@@ -4,7 +4,7 @@
     <nav class="navbar">
       <div class="nav-container">
         <div class="logo">
-          <img src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" alt="慧学澄明教育学习平台">
+          <img src="/src/assets/logo.svg" alt="Logo">
           <h1>慧学澄明教育学习平台</h1>
         </div>
         <ul class="nav-menu">

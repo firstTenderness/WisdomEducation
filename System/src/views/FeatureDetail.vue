@@ -5,18 +5,18 @@
       <div class="container">
         <div class="navbar-content">
           <div class="navbar-left">
-            <el-avatar :size="40" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" class="nav-logo"></el-avatar>
+            <el-avatar :size="40" src="/src/assets/logo.svg" class="nav-logo"></el-avatar>
             <h1 class="platform-name">慧学澄明教育学习平台</h1>
           </div>
           <div class="navbar-right">
             <nav class="nav-menu">
-              <a href="/portal" class="nav-link">首页</a>
-              <a href="/portal#features" class="nav-link active">特色功能</a>
-              <a href="/portal#courses" class="nav-link">课程中心</a>
-              <a href="/portal#policy" class="nav-link">乡村教育政策</a>
-              <a href="/portal#breakthrough" class="nav-link">破茧视界</a>
-              <a href="/portal#about" class="nav-link">关于我们</a>
-              <a href="/portal#contact" class="nav-link">联系我们</a>
+              <router-link to="/portal" class="nav-link">首页</router-link>
+              <router-link to="/portal#features" class="nav-link active">特色功能</router-link>
+              <router-link to="/portal#courses" class="nav-link">课程中心</router-link>
+              <router-link to="/portal#policy" class="nav-link">乡村教育政策</router-link>
+              <router-link to="/portal#breakthrough" class="nav-link">破茧视界</router-link>
+              <router-link to="/portal#about" class="nav-link">关于我们</router-link>
+              <router-link to="/portal#contact" class="nav-link">联系我们</router-link>
             </nav>
             <div class="nav-buttons">
               <router-link to="/login" class="btn btn-outline">登录</router-link>
@@ -37,9 +37,9 @@
           <h1 class="feature-title">{{ featureDetail?.title || '功能详情' }}</h1>
           <p class="feature-description">{{ featureDetail?.description || '正在加载功能详情...' }}</p>
           <nav class="breadcrumb">
-            <a href="/portal">首页</a>
+            <router-link to="/portal">首页</router-link>
             <span>/</span>
-            <a href="/portal#features">特色功能</a>
+            <router-link to="/portal#features">特色功能</router-link>
             <span>/</span>
             <span class="current">{{ featureDetail?.title || '功能详情' }}</span>
           </nav>
@@ -186,13 +186,13 @@
           <div class="footer-column">
             <h3>快速链接</h3>
             <ul class="footer-links">
-              <li><a href="/portal">首页</a></li>
-              <li><a href="/portal#features">特色功能</a></li>
-              <li><a href="/portal#courses">课程中心</a></li>
-              <li><a href="/portal#policy">乡村教育政策</a></li>
-              <li><a href="/portal#breakthrough">破茧视界</a></li>
-              <li><a href="/portal#about">关于我们</a></li>
-              <li><a href="/portal#contact">联系我们</a></li>
+              <li><router-link to="/portal">首页</router-link></li>
+              <li><router-link to="/portal#features">特色功能</router-link></li>
+              <li><router-link to="/portal#courses">课程中心</router-link></li>
+              <li><router-link to="/portal#policy">乡村教育政策</router-link></li>
+              <li><router-link to="/portal#breakthrough">破茧视界</router-link></li>
+              <li><router-link to="/portal#about">关于我们</router-link></li>
+              <li><router-link to="/portal#contact">联系我们</router-link></li>
             </ul>
           </div>
           <div class="footer-column">

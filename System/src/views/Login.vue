@@ -1,5 +1,9 @@
 <template>
   <div class="login-container">
+    <router-link to="/portal" class="back-to-portal">
+      <i class="fas fa-arrow-left"></i>
+      返回首页
+    </router-link>
     <div class="login-box">
       <div class="login-header">
         <h2 class="login-title">慧学澄明学习教育平台</h2>
@@ -164,15 +168,10 @@ const handleLogin = async () => {
   
   try {
     // 调用后端登录API
-    console.log('开始登录，账号：', formData.account);
-    console.log('登录请求数据：', { account: formData.account, password: formData.password });
-    
     const response = await login({
       account: formData.account,
       password: formData.password
     });
-    
-    console.log('登录响应：', response);
     
     // 后端返回的用户数据
     let userData = response;
@@ -187,15 +186,9 @@ const handleLogin = async () => {
       throw new Error('登录响应数据中缺少token');
     }
     
-    console.log('用户数据：', userData);
-    
     // 保存用户信息到本地存储
     localStorage.setItem('token', userData.token);
     localStorage.setItem('userInfo', JSON.stringify(userData));
-    
-    console.log('保存用户信息成功');
-    console.log('本地存储中的token：', localStorage.getItem('token'));
-    console.log('本地存储中的userInfo：', localStorage.getItem('userInfo'));
     
     if (formData.rememberMe) {
       localStorage.setItem('rememberedCredentials', JSON.stringify({
@@ -206,26 +199,21 @@ const handleLogin = async () => {
       localStorage.removeItem('rememberedCredentials');
     }
     
-    console.log('准备跳转到首页');
-    
-    // 强制跳转到首页
+    // 强制跳转到学生端页面
     setTimeout(() => {
-      console.log('执行跳转');
-      window.location.href = '/home';
+      router.push('/home');
     }, 500);
     
   } catch (err) {
-    console.error('登录错误:', err);
-    console.error('错误堆栈:', err.stack);
+    ElMessage.error(err.message || '登录失败，请稍后重试');
     errorMessage.value = err.message || '登录失败，请稍后重试';
   } finally {
     isLoading.value = false;
-    console.log('登录流程结束');
   }
 };
 
 const handleForgotPassword = () => {
-  alert('请联系管理员重置密码');
+  ElMessage.info('请联系管理员重置密码');
 };
 
 const handleRegister = () => {
@@ -285,6 +273,36 @@ const handleRegister = () => {
 .login-header {
   text-align: center;
   margin-bottom: 35px;
+  position: relative;
+}
+
+.back-to-portal {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.back-to-portal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+  filter: brightness(1.05);
+}
+
+.back-to-portal i {
+  font-size: 12px;
 }
 
 .login-title {

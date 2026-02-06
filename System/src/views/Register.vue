@@ -196,6 +196,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
 
 const router = useRouter();
 
@@ -382,7 +383,7 @@ const sendCode = async () => {
       }
     }, 1000);
     
-    alert(`验证码已发送至 ${formData.phone}，验证码为：123456`);
+    ElMessage.success(`验证码已发送至 ${formData.phone}，验证码为：123456`);
   }, 1000);
 };
 
@@ -410,7 +411,7 @@ const handleRegister = async () => {
       phone: formData.phone,
       token: 'mock-token-' + Date.now(),
       userId: 'user-' + Date.now(),
-      avatar: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+      avatar: '/src/assets/logo.svg'
     };
     
     localStorage.setItem('token', userData.token);
@@ -429,11 +430,11 @@ const goToLogin = () => {
 };
 
 const showTerms = () => {
-  alert('用户协议内容...\n（此处为演示，实际应跳转到用户协议页面）');
+  ElMessage.info('用户协议内容...\n（此处为演示，实际应跳转到用户协议页面）');
 };
 
 const showPrivacy = () => {
-  alert('隐私政策内容...\n（此处为演示，实际应跳转到隐私政策页面）');
+  ElMessage.info('隐私政策内容...\n（此处为演示，实际应跳转到隐私政策页面）');
 };
 </script>
 

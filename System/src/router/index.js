@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 
 // 懒加载导入页面组件
 const StudentHome = () => import('../views/StudentHome.vue')
@@ -100,7 +100,7 @@ const routes = [
 
 // 创建路由实例
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL), // 适配Vite环境变量
+  history: createWebHashHistory(import.meta.env.BASE_URL), // 使用hash模式，避免刷新404问题
   routes
 })
 
