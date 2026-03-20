@@ -4,6 +4,7 @@
       <div class="header-bg"></div>
       <div class="header-content">
         <div class="header-left">
+
           <h2 class="inbox-title">收件箱</h2>
           <p class="inbox-subtitle">查看和管理您的消息通知</p>
         </div>
@@ -188,6 +189,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
 
 const searchKeyword = ref('')
 const messageFilter = ref('all')
@@ -426,6 +431,8 @@ const handleFilterChange = () => {
 .header-left {
   flex: 1;
 }
+
+
 
 .inbox-title {
   font-size: 32px;

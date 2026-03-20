@@ -4,6 +4,7 @@
     <div class="cloud-header">
       <div class="header-bg"></div>
       <div class="header-content">
+
         <div class="header-left">
           <h2 class="cloud-title">资源宝库</h2>
           <p class="cloud-subtitle">丰富的学习资源，助力山区孩子成长</p>
@@ -14,6 +15,15 @@
           </el-button>
           <el-button type="primary" @click="createFolder">
             <i class="el-icon-plus"></i> 新建文件夹
+          </el-button>
+          <el-button type="primary" @click="showSmartClassification">
+            <i class="el-icon-data-analysis"></i> 智能分类
+          </el-button>
+          <el-button type="primary" @click="showSmartRecommendations">
+            <i class="el-icon-s-marketing"></i> 智能推荐
+          </el-button>
+          <el-button type="primary" @click="showSharingCollaboration">
+            <i class="el-icon-share"></i> 分享协作
           </el-button>
           <el-button @click="refreshFiles">
             <i class="el-icon-refresh"></i> 刷新
@@ -258,13 +268,177 @@
         </div>
       </div>
     </el-dialog>
+    
+    <!-- 智能资源分类对话框 -->
+    <el-dialog v-model="showClassificationDialog" title="智能资源分类" width="600px">
+      <div class="classification-content">
+        <el-card shadow="hover" class="classification-card">
+          <template #header>
+            <div class="card-header">
+              <span>智能分类功能</span>
+            </div>
+          </template>
+          <div class="classification-features">
+            <div class="feature-item">
+              <div class="feature-icon"><i class="el-icon-data-analysis"></i></div>
+              <div class="feature-content">
+                <h4>自动识别文件类型</h4>
+                <p>基于文件内容和扩展名，智能识别并分类各类学习资源</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon"><i class="el-icon-folder"></i></div>
+              <div class="feature-content">
+                <h4>自动创建分类文件夹</h4>
+                <p>根据文件类型和内容，自动创建合理的文件夹结构</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon"><i class="el-icon-s-marketing"></i></div>
+              <div class="feature-content">
+                <h4>智能标签生成</h4>
+                <p>为文件自动生成相关标签，提高检索效率</p>
+              </div>
+            </div>
+          </div>
+          <div class="classification-actions">
+            <el-button type="primary" @click="startSmartClassification">
+              <i class="el-icon-sync"></i> 开始智能分类
+            </el-button>
+          </div>
+        </el-card>
+      </div>
+    </el-dialog>
+    
+    <!-- 智能资源推荐对话框 -->
+    <el-dialog v-model="showRecommendationsDialog" title="智能资源推荐" width="600px">
+      <div class="recommendations-content">
+        <el-card shadow="hover" class="recommendations-card">
+          <template #header>
+            <div class="card-header">
+              <span>智能推荐功能</span>
+            </div>
+          </template>
+          <div class="recommendations-list">
+            <el-empty v-if="recommendedResources.length === 0" description="暂无推荐资源" />
+            <div v-else class="resource-item" v-for="resource in recommendedResources" :key="resource.id">
+              <div class="resource-icon">
+                <i v-if="resource.type === 'folder'" class="el-icon-folder" style="font-size: 24px; color: #409eff;"></i>
+                <i v-else-if="resource.extension === 'doc' || resource.extension === 'docx'" class="el-icon-document" style="font-size: 24px; color: #2196f3;"></i>
+                <i v-else-if="resource.extension === 'xls' || resource.extension === 'xlsx'" class="el-icon-data-analysis" style="font-size: 24px; color: #4caf50;"></i>
+                <i v-else-if="resource.extension === 'ppt' || resource.extension === 'pptx'" class="el-icon-picture-outline-round" style="font-size: 24px; color: #ff9800;"></i>
+                <i v-else-if="resource.extension === 'pdf'" class="el-icon-document-copy" style="font-size: 24px; color: #f44336;"></i>
+                <i v-else class="el-icon-document" style="font-size: 24px; color: #606266;"></i>
+              </div>
+              <div class="resource-info">
+                <h4>{{ resource.name }}</h4>
+                <p class="resource-description">{{ resource.description }}</p>
+                <div class="resource-meta">
+                  <span class="resource-score">匹配度：{{ resource.score }}%</span>
+                  <span class="resource-type">{{ resource.type === 'folder' ? '文件夹' : resource.extension?.toUpperCase() }}</span>
+                </div>
+              </div>
+              <div class="resource-actions">
+                <el-button size="small" @click="previewFile(resource)">
+                  <i class="el-icon-view"></i> 查看
+                </el-button>
+              </div>
+            </div>
+          </div>
+          <div class="recommendations-actions">
+            <el-button type="primary" @click="refreshRecommendations">
+              <i class="el-icon-refresh"></i> 刷新推荐
+            </el-button>
+          </div>
+        </el-card>
+      </div>
+    </el-dialog>
+    
+    <!-- 分享与协作对话框 -->
+    <el-dialog v-model="showSharingDialog" title="分享与协作" width="600px">
+      <div class="sharing-content">
+        <el-card shadow="hover" class="sharing-card">
+          <template #header>
+            <div class="card-header">
+              <span>分享与协作功能</span>
+            </div>
+          </template>
+          <div class="sharing-features">
+            <div class="feature-item">
+              <div class="feature-icon"><i class="el-icon-share"></i></div>
+              <div class="feature-content">
+                <h4>资源分享</h4>
+                <p>生成分享链接，支持设置访问权限和有效期</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon"><i class="el-icon-user"></i></div>
+              <div class="feature-content">
+                <h4>协作编辑</h4>
+                <p>支持多人同时编辑文档，实时同步更改</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon"><i class="el-icon-message"></i></div>
+              <div class="feature-content">
+                <h4>评论与反馈</h4>
+                <p>对文件进行评论，提供反馈和建议</p>
+              </div>
+            </div>
+          </div>
+          <div class="sharing-form">
+            <el-form :model="sharingForm" label-width="80px">
+              <el-form-item label="选择文件">
+                <el-select v-model="sharingForm.fileId" placeholder="请选择要分享的文件">
+                  <el-option 
+                    v-for="file in files" 
+                    :key="file.id" 
+                    :label="file.name" 
+                    :value="file.id"
+                    :disabled="file.type === 'folder'"
+                  />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="分享方式">
+                <el-radio-group v-model="sharingForm.shareType">
+                  <el-radio label="link">生成链接</el-radio>
+                  <el-radio label="email">邮件分享</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="访问权限">
+                <el-select v-model="sharingForm.permission" placeholder="请选择访问权限">
+                  <el-option label="仅查看" value="view"></el-option>
+                  <el-option label="可编辑" value="edit"></el-option>
+                  <el-option label="可评论" value="comment"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="有效期">
+                <el-select v-model="sharingForm.expiry" placeholder="请选择有效期">
+                  <el-option label="1天" value="1d"></el-option>
+                  <el-option label="7天" value="7d"></el-option>
+                  <el-option label="30天" value="30d"></el-option>
+                  <el-option label="永久" value="never"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-form>
+          </div>
+          <div class="sharing-actions">
+            <el-button type="primary" @click="createShareLink">
+              <i class="el-icon-link"></i> 创建分享
+            </el-button>
+          </div>
+        </el-card>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const searchKeyword = ref('')
 const fileFilter = ref('all')
 const selectedFiles = ref([])
@@ -275,6 +449,16 @@ const currentPreviewFile = ref(null)
 const uploadProgress = ref(0)
 const newFolderName = ref('')
 const uploadFiles = ref([])
+const showClassificationDialog = ref(false)
+const showRecommendationsDialog = ref(false)
+const showSharingDialog = ref(false)
+const recommendedResources = ref([])
+const sharingForm = ref({
+  fileId: '',
+  shareType: 'link',
+  permission: 'view',
+  expiry: '7d'
+})
 const files = ref([
   {
     id: 1,
@@ -619,6 +803,148 @@ const handleCommand = (command, row) => {
       break
   }
 }
+
+// 智能分类相关方法
+const showSmartClassification = () => {
+  showClassificationDialog.value = true
+}
+
+const startSmartClassification = () => {
+  // 显示加载动画
+  ElMessage.loading({
+    message: '正在进行智能分类...',
+    duration: 2000,
+    showClose: true
+  })
+  
+  // 模拟分类过程
+  setTimeout(() => {
+    // 显示成功消息
+    ElMessage.success({
+      message: '智能分类完成，已为您创建分类文件夹并整理文件',
+      duration: 3000,
+      showClose: true
+    })
+    
+    // 关闭对话框
+    showClassificationDialog.value = false
+  }, 2000)
+}
+
+// 智能推荐相关方法
+const showSmartRecommendations = () => {
+  // 先显示对话框
+  showRecommendationsDialog.value = true
+  // 然后再刷新推荐
+  refreshRecommendations()
+}
+
+const refreshRecommendations = () => {
+  // 显示加载动画
+  ElMessage.loading({
+    message: '正在生成智能推荐...',
+    duration: 1500,
+    showClose: true
+  })
+  
+  // 清空现有推荐
+  recommendedResources.value = []
+  
+  // 模拟推荐生成过程
+  setTimeout(() => {
+    // 逐步添加推荐资源，实现动画效果
+    recommendedResources.value = [
+      {
+        id: 11,
+        name: '科学实验指南.pdf',
+        type: 'file',
+        extension: 'pdf',
+        size: 15360,
+        updateTime: '2024-01-20 10:00:00',
+        description: '基于您的学习内容，推荐此科学实验指南',
+        score: 95
+      },
+      {
+        id: 12,
+        name: '山区生物多样性研究.docx',
+        type: 'file',
+        extension: 'docx',
+        size: 10240,
+        updateTime: '2024-01-18 14:30:00',
+        description: '与您最近查看的山区生物图鉴相关',
+        score: 90
+      },
+      {
+        id: 13,
+        name: '天文观测实践.pptx',
+        type: 'file',
+        extension: 'pptx',
+        size: 20480,
+        updateTime: '2024-01-15 09:00:00',
+        description: '基于您对天文知识的兴趣推荐',
+        score: 85
+      }
+    ]
+    
+    // 显示成功消息
+    ElMessage.success({
+      message: '智能推荐已更新，为您找到3个相关资源',
+      duration: 3000,
+      showClose: true
+    })
+  }, 1500)
+}
+
+// 分享与协作相关方法
+const showSharingCollaboration = () => {
+  showSharingDialog.value = true
+}
+
+const createShareLink = () => {
+  if (!sharingForm.value.fileId) {
+    ElMessage.warning({
+      message: '请选择要分享的文件',
+      duration: 3000,
+      showClose: true
+    })
+    return
+  }
+  
+  // 显示加载动画
+  ElMessage.loading({
+    message: '正在创建分享链接...',
+    duration: 1500,
+    showClose: true
+  })
+  
+  // 模拟分享链接创建过程
+  setTimeout(() => {
+    const shareUrl = `https://cloud.wisdomeducation.com/share/${Math.random().toString(36).substring(2, 15)}`
+    
+    // 显示成功消息
+    ElMessage.success({
+      message: '分享链接已创建',
+      duration: 2000,
+      showClose: true
+    })
+    
+    // 显示分享链接对话框
+    ElMessageBox.alert(`分享链接：${shareUrl}\n有效期：${sharingForm.value.expiry === 'never' ? '永久' : sharingForm.value.expiry}`, '分享成功', {
+      confirmButtonText: '复制链接',
+      callback: () => {
+        ElMessage.success({
+          message: '链接已复制到剪贴板',
+          duration: 2000,
+          showClose: true
+        })
+      }
+    })
+    
+    // 关闭分享对话框
+    showSharingDialog.value = false
+  }, 1500)
+}
+
 </script>
 
 <style scoped>
@@ -904,28 +1230,68 @@ const handleCommand = (command, row) => {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .cloud-page {
+    padding: 15px;
+  }
+  
   .cloud-header {
-    padding: 20px;
+    margin-bottom: 20px;
   }
   
   .header-content {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
+    padding: 20px;
+  }
+  
+  .cloud-title {
+    font-size: 24px;
+  }
+  
+  .cloud-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .cloud-actions .el-button {
+    font-size: 12px;
+    padding: 8px 12px;
+    flex: 1;
+    min-width: 120px;
   }
   
   .cloud-stats {
     flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
   }
   
   .stat-card {
     min-width: 100%;
   }
   
+  .stat-item {
+    gap: 12px;
+  }
+  
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+  
+  .stat-value {
+    font-size: 20px;
+  }
+  
   .cloud-filters {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
   }
   
   .cloud-filters .el-select,
@@ -934,9 +1300,113 @@ const handleCommand = (command, row) => {
     margin-left: 0 !important;
   }
   
+  .el-table {
+    font-size: 12px;
+  }
+  
+  .el-table th,
+  .el-table td {
+    padding: 8px;
+  }
+  
+  .el-table-column {
+    min-width: 80px !important;
+  }
+  
+  .file-name-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .file-type-tag {
+    margin-left: 0;
+  }
+  
+  .empty-files {
+    margin-top: 40px;
+    padding: 30px 15px;
+  }
+  
+  .empty-icon {
+    font-size: 64px;
+  }
+  
+  .empty-title {
+    font-size: 18px;
+  }
+  
   .empty-actions {
     flex-direction: column;
     align-items: center;
+    gap: 8px;
+  }
+  
+  .upload-demo {
+    margin-bottom: 15px;
+  }
+  
+  .file-preview-content {
+    gap: 15px;
+  }
+  
+  .preview-icon {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .preview-icon i {
+    font-size: 32px !important;
+  }
+  
+  .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .info-label {
+    min-width: auto;
+  }
+  
+  .preview-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .classification-content,
+  .recommendations-content,
+  .sharing-content {
+    padding: 5px;
+  }
+  
+  .feature-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .resource-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .resource-actions {
+    margin-top: 12px;
+  }
+  
+  .sharing-form {
+    width: 100%;
+  }
+  
+  .el-form-item {
+    width: 100%;
+  }
+  
+  .el-select,
+  .el-radio-group {
+    width: 100%;
   }
 }
 
@@ -1032,6 +1502,222 @@ const handleCommand = (command, row) => {
   .preview-actions {
     flex-wrap: wrap;
     gap: 8px;
+  }
+}
+
+/* 智能分类对话框样式 */
+.classification-content {
+  padding: 10px;
+}
+
+.classification-card {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card-header {
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.classification-features {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.feature-item {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  flex-shrink: 0;
+}
+
+.feature-content h4 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.feature-content p {
+  margin: 0;
+  font-size: 14px;
+  color: #606266;
+  line-height: 1.5;
+}
+
+.classification-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* 智能推荐对话框样式 */
+.recommendations-content {
+  padding: 10px;
+}
+
+.recommendations-card {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.recommendations-list {
+  margin: 20px 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.resource-item {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+}
+
+.resource-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.resource-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.resource-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.resource-info h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.resource-description {
+  margin: 0;
+  font-size: 14px;
+  color: #606266;
+  line-height: 1.5;
+}
+
+.resource-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #909399;
+}
+
+.resource-score {
+  color: #409eff;
+  font-weight: 500;
+}
+
+.resource-actions {
+  display: flex;
+  align-items: center;
+}
+
+.recommendations-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* 分享与协作对话框样式 */
+.sharing-content {
+  padding: 10px;
+}
+
+.sharing-card {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sharing-features {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.sharing-form {
+  margin: 20px 0;
+}
+
+.sharing-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .feature-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .resource-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .resource-actions {
+    margin-top: 12px;
+  }
+  
+  .sharing-form {
+    width: 100%;
+  }
+  
+  .el-form-item {
+    width: 100%;
+  }
+  
+  .el-select,
+  .el-radio-group {
+    width: 100%;
   }
 }
 </style>

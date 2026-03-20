@@ -5,6 +5,9 @@
       <div class="nav-bg"></div>
       <div class="nav-content">
         <div class="nav-left">
+          <div class="mobile-menu-toggle" @click="toggleCollapse" v-if="isMobile">
+            <i class="el-icon-menu"></i>
+          </div>
           <el-avatar :size="40" src="/src/assets/logo.svg" class="nav-logo"></el-avatar>
           <h1 class="platform-name">慧学澄明学习教育平台-学生端</h1>
         </div>
@@ -40,20 +43,23 @@
           <el-button 
             type="primary" 
             @click="handleTeacherSwitch"
-            class="interactive-btn"
+            class="btn btn-primary btn-md"
           >
             切换教师端
           </el-button>
           <el-button 
             type="danger" 
             @click="handleLogout"
-            class="interactive-btn"
+            class="btn btn-accent btn-md"
           >
             退出登录
           </el-button>
         </div>
       </div>
     </div>
+    
+    <!-- 移动端菜单遮罩层 -->
+    <div v-if="isCollapse && isMobile" class="sidebar-overlay" @click="toggleCollapse"></div>
     
     <!-- 主体布局 -->
     <div class="main-layout">
@@ -169,25 +175,25 @@
                 <div class="card-icon study-icon"><i class="el-icon-book"></i></div>
                 <h4>课程学习</h4>
                 <p>探索丰富的课程资源，开启学习之旅</p>
-                <el-button type="primary" @click="navigateTo('1')">开始学习</el-button>
+                <el-button type="primary" @click="navigateTo('1')" class="btn btn-primary btn-md">开始学习</el-button>
               </el-card>
               <el-card shadow="hover" class="overview-card">
                 <div class="card-icon practice-icon"><i class="el-icon-brush"></i></div>
                 <h4>智能练习</h4>
                 <p>个性化练习，针对性提升</p>
-                <el-button type="success" @click="navigateTo('7')">开始练习</el-button>
+                <el-button type="success" @click="navigateTo('7')" class="btn btn-secondary btn-md">开始练习</el-button>
               </el-card>
               <el-card shadow="hover" class="overview-card">
                 <div class="card-icon create-icon"><i class="el-icon-edit"></i></div>
                 <h4>创意创作</h4>
                 <p>发挥想象力，创作精彩内容</p>
-                <el-button type="warning" @click="navigateTo('3')">开始创作</el-button>
+                <el-button type="warning" @click="navigateTo('3')" class="btn btn-accent btn-md">开始创作</el-button>
               </el-card>
               <el-card shadow="hover" class="overview-card">
                 <div class="card-icon break-icon"><i class="el-icon-video-camera"></i></div>
                 <h4>破茧视界</h4>
                 <p>打破信息茧房，拓展视野</p>
-                <el-button type="danger" @click="navigateTo('8')">探索世界</el-button>
+                <el-button type="danger" @click="navigateTo('8')" class="btn btn-outline btn-md">探索世界</el-button>
               </el-card>
             </div>
 
@@ -208,7 +214,7 @@
                     <el-progress :percentage="course.progress" :stroke-width="8"></el-progress>
                     <span class="progress-text">{{ course.progress }}%</span>
                   </div>
-                  <el-button type="primary" size="small" class="course-btn" @click="continueLearning(course)">继续学习</el-button>
+                  <el-button type="primary" size="small" class="course-btn btn btn-primary btn-sm" @click="continueLearning(course)">继续学习</el-button>
                 </el-card>
               </div>
             </div>
@@ -231,53 +237,14 @@
                   <h4 class="video-title">{{ video.title }}</h4>
                   <p class="video-description">{{ video.description }}</p>
                   <a :href="video.url" target="_blank" class="video-link">
-                    <el-button type="info">观看视频</el-button>
+                    <el-button type="info" class="btn btn-outline btn-md">观看视频</el-button>
                   </a>
                 </el-card>
               </div>
             </div>
           </div>
 
-          <!-- 破茧视界内容 -->
-          <div v-else-if="currentMenu === '8'" class="breakthrough-content">
-            <div class="breakthrough-header">
-              <h3>破茧视界</h3>
-              <p>打破信息茧房，拓展多元视野</p>
-            </div>
-            <div class="video-categories">
-              <el-tag 
-                v-for="category in videoCategories" 
-                :key="category"
-                :class="{ active: selectedCategory === category }"
-                @click="selectedCategory = category"
-                class="category-tag"
-              >
-                {{ category }}
-              </el-tag>
-            </div>
-            <div class="video-grid">
-              <el-card 
-                v-for="video in filteredVideos" 
-                :key="video.id"
-                shadow="hover"
-                class="video-card-large"
-              >
-                <div class="video-thumbnail-large">
-                  <img :src="video.thumbnail" :alt="video.title" class="thumbnail-img-large">
-                  <div class="play-icon-large"><i class="el-icon-video-play"></i></div>
-                </div>
-                <h4 class="video-title-large">{{ video.title }}</h4>
-                <p class="video-description-large">{{ video.description }}</p>
-                <div class="video-meta">
-                  <span class="video-category">{{ video.category }}</span>
-                  <span class="video-duration">{{ video.duration }}</span>
-                </div>
-                <a :href="video.url" target="_blank" class="video-link-large">
-                  <el-button type="primary" class="watch-btn">立即观看</el-button>
-                </a>
-              </el-card>
-            </div>
-          </div>
+
 
           <!-- 其他页面内容 -->
           <component v-else :is="currentView"></component>
@@ -288,17 +255,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { scrollReveal, scrollScale } from '../utils/animation'
 // 导入子页面组件
 import Course from './Course.vue'
 import Inbox from './Inbox.vue'
 import Topic from './Topic.vue'
 import Notes from './Notes.vue'
 import Cloud from './Cloud.vue'
-import AiSummary from './AiSummary.vue'
+import Knowledge from './Knowledge.vue'
 import SmartPractice from './SmartPractice.vue'
+import Breakthrough from './Breakthrough.vue'
 import HeroRank from './HeroRank.vue'
 
 const router = useRouter()
@@ -306,6 +275,7 @@ const router = useRouter()
 const userInfo = ref(JSON.parse(localStorage.getItem('userInfo') || '{"name":"未知用户","avatar":""}'))
 const currentMenu = ref('0') // 当前选中菜单
 const isCollapse = ref(false) // 侧边栏折叠状态
+const isMobile = ref(false) // 是否为移动设备
 const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png' // 默认头像
 // 新增：页面装饰性数据
 const todayStudyTime = ref(Math.floor(Math.random() * 120) + 10) // 今日学习时间
@@ -318,8 +288,9 @@ const menuMap = {
   '3': Topic,
   '4': Notes,
   '5': Cloud,
-  '6': AiSummary,
+  '6': Knowledge,
   '7': SmartPractice,
+  '8': Breakthrough,
   '9': HeroRank
 }
 
@@ -443,8 +414,22 @@ const switchCategory = (category) => {
   }
 }
 
-// 初始化：1. 校验登录态 2. 获取用户信息
+// 检测屏幕尺寸
+const checkScreenSize = () => {
+  isMobile.value = window.innerWidth <= 768
+  // 在移动设备上默认关闭侧边栏
+  if (isMobile.value) {
+    isCollapse.value = false
+  }
+}
+
+// 初始化：1. 校验登录态 2. 获取用户信息 3. 初始化滚动动画
 onMounted(async () => {
+  // 检测屏幕尺寸
+  checkScreenSize()
+  // 添加屏幕尺寸变化监听器
+  window.addEventListener('resize', checkScreenSize)
+
   // 关键修复：登录态校验（无token则强制跳登录页）
   const token = localStorage.getItem('token')
   if (!token) {
@@ -462,6 +447,20 @@ onMounted(async () => {
   } catch (error) {
     ElMessage.error('获取用户信息失败')
   }
+
+  // 初始化滚动动画
+  setTimeout(() => {
+    scrollReveal('.overview-card', 0.1, 100)
+    scrollReveal('.course-card', 0.1, 100)
+    scrollReveal('.video-card', 0.1, 100)
+    scrollScale('.welcome-banner', 0.1, 0)
+    scrollReveal('.section-title', 0.1, 50)
+  }, 100)
+})
+
+// 清理事件监听器
+onUnmounted(() => {
+  window.removeEventListener('resize', checkScreenSize)
 })
 
 // 切换到教师端
@@ -483,8 +482,8 @@ const handleTeacherSwitch = () => {
       }
     }
     
-    // 明确检查只有角色类型为2的用户才能切换到教师端
-    if (roleType === 2) {
+    // 检查角色类型为2或演示用户（hasAllAccess为true）的用户才能切换到教师端
+    if (roleType === 2 || userInfoObj.hasAllAccess) {
       ElMessage.success('切换到教师端')
       router.push('/teacher')
     } else {
@@ -508,10 +507,10 @@ const continueLearning = (course) => {
 const handleUserMenuCommand = (command) => {
   if (command === 'profile') {
     ElMessage.success('跳转到个人信息页面')
-    // 这里可以添加跳转到个人信息页面的逻辑
+    router.push('/profile')
   } else if (command === 'settings') {
     ElMessage.success('跳转到个人设置页面')
-    // 这里可以添加跳转到个人设置页面的逻辑
+    router.push('/settings')
   }
 }
 
@@ -626,6 +625,20 @@ const handleLogout = () => {
   align-items: center;
 }
 
+.mobile-menu-toggle {
+  display: none;
+  font-size: 24px;
+  cursor: pointer;
+  margin-right: 10px;
+  color: var(--text-primary);
+  transition: var(--transition);
+}
+
+.mobile-menu-toggle:hover {
+  color: var(--primary-color);
+  transform: scale(1.1);
+}
+
 .nav-logo {
   margin-right: 15px;
   transition: transform 0.3s ease;
@@ -650,6 +663,7 @@ const handleLogout = () => {
 .nav-right {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .nav-stats {
@@ -694,7 +708,7 @@ const handleLogout = () => {
 .user-info {
   display: flex;
   align-items: center;
-  margin-right: 20px;
+  margin-right: 10px;
 }
 
 .user-avatar-wrapper {
@@ -736,7 +750,7 @@ const handleLogout = () => {
 }
 
 .interactive-btn {
-  margin-left: 10px;
+  margin-left: 5px;
   transition: var(--transition);
 }
 
@@ -1019,6 +1033,11 @@ const handleLogout = () => {
   transition: var(--transition);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
 }
 
 .overview-card::before {
@@ -1185,6 +1204,9 @@ const handleLogout = () => {
   box-shadow: var(--shadow-sm);
   transition: var(--transition);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .course-card::before {
@@ -1221,6 +1243,9 @@ const handleLogout = () => {
 
 .course-info {
   padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .course-title {
@@ -1230,6 +1255,7 @@ const handleLogout = () => {
   margin-bottom: 10px;
   transition: var(--transition);
   line-height: 1.4;
+  flex: 1;
 }
 
 .course-card:hover .course-title {
@@ -1273,6 +1299,7 @@ const handleLogout = () => {
   transition: var(--transition);
   border-radius: 20px;
   padding: 10px 0;
+  margin-top: auto;
 }
 
 .course-btn:hover {
@@ -1298,6 +1325,9 @@ const handleLogout = () => {
   box-shadow: var(--shadow-sm);
   transition: var(--transition);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .video-card::before {
@@ -1372,6 +1402,9 @@ const handleLogout = () => {
 
 .video-info {
   padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .video-title {
@@ -1381,6 +1414,7 @@ const handleLogout = () => {
   margin-bottom: 10px;
   transition: var(--transition);
   line-height: 1.4;
+  flex: 1;
 }
 
 .video-card:hover .video-title {
@@ -1403,6 +1437,7 @@ const handleLogout = () => {
   display: block;
   text-align: center;
   transition: var(--transition);
+  margin-top: auto;
 }
 
 .video-link .el-button {
@@ -1598,13 +1633,89 @@ const handleLogout = () => {
 }
 
 /* 响应式设计 */
+@media (max-width: 1024px) {
+  .platform-name {
+    font-size: 16px;
+  }
+  
+  .nav-stats {
+    gap: 15px;
+  }
+  
+  .overview-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .course-list,
+  .video-list,
+  .video-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
+  /* 全局样式优化 */
+  :root {
+    --mobile-padding: 16px;
+    --mobile-border-radius: 12px;
+    --mobile-card-shadow: 0 4px 16px rgba(103, 194, 58, 0.15);
+    --mobile-btn-height: 44px;
+  }
+  
+  .navbar {
+    height: 64px;
+    box-shadow: 0 2px 12px rgba(103, 194, 58, 0.2);
+    background-color: var(--bg-primary);
+  }
+  
+  .nav-bg {
+    height: 64px;
+  }
+  
   .nav-content {
-    padding: 0 15px;
+    padding: 0 var(--mobile-padding);
+    height: 64px;
+    align-items: center;
+  }
+  
+  .mobile-menu-toggle {
+    display: block;
+    font-size: 24px;
+    margin-right: 12px;
+    color: var(--primary-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .mobile-menu-toggle:hover {
+    color: var(--primary-dark);
+    transform: scale(1.1);
+  }
+  
+  .nav-logo {
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+    transition: transform 0.3s ease;
+  }
+  
+  .nav-logo:hover {
+    transform: scale(1.1);
   }
   
   .platform-name {
-    font-size: 16px;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+    color: var(--primary-dark);
+    transition: color 0.3s ease;
+  }
+  
+  .platform-name:hover {
+    color: var(--primary-color);
   }
   
   .nav-stats {
@@ -1615,76 +1726,985 @@ const handleLogout = () => {
     display: none;
   }
   
+  .user-info {
+    margin-right: 8px;
+  }
+  
+  .user-avatar-wrapper {
+    padding: 6px 12px;
+    border-radius: 20px;
+    background-color: var(--bg-secondary);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .user-avatar-wrapper:hover {
+    background-color: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    margin-right: 6px;
+    border: 2px solid var(--primary-light);
+    transition: all 0.3s ease;
+  }
+  
+  .user-avatar-wrapper:hover .user-avatar {
+    border-color: var(--bg-primary);
+    transform: scale(1.05);
+  }
+  
+  .interactive-btn {
+    margin-left: 6px;
+    padding: 8px 14px;
+    font-size: 12px;
+    min-width: 80px;
+    height: 36px;
+    border-radius: 18px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .interactive-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(103, 194, 58, 0.25);
+  }
+  
   .content-area {
+    padding: var(--mobile-padding);
+    min-height: calc(100vh - 64px);
+  }
+  
+  .main-layout {
+    min-height: calc(100vh - 64px);
+  }
+  
+  .main-content {
     padding: 20px;
+    border-radius: var(--mobile-border-radius);
+    box-shadow: var(--mobile-card-shadow);
+    background-color: var(--bg-primary);
+    transition: all 0.3s ease;
   }
   
-  .overview-cards {
-    grid-template-columns: 1fr;
+  .main-content:hover {
+    box-shadow: 0 6px 20px rgba(103, 194, 58, 0.2);
   }
   
-  .course-list,
-  .video-list,
-  .video-grid {
-    grid-template-columns: 1fr;
-  }
-  
+  /* 侧边栏优化 */
   .sidebar {
     position: fixed;
-    left: -220px;
-    top: 70px;
-    height: calc(100vh - 70px);
-    z-index: 99;
-    box-shadow: var(--shadow-lg);
+    left: -300px;
+    top: 64px;
+    height: calc(100vh - 64px);
+    width: 260px;
+    z-index: 999;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--bg-primary);
+    overflow-y: auto;
   }
   
   .sidebar.is-collapse {
     left: 0;
-    width: 220px;
+    width: 260px;
+  }
+  
+  .sidebar-menu .el-menu-item {
+    height: 50px;
+    line-height: 50px;
+    margin: 4px 12px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+  }
+  
+  .sidebar-menu .el-menu-item i {
+    font-size: 18px;
+  }
+  
+  .sidebar-menu .el-menu-item:hover {
+    background-color: rgba(103, 194, 58, 0.1);
+    transform: translateX(6px);
+  }
+  
+  .sidebar-menu .el-menu-item.is-active {
+    background-color: var(--primary-light);
+    color: var(--bg-primary);
+    box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
+  }
+  
+  .logo-container {
+    padding: 16px 12px;
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+  }
+  
+  .logo-container:hover {
+    background-color: var(--bg-secondary);
+  }
+  
+  /* 欢迎横幅优化 */
+  .welcome-banner {
+    height: 160px;
+    margin-bottom: 20px;
+    border-radius: var(--mobile-border-radius);
+    box-shadow: 0 6px 20px rgba(103, 194, 58, 0.25);
+    transition: all 0.3s ease;
+  }
+  
+  .welcome-banner:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(103, 194, 58, 0.3);
+  }
+  
+  .banner-content h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .banner-content p {
+    font-size: 14px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .welcome-banner:hover .banner-content h3 {
+    transform: scale(1.05);
+  }
+  
+  .welcome-banner:hover .banner-content p {
+    transform: scale(1.05);
+  }
+  
+  /* 概览卡片优化 */
+  .overview-cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .overview-card {
+    padding: 20px;
+    min-height: 180px;
+    border-radius: var(--mobile-border-radius);
+    box-shadow: var(--mobile-card-shadow);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .overview-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+  
+  .overview-card:hover::before {
+    transform: scaleX(1);
+  }
+  
+  .overview-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(103, 194, 58, 0.25);
+  }
+  
+  .card-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 16px rgba(103, 194, 58, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .overview-card:hover .card-icon {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 8px 20px rgba(103, 194, 58, 0.4);
+  }
+  
+  .overview-card h4 {
+    font-size: 17px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+  }
+  
+  .overview-card:hover h4 {
+    color: var(--primary-color);
+  }
+  
+  .overview-card p {
+    font-size: 14px;
+    margin-bottom: 16px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+  }
+  
+  .overview-card:hover p {
+    color: var(--text-primary);
+  }
+  
+  .overview-card .el-button {
+    padding: 8px 20px;
+    font-size: 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-width: 100px;
+  }
+  
+  .overview-card .el-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
+  }
+  
+  /* 标题样式优化 */
+  .section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    color: var(--text-primary);
+    position: relative;
+  }
+  
+  .section-title::after {
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    transition: width 0.3s ease;
+  }
+  
+  .section-title:hover::after {
+    width: 120px;
+  }
+  
+  .section-title:hover {
+    color: var(--primary-color);
+  }
+  
+  .section-subtitle {
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+  }
+  
+  .section-title:hover + .section-subtitle {
+    color: var(--text-primary);
+  }
+  
+  /* 课程卡片优化 */
+  .course-list,
+  .video-list,
+  .video-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .course-card,
+  .video-card {
+    margin-bottom: 0;
+    border-radius: var(--mobile-border-radius);
+    box-shadow: var(--mobile-card-shadow);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .course-card::before,
+  .video-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+  
+  .course-card:hover::before,
+  .video-card:hover::before {
+    transform: scaleX(1);
+  }
+  
+  .course-card:hover,
+  .video-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 25px rgba(103, 194, 58, 0.25);
+  }
+  
+  .course-cover {
+    height: 140px;
+    border-radius: var(--mobile-border-radius) var(--mobile-border-radius) 0 0;
+    transition: transform 0.3s ease;
+  }
+  
+  .course-card:hover .course-cover {
+    transform: scale(1.05);
+  }
+  
+  .course-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+    line-height: 1.4;
+    transition: color 0.3s ease;
+  }
+  
+  .course-card:hover .course-title {
+    color: var(--primary-color);
+  }
+  
+  .course-teacher {
+    font-size: 13px;
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+  }
+  
+  .course-card:hover .course-teacher {
+    color: var(--text-primary);
+  }
+  
+  .course-progress {
+    margin-bottom: 12px;
+  }
+  
+  .progress-text {
+    font-size: 12px;
+    margin-top: 4px;
+    color: var(--text-light);
+    transition: color 0.3s ease;
+  }
+  
+  .course-card:hover .progress-text {
+    color: var(--primary-color);
+  }
+  
+  .course-btn {
+    padding: 10px 0;
+    font-size: 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .course-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
+  }
+  
+  /* 视频卡片优化 */
+  .video-thumbnail {
+    height: 140px;
+    margin-bottom: 12px;
+    border-radius: var(--mobile-border-radius) var(--mobile-border-radius) 0 0;
+    transition: transform 0.3s ease;
+  }
+  
+  .video-card:hover .video-thumbnail {
+    transform: scale(1.02);
+  }
+  
+  .thumbnail-img {
+    height: 140px;
+    transition: transform 0.3s ease;
+  }
+  
+  .video-card:hover .thumbnail-img {
+    transform: scale(1.05);
+  }
+  
+  .play-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+  }
+  
+  .play-icon:hover {
+    background-color: var(--primary-color);
+    transform: translate(-50%, -50%) scale(1.2);
+    box-shadow: 0 8px 20px rgba(103, 194, 58, 0.4);
+  }
+  
+  .video-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+    line-height: 1.4;
+    transition: color 0.3s ease;
+  }
+  
+  .video-card:hover .video-title {
+    color: var(--primary-color);
+  }
+  
+  .video-description {
+    font-size: 13px;
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    transition: color 0.3s ease;
+  }
+  
+  .video-card:hover .video-description {
+    color: var(--text-primary);
+  }
+  
+  .video-link .el-button {
+    padding: 8px 20px;
+    font-size: 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .video-link .el-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
+  }
+  
+  /* 大视频卡片优化 */
+  .video-card-large {
+    margin-bottom: 0;
+    border-radius: var(--mobile-border-radius);
+    box-shadow: var(--mobile-card-shadow);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .video-thumbnail-large {
+    height: 160px;
+  }
+  
+  .thumbnail-img-large {
+    height: 160px;
+  }
+  
+  .play-icon-large {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+  }
+  
+  .video-info-large {
+    padding: 20px;
+  }
+  
+  .video-title-large {
+    font-size: 17px;
+  }
+  
+  /* 页面头部优化 */
+  .page-header {
+    margin-bottom: 20px;
+  }
+  
+  .page-title {
+    font-size: 20px;
+  }
+  
+  .breadcrumb {
+    font-size: 12px;
+  }
+  
+  .header-decoration {
+    width: 100px;
   }
 }
 
-/* 滚动条样式 */
-.content-area::-webkit-scrollbar {
-  width: 8px;
+@media (max-width: 480px) {
+  .mobile-menu-toggle {
+    font-size: 22px;
+    margin-right: 10px;
+  }
+  
+  .platform-name {
+    font-size: 12px;
+    max-width: 100px;
+  }
+  
+  .interactive-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+    min-width: 70px;
+    height: 32px;
+  }
+  
+  .main-content {
+    padding: 16px;
+  }
+  
+  .welcome-banner {
+    height: 140px;
+  }
+  
+  .banner-content h3 {
+    font-size: 18px;
+  }
+  
+  .banner-content p {
+    font-size: 13px;
+  }
+  
+  .overview-card {
+    padding: 16px;
+    min-height: 160px;
+  }
+  
+  .card-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+  
+  .overview-card h4 {
+    font-size: 16px;
+  }
+  
+  .overview-card p {
+    font-size: 13px;
+  }
+  
+  .course-cover,
+  .thumbnail-img {
+    height: 120px;
+  }
+  
+  .video-thumbnail-large,
+  .thumbnail-img-large {
+    height: 140px;
+  }
+  
+  .section-title {
+    font-size: 16px;
+  }
+  
+  .section-subtitle {
+    font-size: 13px;
+  }
+  
+  .course-title,
+  .video-title {
+    font-size: 15px;
+  }
+  
+  .course-teacher,
+  .video-description {
+    font-size: 12px;
+  }
 }
 
-.content-area::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-  border-radius: 4px;
+/* 大视频卡片优化 */
+.video-card-large:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 25px rgba(103, 194, 58, 0.25);
 }
 
-.content-area::-webkit-scrollbar-thumb {
-  background: var(--primary-light);
-  border-radius: 4px;
-  transition: var(--transition);
+.video-thumbnail-large {
+  height: 180px;
+  margin-bottom: 20px;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+  transition: transform 0.3s ease;
 }
 
-.content-area::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-color);
+.video-card-large:hover .video-thumbnail-large {
+  transform: scale(1.02);
 }
 
-/* 加载动画 */
-.loading-container {
-  display: flex;
+.thumbnail-img-large {
+  height: 180px;
+  transition: transform 0.3s ease;
+}
+
+.video-card-large:hover .thumbnail-img-large {
+  transform: scale(1.05);
+}
+
+.play-icon-large {
+  width: 70px;
+  height: 70px;
+  font-size: 28px;
+  background-color: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.play-icon-large:hover {
+  background-color: var(--primary-color);
+  transform: translate(-50%, -50%) scale(1.2);
+  box-shadow: 0 8px 20px rgba(103, 194, 58, 0.4);
+}
+
+.video-info-large {
+  padding: 24px;
+}
+
+.video-title-large {
+  font-size: 19px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  color: var(--text-primary);
+  line-height: 1.4;
+  transition: color 0.3s ease;
+}
+
+.video-card-large:hover .video-title-large {
+  color: var(--primary-color);
+}
+
+/* 视频分类优化 */
+.video-categories {
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
   justify-content: center;
-  align-items: center;
-  height: 200px;
 }
 
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid var(--bg-secondary);
-  border-top: 4px solid var(--primary-color);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.category-tag {
+  padding: 10px 20px;
+  font-size: 15px;
+  border-radius: 25px;
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.category-tag:hover {
+  background-color: rgba(103, 194, 58, 0.1);
+  color: var(--primary-color);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(103, 194, 58, 0.2);
 }
+
+.category-tag.active {
+  background-color: var(--primary-light);
+  color: var(--bg-primary);
+  box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
+}
+
+.category-tag.active:hover {
+  background-color: var(--primary-color);
+}
+  
+  /* 页面头部优化 */
+  .page-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    transition: color 0.3s ease;
+  }
+  
+  .page-header:hover .page-title {
+    color: var(--primary-color);
+  }
+  
+  .breadcrumb {
+    font-size: 15px;
+    color: var(--text-secondary);
+  }
+  
+  .page-header {
+    margin-bottom: 24px;
+  }
+  
+  .header-decoration {
+    width: 120px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+  
+  .page-header:hover .header-decoration {
+    width: 160px;
+  }
+  
+  /* 按钮样式优化 */
+  .el-button {
+    min-width: 90px;
+    font-size: 15px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .el-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(103, 194, 58, 0.25);
+  }
+  
+  .el-button--primary {
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    border: none;
+  }
+  
+  .el-button--primary:hover {
+    background: linear-gradient(90deg, var(--primary-light), var(--primary-color));
+  }
+  
+  /* 表单元素优化 */
+  .el-input,
+  .el-select {
+    width: 100%;
+    border-radius: 10px;
+  }
+  
+  .el-input__inner,
+  .el-select__input {
+    font-size: 15px;
+    height: 44px;
+    border-radius: 10px;
+  }
+  
+  .el-input:focus-within,
+  .el-select:focus-within {
+    box-shadow: 0 0 0 3px rgba(103, 194, 58, 0.2);
+  }
+  
+  /* 移动端侧边栏遮罩层 */
+  .sidebar-overlay {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 98;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  /* 确保侧边栏在移动端上的显示效果 */
+  .sidebar {
+    z-index: 99;
+  }
+  
+  /* 调整移动端上的菜单图标大小 */
+  .sidebar-menu .el-menu-item {
+    height: 52px;
+    line-height: 52px;
+    margin: 4px 12px;
+  }
+  
+  .sidebar-menu .el-menu-item i {
+    font-size: 18px;
+  }
+  
+  .logo-container {
+    padding: 18px 14px;
+  }
+  
+  /* 确保移动端上的按钮有足够的点击区域 */
+  .interactive-btn {
+    min-width: 80px;
+  }
+  
+  /* 调整移动端上的表格样式（如果有） */
+  .el-table {
+    font-size: 13px;
+  }
+  
+  .el-table__header th {
+    padding: 12px 10px;
+    font-size: 12px;
+  }
+  
+  .el-table__body td {
+    padding: 10px 10px;
+    font-size: 12px;
+  }
+  
+  /* 调整移动端上的弹窗大小 */
+  .el-dialog {
+    width: 96% !important;
+    margin: 15px auto !important;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: var(--mobile-border-radius);
+  }
+  
+  .el-dialog__header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .el-dialog__title {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--text-primary);
+  }
+  
+  .el-dialog__body {
+    padding: 20px;
+    font-size: 15px;
+  }
+  
+  .el-dialog__footer {
+    padding: 20px;
+    border-top: 1px solid var(--border-color);
+  }
+  
+  /* 调整移动端上的表单元素 */
+  .el-form-item {
+    margin-bottom: 16px;
+  }
+  
+  .el-form-item__label {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  /* 调整移动端上的标签大小 */
+  .el-tag {
+    padding: 4px 10px;
+    font-size: 12px;
+    height: 24px;
+    line-height: 24px;
+    border-radius: 12px;
+  }
+  
+  /* 滚动条样式优化 */
+  .content-area::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .content-area::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 3px;
+  }
+  
+  .content-area::-webkit-scrollbar-thumb {
+    background: var(--primary-light);
+    border-radius: 3px;
+    transition: background 0.3s ease;
+  }
+  
+  .content-area::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+  }
+  
+  /* 加载动画优化 */
+  .loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--bg-secondary);
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* 响应式调整 */
+  @media (max-width: 480px) {
+    .platform-name {
+      font-size: 16px;
+      max-width: 140px;
+    }
+    
+    .interactive-btn {
+      font-size: 13px;
+      min-width: 75px;
+      padding: 8px 14px;
+    }
+    
+    .main-content {
+      padding: 20px;
+    }
+    
+    .welcome-banner {
+      height: 160px;
+    }
+    
+    .banner-content h3 {
+      font-size: 20px;
+    }
+    
+    .banner-content p {
+      font-size: 14px;
+    }
+  }
+
+  /* 滚动条样式 */
+  .content-area::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .content-area::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 3px;
+  }
+  
+  .content-area::-webkit-scrollbar-thumb {
+    background: var(--primary-light);
+    border-radius: 3px;
+    transition: background 0.3s ease;
+  }
+  
+  .content-area::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+  }
+  
+  /* 加载动画 */
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150px;
+  }
+  
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--bg-secondary);
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 
 /* 卡片悬浮效果增强 */
 .overview-card,

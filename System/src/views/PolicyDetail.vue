@@ -20,6 +20,24 @@
           <router-link to="/login" class="btn btn-secondary login-btn">登录</router-link>
           <router-link to="/login" class="btn btn-primary">注册</router-link>
         </div>
+        <!-- 移动端菜单按钮 -->
+        <div class="mobile-menu-btn" @click="toggleMobileMenu">
+          <div class="menu-icon" :class="{ active: mobileMenuOpen }"></div>
+        </div>
+      </div>
+      <!-- 移动端菜单 -->
+      <div class="mobile-menu" :class="{ active: mobileMenuOpen }">
+        <ul class="mobile-nav-menu">
+          <li><router-link to="/portal" @click="toggleMobileMenu()">首页</router-link></li>
+          <li><router-link to="/portal#features" @click="toggleMobileMenu()">特色功能</router-link></li>
+          <li><router-link to="/portal#courses" @click="toggleMobileMenu()">课程中心</router-link></li>
+          <li><router-link to="/portal#policy" @click="toggleMobileMenu()">乡村教育政策</router-link></li>
+          <li><router-link to="/portal#breakthrough" @click="toggleMobileMenu()">破茧视界</router-link></li>
+          <li><router-link to="/portal#about" @click="toggleMobileMenu()">关于我们</router-link></li>
+          <li><router-link to="/portal#contact" @click="toggleMobileMenu()">联系我们</router-link></li>
+          <li><router-link to="/login" @click="toggleMobileMenu()">登录</router-link></li>
+          <li><router-link to="/login" @click="toggleMobileMenu()">注册</router-link></li>
+        </ul>
       </div>
     </nav>
 
@@ -28,6 +46,9 @@
       <div class="policy-detail-container-inner">
         <!-- 政策头部信息 -->
         <div class="policy-header">
+          <button class="back-button" @click="goBack">
+            <i class="fas fa-arrow-left"></i> 返回
+          </button>
           <div class="policy-meta">
             <span class="policy-date">{{ policy.date }}</span>
             <span class="policy-source">{{ policy.source }}</span>
@@ -115,15 +136,61 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
 const policyId = route.params.id
+
+// 移动端菜单
+const mobileMenuOpen = ref(false)
+
+const toggleMobileMenu = () => {
+  mobileMenuOpen.value = !mobileMenuOpen.value
+}
+
+// 返回上一页
+const goBack = () => {
+  router.back()
+}
 
 // 政策数据
 const policies = ref([
   {
     id: '1',
+    title: '2026年全国两会关于乡村教育发展的重要部署',
+    date: '2026-03-05',
+    source: '全国人民代表大会',
+    content: `
+      <p>2026年3月，全国两会在北京召开，乡村教育成为代表委员关注的热点话题。政府工作报告明确提出要大力发展乡村教育，促进教育公平，推动城乡教育一体化发展。</p>
+      <h3>一、乡村教育发展的总体要求</h3>
+      <p>坚持以习近平新时代中国特色社会主义思想为指导，全面贯彻党的教育方针，落实立德树人根本任务，以促进教育公平为核心，以提高教育质量为关键，以改革创新为动力，加快推进乡村教育现代化，为乡村全面振兴提供坚实的人才支撑。</p>
+      <h3>二、主要政策措施</h3>
+      <p>（一）加强乡村教师队伍建设。实施乡村教师素质提升计划，加大乡村教师培训力度，提高乡村教师待遇，完善乡村教师激励机制，吸引更多优秀人才到乡村任教。</p>
+      <p>（二）改善乡村学校办学条件。加大对乡村学校的投入，改善学校基础设施，完善教学设备，推进乡村学校数字化建设，缩小城乡学校办学条件差距。</p>
+      <p>（三）推进乡村教育优质均衡发展。优化乡村学校布局，加强乡村学校与城镇学校的合作交流，推动优质教育资源向乡村辐射，提高乡村教育质量。</p>
+      <p>（四）发展乡村特色教育。结合乡村实际，开发具有地方特色的课程资源，开展劳动教育、乡土文化教育等特色教育活动，培养学生的实践能力和乡土情怀。</p>
+      <p>（五）加强乡村学前教育。扩大乡村学前教育资源供给，提高乡村学前教育质量，解决乡村幼儿"入园难"问题。</p>
+      <p>（六）推进乡村教育数字化转型。加强乡村学校信息化建设，推进"互联网+教育"，让乡村学生享受到优质的在线教育资源。</p>
+      <p>（七）完善乡村教育资助体系。加大对乡村家庭经济困难学生的资助力度，确保每个孩子都能接受公平而有质量的教育。</p>
+      <h3>三、保障机制</h3>
+      <p>（一）强化组织领导。各级政府要把乡村教育发展作为重要任务，加强统筹协调，形成工作合力。</p>
+      <p>（二）加大投入力度。建立健全乡村教育经费保障机制，确保乡村教育投入稳步增长。</p>
+      <p>（三）加强监督评估。建立乡村教育发展监测评估机制，定期对乡村教育发展情况进行评估，及时解决存在的问题。</p>
+      <p>（四）营造良好氛围。广泛宣传乡村教育发展的重要意义，动员社会力量支持乡村教育，形成全社会关心支持乡村教育的良好氛围。</p>
+    `,
+    highlights: [
+      '加强乡村教师队伍建设，提高乡村教师待遇',
+      '改善乡村学校办学条件，推进数字化建设',
+      '推进乡村教育优质均衡发展，缩小城乡差距',
+      '发展乡村特色教育，培养学生实践能力',
+      '加强乡村学前教育，解决"入园难"问题',
+      '推进乡村教育数字化转型，利用"互联网+教育"',
+      '完善乡村教育资助体系，确保教育公平' 
+    ]
+  },
+  {
+    id: '2',
     title: '中共中央 国务院关于进一步深化农村改革 扎实推进乡村全面振兴的意见',
     date: '2025-06-18',
     source: '中共中央 国务院',
@@ -184,7 +251,7 @@ const policies = ref([
     ]
   },
   {
-    id: '2',
+    id: '3',
     title: '中共中央 国务院关于做好2023年全面推进乡村振兴重点工作的意见',
     date: '2023-02-18',
     source: '中共中央 国务院',
@@ -245,9 +312,9 @@ const policies = ref([
     ]
   },
   {
-    id: '3',
+    id: '4',
     title: '国家乡村振兴局关于落实党中央国务院 2023年全面推进乡村振兴重点工作部署的实施意见',
-    date: '2023-02-06',
+    date: '2023-02-20',
     source: '国家乡村振兴局',
     content: `
       <p>2023年是全面贯彻落实党的二十大精神的开局之年，做好乡村振兴工作意义重大。为深入贯彻落实《中共中央 国务院关于做好2023年全面推进乡村振兴重点工作的意见》，现提出如下实施意见。</p>
@@ -276,7 +343,7 @@ const policies = ref([
     ]
   },
   {
-    id: '4',
+    id: '5',
     title: '教育部发布《义务教育劳动课程标准（2022年版）》',
     date: '2022-05-06',
     source: '教育部',
@@ -308,7 +375,7 @@ const policies = ref([
     ]
   },
   {
-    id: '5',
+    id: '6',
     title: '中共中央 国务院关于做好2022年全面推进乡村振兴重点工作的意见',
     date: '2022-02-22',
     source: '中共中央 国务院',
@@ -422,6 +489,105 @@ onMounted(() => {
   padding: 15px 30px;
 }
 
+/* 移动端菜单按钮 */
+.mobile-menu-btn {
+  display: none;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.menu-icon {
+  width: 30px;
+  height: 24px;
+  position: relative;
+  cursor: pointer;
+}
+
+.menu-icon::before,
+.menu-icon::after,
+.menu-icon span {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  background-color: #409eff;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.menu-icon span {
+  top: 10.5px;
+}
+
+.menu-icon::before {
+  top: 0;
+}
+
+.menu-icon::after {
+  bottom: 0;
+}
+
+.menu-icon.active span {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.menu-icon.active::before {
+  transform: rotate(45deg);
+  top: 10.5px;
+}
+
+.menu-icon.active::after {
+  transform: rotate(-45deg);
+  bottom: 10.5px;
+}
+
+/* 移动端菜单 */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 80%;
+  max-width: 300px;
+  height: 100vh;
+  background: linear-gradient(135deg, #409eff 0%, #69c0ff 100%);
+  z-index: 1000;
+  transition: right 0.3s ease;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+}
+
+.mobile-menu.active {
+  right: 0;
+}
+
+.mobile-nav-menu {
+  list-style: none;
+  width: 100%;
+  padding: 0 30px;
+}
+
+.mobile-nav-menu li {
+  margin-bottom: 20px;
+}
+
+.mobile-nav-menu a {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 12px 0;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.mobile-nav-menu a:hover {
+  transform: translateX(10px);
+  color: #f0f9ff;
+}
+
 .logo {
   display: flex;
   align-items: center;
@@ -488,6 +654,32 @@ onMounted(() => {
   padding: 40px;
   margin-bottom: 40px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* 返回按钮 */
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #f5f7fa;
+  color: #409eff;
+  border: 1px solid #dcdfe6;
+  border-radius: 50px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.back-button:hover {
+  background-color: #ecf5ff;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.2);
 }
 
 .policy-meta {
@@ -745,6 +937,40 @@ onMounted(() => {
     display: none;
   }
 
+  .nav-buttons {
+    display: none;
+  }
+
+  .mobile-menu-btn {
+    display: block;
+  }
+
+  .logo h1 {
+    font-size: 16px;
+  }
+
+  .logo img {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+  }
+
+  .nav-container {
+    padding: 10px 20px;
+  }
+
+  .policy-detail-section {
+    padding: 40px 0;
+  }
+
+  .policy-detail-container-inner {
+    padding: 0 20px;
+  }
+
+  .policy-header {
+    padding: 30px 20px;
+  }
+
   .policy-title {
     font-size: 24px;
   }
@@ -754,14 +980,104 @@ onMounted(() => {
     gap: 10px;
   }
 
+  .policy-content {
+    padding: 30px 20px;
+  }
+
+  .policy-body {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .policy-body h3 {
+    font-size: 18px;
+  }
+
+  .policy-highlights {
+    padding-top: 25px;
+  }
+
+  .policy-highlights h3 {
+    font-size: 18px;
+  }
+
+  .related-policies {
+    padding: 30px 20px;
+  }
+
+  .related-policies h3 {
+    font-size: 18px;
+  }
+
   .related-policy-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
+    padding: 12px;
   }
 
   .related-policy-date {
     flex: 1;
+  }
+
+  .related-policy-title {
+    font-size: 15px;
+  }
+
+  .footer-container {
+    padding: 0 20px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  /* 改进触摸交互 */
+  .share-icon,
+  .related-policy-item,
+  .related-policy-title {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* 小屏幕设备优化 */
+@media (max-width: 480px) {
+  .policy-title {
+    font-size: 20px;
+  }
+
+  .policy-header {
+    padding: 25px 15px;
+  }
+
+  .policy-content {
+    padding: 25px 15px;
+  }
+
+  .policy-body {
+    font-size: 14px;
+  }
+
+  .policy-body h3 {
+    font-size: 16px;
+  }
+
+  .related-policies {
+    padding: 25px 15px;
+  }
+
+  .related-policies h3 {
+    font-size: 16px;
+  }
+
+  .related-policy-item {
+    padding: 10px;
+  }
+
+  .related-policy-title {
+    font-size: 14px;
   }
 }
 </style>

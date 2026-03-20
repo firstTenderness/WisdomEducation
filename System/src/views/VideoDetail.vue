@@ -7,14 +7,24 @@
           <img src="/src/assets/logo.svg" alt="Logo">
           <h1>慧学澄明教育学习平台</h1>
         </div>
-        <ul class="nav-menu">
-          <li><router-link to="/portal">首页</router-link></li>
-          <li><router-link to="/portal#features">特色功能</router-link></li>
-          <li><router-link to="/portal#courses">课程中心</router-link></li>
-          <li><router-link to="/portal#policy">乡村教育政策</router-link></li>
-          <li><router-link to="/portal#breakthrough">破茧视界</router-link></li>
-          <li><router-link to="/portal#about">关于我们</router-link></li>
-          <li><router-link to="/portal#contact">联系我们</router-link></li>
+        <!-- 移动端菜单按钮 -->
+        <div class="menu-toggle" @click="toggleMenu">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+        </div>
+        <ul class="nav-menu" :class="{ 'active': isMenuOpen }">
+          <li><router-link to="/portal" @click="isMenuOpen = false">首页</router-link></li>
+          <li><router-link to="/portal#features" @click="isMenuOpen = false">特色功能</router-link></li>
+          <li><router-link to="/portal#courses" @click="isMenuOpen = false">课程中心</router-link></li>
+          <li><router-link to="/portal#policy" @click="isMenuOpen = false">乡村教育政策</router-link></li>
+          <li><router-link to="/portal#breakthrough" @click="isMenuOpen = false">破茧视界</router-link></li>
+          <li><router-link to="/portal#about" @click="isMenuOpen = false">关于我们</router-link></li>
+          <li><router-link to="/portal#contact" @click="isMenuOpen = false">联系我们</router-link></li>
+          <li class="mobile-nav-buttons">
+            <router-link to="/login" class="btn btn-secondary login-btn" @click="isMenuOpen = false">登录</router-link>
+            <router-link to="/login" class="btn btn-primary" @click="isMenuOpen = false">注册</router-link>
+          </li>
         </ul>
         <div class="nav-buttons">
           <router-link to="/login" class="btn btn-secondary login-btn">登录</router-link>
@@ -22,10 +32,18 @@
         </div>
       </div>
     </nav>
+    
+    <!-- 移动端菜单遮罩 -->
+    <div class="menu-overlay" v-if="isMenuOpen" @click="toggleMenu"></div>
 
     <!-- 视频详情区 -->
     <section class="video-detail-section">
       <div class="video-detail-container-inner">
+        <!-- 返回按钮 -->
+        <button class="back-btn" @click="goBack">
+          <i class="fas fa-arrow-left"></i>
+          返回上一页
+        </button>
         <!-- 视频播放器 -->
         <div class="video-player">
           <div class="video-wrapper">
@@ -44,7 +62,7 @@
           </div>
           <p class="video-description">{{ video.description }}</p>
           <div class="video-tags">
-            <span class="tag" v-for="(tag, index) in video.tags" :key="index">{{ tag }}</span>
+            <span class="tag" v-for="(tag, index) in video.tags" :key="index" @click="handleTagClick(tag)">{{ tag }}</span>
           </div>
           <div class="video-actions">
             <button class="action-btn like-btn">
@@ -131,10 +149,29 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
 const videoId = route.params.id
+
+// 移动端菜单状态
+const isMenuOpen = ref(false)
+
+// 切换菜单
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value
+  if (isMenuOpen.value) {
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.overflow = ''
+  }
+}
+
+// 返回上一页
+const goBack = () => {
+  router.back()
+}
 
 // 视频数据
 const videos = ref([
@@ -215,6 +252,12 @@ const relatedVideos = computed(() => {
   return videos.value.filter(v => v.id !== videoId).slice(0, 4)
 })
 
+// 处理标签点击
+const handleTagClick = (tag) => {
+  // 跳转到视频列表页面，并传递标签参数
+  router.push({ path: '/portal', query: { tag: tag } })
+}
+
 // 导航栏滚动效果
 onMounted(() => {
   window.addEventListener('scroll', () => {
@@ -275,6 +318,34 @@ onMounted(() => {
   margin: 0;
 }
 
+/* 移动端菜单按钮 */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.menu-toggle .bar {
+  width: 25px;
+  height: 3px;
+  background-color: #409eff;
+  margin: 3px 0;
+  transition: all 0.3s;
+}
+
+/* 移动端菜单遮罩 */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  transition: opacity 0.3s;
+}
+
 .nav-menu {
   display: flex;
   list-style: none;
@@ -302,6 +373,21 @@ onMounted(() => {
 
 .login-btn {
   margin-right: 10px;
+}
+
+/* 移动端导航按钮 */
+.mobile-nav-buttons {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e4e7ed;
+}
+
+.mobile-nav-buttons .btn {
+  width: 100%;
+  text-align: center;
 }
 
 /* 视频详情区 */
@@ -603,12 +689,122 @@ onMounted(() => {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .nav-container {
+    padding: 15px 20px;
+  }
+
+  .logo img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .logo h1 {
+    font-size: 16px;
+  }
+
+  /* 显示移动端菜单按钮 */
+  .menu-toggle {
+    display: flex;
+  }
+
+  /* 隐藏桌面端导航菜单 */
   .nav-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 80%;
+    max-width: 300px;
+    height: 100vh;
+    background-color: #fff;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    transition: right 0.3s ease;
+    z-index: 1000;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-menu.active {
+    right: 0;
+  }
+
+  .nav-menu li {
+    margin: 0;
+  }
+
+  .nav-menu a {
+    font-size: 18px;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 4px;
+    transition: all 0.3s;
+  }
+
+  .nav-menu a:hover {
+    background-color: #ecf5ff;
+    color: #409eff;
+  }
+
+  /* 显示移动端导航按钮 */
+  .mobile-nav-buttons {
+    display: flex;
+  }
+
+  /* 隐藏桌面端导航按钮 */
+  .nav-buttons {
     display: none;
+  }
+
+  /* 视频详情区 */
+  .video-detail-section {
+    padding: 40px 0;
+  }
+
+  .video-detail-container-inner {
+    padding: 0 20px;
+  }
+
+  /* 视频播放器 */
+  .video-player {
+    margin-bottom: 30px;
+  }
+
+  /* 视频信息 */
+  .video-info {
+    padding: 30px 20px;
+    margin-bottom: 30px;
   }
 
   .video-title {
     font-size: 24px;
+  }
+
+  .video-meta {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .video-description {
+    font-size: 15px;
+  }
+
+  .video-actions {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .action-btn {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+  }
+
+  /* 相关视频 */
+  .related-videos {
+    padding: 30px 20px;
+    margin-bottom: 30px;
   }
 
   .related-video-item {
@@ -621,6 +817,81 @@ onMounted(() => {
 
   .related-video-thumbnail img {
     height: 200px;
+  }
+
+  .related-video-info {
+    margin-top: 15px;
+  }
+
+  /* 页脚 */
+  .footer {
+    padding: 40px 0 20px;
+  }
+
+  .footer-container {
+    padding: 0 20px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .footer-column h3 {
+    font-size: 16px;
+  }
+
+  .footer-links li {
+    margin-bottom: 8px;
+  }
+
+  .footer-links a {
+    font-size: 13px;
+  }
+
+  .footer-bottom {
+    padding-top: 20px;
+    font-size: 13px;
+  }
+}
+
+/* 小屏幕设备 */
+@media (max-width: 480px) {
+  .logo h1 {
+    display: none;
+  }
+
+  .video-title {
+    font-size: 20px;
+  }
+
+  .video-info {
+    padding: 20px 15px;
+  }
+
+  .video-detail-container-inner {
+    padding: 0 15px;
+  }
+
+  .action-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .related-videos {
+    padding: 20px 15px;
+  }
+
+  .related-video-thumbnail img {
+    height: 160px;
+  }
+
+  .related-video-title {
+    font-size: 15px;
+  }
+
+  .related-video-meta {
+    font-size: 13px;
   }
 }
 </style>

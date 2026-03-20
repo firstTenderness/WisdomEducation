@@ -4,6 +4,7 @@
     <div class="rank-header">
       <div class="rank-header-top">
         <div class="rank-title">
+
           <h2>鸿鹄榜</h2>
           <p class="rank-subtitle">鸿鹄之志，志在千里</p>
         </div>
@@ -17,10 +18,10 @@
         </div>
         <div class="rank-tabs">
           <el-tabs v-model="activeTab" @tab-change="switchTab" class="rank-tabs-container">
-            <el-tab-pane label="总榜" name="total"></el-tab-pane>
-            <el-tab-pane label="周榜" name="weekly"></el-tab-pane>
-            <el-tab-pane label="月榜" name="monthly"></el-tab-pane>
-            <el-tab-pane label="学科榜" name="subject"></el-tab-pane>
+            <el-tab-pane label="数学榜" name="math"></el-tab-pane>
+            <el-tab-pane label="语文榜" name="chinese"></el-tab-pane>
+            <el-tab-pane label="英语榜" name="english"></el-tab-pane>
+            <el-tab-pane label="物理榜" name="physics"></el-tab-pane>
           </el-tabs>
         </div>
       </div>
@@ -276,6 +277,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
 
 // 默认头像
 const defaultAvatar = '/src/assets/logo.svg'
@@ -287,105 +292,446 @@ const activeTab = ref('total')
 const showUserDetail = ref(false)
 const currentUserDetail = ref(null)
 
-// 前三名数据
-const topThreeData = ref([
-  {
-    id: 1,
-    name: '张明',
-    score: 12500,
-    level: '学霸',
-    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20smiling&image_size=square',
-    progress: 95
-  },
-  {
-    id: 2,
-    name: '李华',
-    score: 11200,
-    level: '学神',
-    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20smiling&image_size=square',
-    progress: 92
-  },
-  {
-    id: 3,
-    name: '王强',
-    score: 9800,
-    level: '学霸',
-    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20confident&image_size=square',
-    progress: 88
-  }
-])
-
-// 排行榜列表数据
-const rankListData = ref([
-  {
-    id: 4,
-    name: '陈静',
-    score: 8500,
-    level: '优秀',
-    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20smart&image_size=square',
-    progress: 85
-  },
-  {
-    id: 5,
-    name: '刘阳',
-    score: 7200,
-    level: '优秀',
-    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20friendly&image_size=square',
-    progress: 80
-  },
-  {
-    id: 6,
-    name: '赵雨',
-    score: 6800,
-    level: '良好',
-    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20cheerful&image_size=square',
-    progress: 78
-  },
-  {
-    id: 7,
-    name: '孙伟',
-    score: 6500,
-    level: '良好',
-    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20serious&image_size=square',
-    progress: 75
-  },
-  {
-    id: 8,
-    name: '周佳',
-    score: 6200,
-    level: '良好',
-    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20elegant&image_size=square',
-    progress: 72
-  },
-  {
-    id: 9,
-    name: '吴浩',
-    score: 5800,
-    level: '良好',
-    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20energetic&image_size=square',
-    progress: 70
-  },
-  {
+// 数学榜数据
+const mathRankData = {
+  topThree: [
+    {
+      id: 1,
+      name: '张明',
+      score: 15000,
+      level: '学神',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20math%20genius&image_size=square',
+      progress: 100,
+      subject: '数学'
+    },
+    {
+      id: 2,
+      name: '李华',
+      score: 13500,
+      level: '学神',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20math%20expert&image_size=square',
+      progress: 98,
+      subject: '数学'
+    },
+    {
+      id: 3,
+      name: '王强',
+      score: 12000,
+      level: '学霸',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20calculus%20expert&image_size=square',
+      progress: 96,
+      subject: '数学'
+    }
+  ],
+  rankList: [
+    {
+      id: 4,
+      name: '陈静',
+      score: 10500,
+      level: '学霸',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20statistics%20expert&image_size=square',
+      progress: 94,
+      subject: '数学'
+    },
+    {
+      id: 5,
+      name: '刘阳',
+      score: 9800,
+      level: '优秀',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20number%20theory%20expert&image_size=square',
+      progress: 92,
+      subject: '数学'
+    },
+    {
+      id: 6,
+      name: '赵雨',
+      score: 9200,
+      level: '优秀',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20probability%20expert&image_size=square',
+      progress: 90,
+      subject: '数学'
+    },
+    {
+      id: 7,
+      name: '孙伟',
+      score: 8500,
+      level: '良好',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20geometry%20enthusiast&image_size=square',
+      progress: 88,
+      subject: '数学'
+    },
+    {
+      id: 8,
+      name: '周佳',
+      score: 8000,
+      level: '良好',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20algebra%20enthusiast&image_size=square',
+      progress: 85,
+      subject: '数学'
+    },
+    {
+      id: 9,
+      name: '吴浩',
+      score: 7500,
+      level: '良好',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20math%20learner&image_size=square',
+      progress: 82,
+      subject: '数学'
+    },
+    {
+      id: 10,
+      name: '郑琳',
+      score: 7000,
+      level: '中等',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20math%20beginner&image_size=square',
+      progress: 78,
+      subject: '数学',
+      isCurrentUser: true
+    }
+  ],
+  myRank: {
     id: 10,
     name: '郑琳',
-    score: 5500,
+    score: 7000,
     level: '中等',
-    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20bright&image_size=square',
-    progress: 68,
-    isCurrentUser: true
+    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20math%20beginner&image_size=square',
+    rank: 10,
+    progress: 78,
+    subject: '数学'
   }
-])
+}
 
-// 我的排名数据
-const myRankData = ref({
-  id: 10,
-  name: '郑琳',
-  score: 5500,
-  level: '中等',
-  avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20bright&image_size=square',
-  rank: 10,
-  progress: 68
-})
+// 语文榜数据
+const chineseRankData = {
+  topThree: [
+    {
+      id: 11,
+      name: '林芳',
+      score: 14000,
+      level: '学神',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20chinese%20literature%20expert&image_size=square',
+      progress: 99,
+      subject: '语文'
+    },
+    {
+      id: 12,
+      name: '周明',
+      score: 12500,
+      level: '学神',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20literature%20master&image_size=square',
+      progress: 97,
+      subject: '语文'
+    },
+    {
+      id: 13,
+      name: '吴芳',
+      score: 11000,
+      level: '学霸',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20writing%20expert&image_size=square',
+      progress: 95,
+      subject: '语文'
+    }
+  ],
+  rankList: [
+    {
+      id: 14,
+      name: '郑强',
+      score: 9800,
+      level: '学霸',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20poetry%20expert&image_size=square',
+      progress: 93,
+      subject: '语文'
+    },
+    {
+      id: 15,
+      name: '孙丽',
+      score: 9200,
+      level: '优秀',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20reading%20comprehension%20expert&image_size=square',
+      progress: 91,
+      subject: '语文'
+    },
+    {
+      id: 16,
+      name: '刘小刚',
+      score: 8500,
+      level: '优秀',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20grammar%20expert&image_size=square',
+      progress: 89,
+      subject: '语文'
+    },
+    {
+      id: 17,
+      name: '李小红',
+      score: 7800,
+      level: '良好',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20literature%20enthusiast&image_size=square',
+      progress: 87,
+      subject: '语文'
+    },
+    {
+      id: 18,
+      name: '王大力',
+      score: 7200,
+      level: '良好',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20writing%20enthusiast&image_size=square',
+      progress: 84,
+      subject: '语文'
+    },
+    {
+      id: 19,
+      name: '张小丽',
+      score: 6800,
+      level: '良好',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20chinese%20learner&image_size=square',
+      progress: 81,
+      subject: '语文'
+    },
+    {
+      id: 20,
+      name: '林小明',
+      score: 6500,
+      level: '中等',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20chinese%20beginner&image_size=square',
+      progress: 78,
+      subject: '语文',
+      isCurrentUser: true
+    }
+  ],
+  myRank: {
+    id: 20,
+    name: '林小明',
+    score: 6500,
+    level: '中等',
+    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20chinese%20beginner&image_size=square',
+    rank: 20,
+    progress: 78,
+    subject: '语文'
+  }
+}
+
+// 英语榜数据
+const englishRankData = {
+  topThree: [
+    {
+      id: 21,
+      name: '陈明',
+      score: 13500,
+      level: '学神',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20english%20expert&image_size=square',
+      progress: 98,
+      subject: '英语'
+    },
+    {
+      id: 22,
+      name: '刘芳',
+      score: 12000,
+      level: '学神',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20english%20speaking%20expert&image_size=square',
+      progress: 96,
+      subject: '英语'
+    },
+    {
+      id: 23,
+      name: '赵强',
+      score: 10500,
+      level: '学霸',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20english%20writing%20expert&image_size=square',
+      progress: 94,
+      subject: '英语'
+    }
+  ],
+  rankList: [
+    {
+      id: 24,
+      name: '孙伟',
+      score: 9800,
+      level: '学霸',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20english%20listening%20expert&image_size=square',
+      progress: 92,
+      subject: '英语'
+    },
+    {
+      id: 25,
+      name: '周佳',
+      score: 9200,
+      level: '优秀',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20english%20reading%20expert&image_size=square',
+      progress: 90,
+      subject: '英语'
+    },
+    {
+      id: 26,
+      name: '吴浩',
+      score: 8500,
+      level: '优秀',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20english%20grammar%20expert&image_size=square',
+      progress: 88,
+      subject: '英语'
+    },
+    {
+      id: 27,
+      name: '郑琳',
+      score: 7800,
+      level: '良好',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20english%20vocabulary%20expert&image_size=square',
+      progress: 86,
+      subject: '英语'
+    },
+    {
+      id: 28,
+      name: '陈静',
+      score: 7200,
+      level: '良好',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20english%20enthusiast&image_size=square',
+      progress: 83,
+      subject: '英语'
+    },
+    {
+      id: 29,
+      name: '刘阳',
+      score: 6800,
+      level: '良好',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20english%20learner&image_size=square',
+      progress: 80,
+      subject: '英语'
+    },
+    {
+      id: 30,
+      name: '赵雨',
+      score: 6500,
+      level: '中等',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20english%20beginner&image_size=square',
+      progress: 77,
+      subject: '英语',
+      isCurrentUser: true
+    }
+  ],
+  myRank: {
+    id: 30,
+    name: '赵雨',
+    score: 6500,
+    level: '中等',
+    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20english%20beginner&image_size=square',
+    rank: 30,
+    progress: 77,
+    subject: '英语'
+  }
+}
+
+// 物理榜数据
+const physicsRankData = {
+  topThree: [
+    {
+      id: 31,
+      name: '张小明',
+      score: 14500,
+      level: '学神',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20physics%20expert&image_size=square',
+      progress: 99,
+      subject: '物理'
+    },
+    {
+      id: 32,
+      name: '李小红',
+      score: 13000,
+      level: '学神',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20mechanics%20expert&image_size=square',
+      progress: 97,
+      subject: '物理'
+    },
+    {
+      id: 33,
+      name: '王强',
+      score: 11500,
+      level: '学霸',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20electromagnetism%20expert&image_size=square',
+      progress: 95,
+      subject: '物理'
+    }
+  ],
+  rankList: [
+    {
+      id: 34,
+      name: '刘小刚',
+      score: 10000,
+      level: '学霸',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20optics%20expert&image_size=square',
+      progress: 93,
+      subject: '物理'
+    },
+    {
+      id: 35,
+      name: '张小丽',
+      score: 9400,
+      level: '优秀',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20thermodynamics%20expert&image_size=square',
+      progress: 91,
+      subject: '物理'
+    },
+    {
+      id: 36,
+      name: '林小明',
+      score: 8800,
+      level: '优秀',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20quantum%20physics%20enthusiast&image_size=square',
+      progress: 89,
+      subject: '物理'
+    },
+    {
+      id: 37,
+      name: '王大力',
+      score: 8200,
+      level: '良好',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20mechanics%20enthusiast&image_size=square',
+      progress: 87,
+      subject: '物理'
+    },
+    {
+      id: 38,
+      name: '李华',
+      score: 7600,
+      level: '良好',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20electromagnetism%20enthusiast&image_size=square',
+      progress: 84,
+      subject: '物理'
+    },
+    {
+      id: 39,
+      name: '张明',
+      score: 7200,
+      level: '良好',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20male%20student%20avatar%20portrait%20physics%20learner&image_size=square',
+      progress: 81,
+      subject: '物理'
+    },
+    {
+      id: 40,
+      name: '陈静',
+      score: 6800,
+      level: '中等',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20physics%20beginner&image_size=square',
+      progress: 78,
+      subject: '物理',
+      isCurrentUser: true
+    }
+  ],
+  myRank: {
+    id: 40,
+    name: '陈静',
+    score: 6800,
+    level: '中等',
+    avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=asian%20female%20student%20avatar%20portrait%20physics%20beginner&image_size=square',
+    rank: 40,
+    progress: 78,
+    subject: '物理'
+  }
+}
+
+// 当前显示的数据
+const topThreeData = ref(mathRankData.topThree)
+const rankListData = ref(mathRankData.rankList)
+const myRankData = ref(mathRankData.myRank)
 
 // 获取进度条颜色
 const getProgressColor = (progress) => {
@@ -426,18 +772,45 @@ const sendMessage = () => {
 const switchTab = (tabName) => {
   activeTab.value = tabName
   ElMessage.info(`切换到${getTabName(tabName)}`)
-  // 这里可以添加切换排行榜数据的逻辑
+  
+  // 切换排行榜数据
+  switch (tabName) {
+    case 'math':
+      topThreeData.value = mathRankData.topThree
+      rankListData.value = mathRankData.rankList
+      myRankData.value = mathRankData.myRank
+      break
+    case 'chinese':
+      topThreeData.value = chineseRankData.topThree
+      rankListData.value = chineseRankData.rankList
+      myRankData.value = chineseRankData.myRank
+      break
+    case 'english':
+      topThreeData.value = englishRankData.topThree
+      rankListData.value = englishRankData.rankList
+      myRankData.value = englishRankData.myRank
+      break
+    case 'physics':
+      topThreeData.value = physicsRankData.topThree
+      rankListData.value = physicsRankData.rankList
+      myRankData.value = physicsRankData.myRank
+      break
+    default:
+      topThreeData.value = mathRankData.topThree
+      rankListData.value = mathRankData.rankList
+      myRankData.value = mathRankData.myRank
+  }
 }
 
 // 获取标签名称
 const getTabName = (tabName) => {
   const tabMap = {
-    'total': '总榜',
-    'weekly': '周榜',
-    'monthly': '月榜',
-    'subject': '学科榜'
+    'math': '数学榜',
+    'chinese': '语文榜',
+    'english': '英语榜',
+    'physics': '物理榜'
   }
-  return tabMap[tabName] || '总榜'
+  return tabMap[tabName] || '数学榜'
 }
 
 // 刷新排行榜
@@ -500,6 +873,27 @@ const shareRank = () => {
 .rank-actions .el-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: white;
+  border-color: white;
+  z-index: 10;
+}
+
+.back-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: white;
+  color: white;
+}
+
+.rank-title {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
 }
 
 .rank-title h2 {

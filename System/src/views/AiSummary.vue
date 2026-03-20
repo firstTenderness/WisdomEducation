@@ -4,6 +4,7 @@
     <div class="ai-header">
       <div class="header-bg"></div>
       <div class="header-content">
+
         <div class="header-left">
           <h2 class="ai-title">知识总结</h2>
           <p class="ai-subtitle">智能整理学习内容，提炼科普知识精华</p>
@@ -217,7 +218,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const selectedCourse = ref('1')
 const showHistoryDetail = ref(false)
 const currentHistorySummary = ref(null)
@@ -425,6 +428,7 @@ const refreshHistory = () => {
   ElMessage.success('历史记录已刷新')
   // 这里可以添加刷新历史记录的逻辑
 }
+
 </script>
 
 <style scoped>
@@ -461,6 +465,7 @@ const refreshHistory = () => {
   padding: 30px;
   color: white;
 }
+
 
 .header-left {
   display: flex;

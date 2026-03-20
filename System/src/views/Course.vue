@@ -4,6 +4,7 @@
       <div class="header-bg"></div>
       <div class="header-content">
         <div class="header-left">
+
           <h2 class="course-title">快乐学习课堂</h2>
           <p class="course-subtitle">轻松学知识，快乐成长每一天</p>
         </div>
@@ -68,52 +69,60 @@
       </el-row>
     </div>
     
+    <!-- 功能按钮区域 -->
+    <div class="feature-buttons-container">
+      <h3 class="feature-title">智能学习功能</h3>
+      <div class="feature-buttons">
+        <el-button type="primary" size="large" @click="handlePersonalizedPath" class="feature-button">
+          <i class="el-icon-data-analysis"></i> 个性化学习路径
+        </el-button>
+        <el-button type="success" size="large" @click="handleRealTimeAnalysis" class="feature-button">
+          <i class="el-icon-data-line"></i> 实时学习分析
+        </el-button>
+      </div>
+    </div>
+    
     <div class="course-grid">
-      <el-row :gutter="20">
-        <el-col :span="6" v-for="course in filteredCourses" :key="course.id">
-          <el-card :body-style="{ padding: 0 }" class="course-card">
+      <h3 class="section-title">推荐课程</h3>
+      <div class="course-row">
+        <div class="course-item" v-for="course in filteredCourses" :key="course.id">
+          <div class="course-card">
             <div class="course-cover">
-              <img :src="course.cover" alt="课程封面" />
-              <div class="course-badge" :class="course.level">
-                {{ course.level === 'beginner' ? '初级' : course.level === 'intermediate' ? '中级' : '高级' }}
+              <div v-if="!course.coverLoaded && !course.coverError" class="image-loading">
+                <i class="el-icon-loading"></i>
+                <span>加载中...</span>
               </div>
-              <div class="course-category">{{ course.category }}</div>
-              <el-button 
-                type="text" 
-                class="course-favorite-btn"
-                @click="toggleFavorite(course)"
-                :icon="course.isFavorite ? 'el-icon-star-on' : 'el-icon-star-off'"
-              ></el-button>
+              <img 
+                :src="course.cover" 
+                alt="课程封面" 
+                @load="course.coverLoaded = true; course.coverError = false"
+                @error="course.coverError = true; course.coverLoaded = false"
+                loading="lazy"
+                decoding="async"
+              />
+              <div v-if="course.coverError" class="image-error">
+                <i class="el-icon-picture-outline"></i>
+                <span>图片加载失败</span>
+              </div>
             </div>
-            <div class="course-content">
-              <h3 class="course-name">{{ course.title }}</h3>
+            <div class="course-info">
+              <h3 class="course-title">{{ course.title }}</h3>
               <p class="course-teacher">讲师：{{ course.teacher }}</p>
-              <div class="course-rating">
-                <el-rate v-model="course.rating" disabled :max="5" size="small" />
-                <span class="course-rating-text">{{ course.rating.toFixed(1) }}</span>
-              </div>
               <div class="course-progress">
                 <el-progress 
                   :percentage="course.progress" 
                   :stroke-width="6"
-                  :color="getProgressColor(course.progress)"
+                  :color="'#4CAF50'"
                 />
-                <p class="course-progress-text">
-                  已学 {{ course.finished }} / 共 {{ course.total }} 课时
-                </p>
+                <span class="course-progress-text">{{ course.progress }}%</span>
               </div>
-              <div class="course-footer">
-                <el-button type="primary" size="small" @click="enterCourse(course)">
-                  进入学习
-                </el-button>
-                <el-button size="small" @click="viewCourseDetail(course)">
-                  查看详情
-                </el-button>
-              </div>
+              <el-button type="primary" size="small" @click="enterCourse(course)" class="continue-btn">
+                继续学习
+              </el-button>
             </div>
-          </el-card>
-        </el-col>
-      </el-row>
+          </div>
+        </div>
+      </div>
     </div>
     
     <div v-if="filteredCourses.length === 0" class="empty-courses">
@@ -300,8 +309,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
+import { scrollReveal, scrollScale } from '../utils/animation'
+
+const router = useRouter()
 
 // 搜索和筛选状态
 const searchKeyword = ref('')
@@ -328,7 +341,7 @@ const courses = ref([
     id: 1,
     title: '趣味语文：童话阅读与写作',
     teacher: '李老师',
-    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=colorful%20children%20chinese%20language%20course%20cover%20with%20fairy%20tales%20and%20books%20for%20elementary%20students&image_size=square',
+    cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=colorful%20chinese%20language%20course%20cover%20with%20fairy%20tales%20and%20books%20for%20elementary%20students&image_size=square',
     progress: 60,
     finished: 6,
     total: 10,
@@ -381,7 +394,9 @@ const courses = ref([
     notes: [
       { content: '童话的特点是想象力丰富，情节生动', time: '2026-01-15 14:30' },
       { content: '写作时要注意开头吸引读者', time: '2026-01-20 16:45' }
-    ]
+    ],
+    coverLoaded: false,
+    coverError: false
   },
   {
     id: 2,
@@ -436,7 +451,9 @@ const courses = ref([
         ]
       }
     ],
-    notes: []
+    notes: [],
+    coverLoaded: false,
+    coverError: false
   },
   {
     id: 3,
@@ -482,7 +499,9 @@ const courses = ref([
         ]
       }
     ],
-    notes: []
+    notes: [],
+    coverLoaded: false,
+    coverError: false
   },
   {
     id: 4,
@@ -528,7 +547,9 @@ const courses = ref([
         ]
       }
     ],
-    notes: []
+    notes: [],
+    coverLoaded: false,
+    coverError: false
   },
   {
     id: 5,
@@ -574,7 +595,9 @@ const courses = ref([
         ]
       }
     ],
-    notes: []
+    notes: [],
+    coverLoaded: false,
+    coverError: false
   },
   {
     id: 6,
@@ -621,7 +644,9 @@ const courses = ref([
         ]
       }
     ],
-    notes: []
+    notes: [],
+    coverLoaded: false,
+    coverError: false
   },
   {
     id: 7,
@@ -667,7 +692,9 @@ const courses = ref([
         ]
       }
     ],
-    notes: []
+    notes: [],
+    coverLoaded: false,
+    coverError: false
   },
   {
     id: 8,
@@ -713,7 +740,9 @@ const courses = ref([
         ]
       }
     ],
-    notes: []
+    notes: [],
+    coverLoaded: false,
+    coverError: false
   },
   {
     id: 9,
@@ -759,7 +788,9 @@ const courses = ref([
         ]
       }
     ],
-    notes: []
+    notes: [],
+    coverLoaded: false,
+    coverError: false
   },
   {
     id: 10,
@@ -806,7 +837,9 @@ const courses = ref([
         ]
       }
     ],
-    notes: []
+    notes: [],
+    coverLoaded: false,
+    coverError: false
   }
 ])
 
@@ -939,6 +972,28 @@ const selectLesson = (lesson) => {
   videoCurrentTime.value = 0
   ElMessage.success(`正在播放：${lesson.title}`)
 }
+
+// 功能按钮处理函数
+const handlePersonalizedPath = () => {
+  ElMessage.success('正在生成个性化学习路径')
+  router.push('/personalized-path')
+}
+
+const handleRealTimeAnalysis = () => {
+  ElMessage.success('正在分析学习数据')
+  router.push('/real-time-analysis')
+}
+
+
+// 初始化滚动动画
+onMounted(() => {
+  setTimeout(() => {
+    scrollReveal('.stat-card', 0.1, 100)
+    scrollReveal('.course-card', 0.1, 100)
+    scrollScale('.course-header', 0.1, 0)
+    scrollReveal('.feature-buttons-container', 0.1, 50)
+  }, 100)
+})
 </script>
 
 <style scoped>
@@ -980,6 +1035,8 @@ const selectLesson = (lesson) => {
 .header-left {
   flex: 1;
 }
+
+
 
 .course-title {
   font-size: 32px;
@@ -1095,24 +1152,63 @@ const selectLesson = (lesson) => {
   margin-top: 20px;
 }
 
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 20px;
+  padding-left: 10px;
+  border-left: 4px solid #4CAF50;
+}
+
+.course-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -10px;
+}
+
+.course-item {
+  flex: 0 0 33.333%;
+  padding: 0 10px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .course-item {
+    flex: 0 0 50%;
+  }
+}
+
+@media (max-width: 480px) {
+  .course-item {
+    flex: 0 0 100%;
+  }
+}
+
 .course-card {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 8px;
   overflow: hidden;
-  border-radius: 12px;
   background: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .course-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .course-cover {
-  position: relative;
   height: 160px;
   overflow: hidden;
-  border-radius: 12px 12px 0 0;
+  border-radius: 8px 8px 0 0;
+  position: relative;
+  background-color: #f5f7fa;
 }
 
 .course-cover img {
@@ -1120,86 +1216,61 @@ const selectLesson = (lesson) => {
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
+  display: block;
 }
 
 .course-card:hover .course-cover img {
-  transform: scale(1.1);
-}
-
-.course-badge {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 6px 14px;
-  border-radius: 16px;
-  font-size: 12px;
-  font-weight: bold;
-  color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-}
-
-.course-card:hover .course-badge {
   transform: scale(1.05);
 }
 
-.course-badge.beginner {
-  background-color: #67c23a;
-}
-
-.course-badge.intermediate {
-  background-color: #e6a23c;
-}
-
-.course-badge.advanced {
-  background-color: #f56c6c;
-}
-
-.course-category {
+.image-loading,
+.image-error {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
   right: 0;
-  padding: 8px 12px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
-  color: white;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.course-favorite-btn {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  color: white;
-  font-size: 20px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  bottom: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  background-color: #f5f7fa;
+  color: #909399;
+  font-size: 12px;
 }
 
-.course-favorite-btn:hover {
-  background: rgba(0, 0, 0, 0.5);
-  transform: scale(1.1);
+.image-loading i {
+  font-size: 24px;
+  margin-bottom: 8px;
+  animation: spin 1s linear infinite;
 }
 
-.course-favorite-btn .el-icon-star-on {
+.image-error i {
+  font-size: 24px;
+  margin-bottom: 8px;
   color: #f56c6c;
 }
 
-.course-content {
-  padding: 20px;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.course-name {
-  font-size: 18px;
-  font-weight: bold;
-  margin: 0 0 12px 0;
+.course-info {
+  padding: 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.course-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 6px 0;
   color: #303133;
   line-height: 1.4;
   display: -webkit-box;
@@ -1210,57 +1281,48 @@ const selectLesson = (lesson) => {
 }
 
 .course-teacher {
-  font-size: 14px;
+  font-size: 12px;
   color: #606266;
-  margin: 0 0 12px 0;
-  display: flex;
-  align-items: center;
-}
-
-.course-teacher::before {
-  content: '👨‍🏫';
-  margin-right: 8px;
-}
-
-.course-rating {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-  gap: 8px;
-}
-
-.course-rating-text {
-  font-size: 14px;
-  color: #606266;
-  font-weight: 500;
+  margin: 0 0 10px 0;
 }
 
 .course-progress {
-  margin: 0 0 18px 0;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.course-progress .el-progress {
+  margin-bottom: 4px;
+}
+
+.course-progress .el-progress__bar {
+  border-radius: 4px;
 }
 
 .course-progress-text {
-  font-size: 12px;
+  font-size: 11px;
   color: #909399;
-  margin: 10px 0 0 0;
-  text-align: right;
+  float: right;
+  margin-top: 2px;
+}
+
+.continue-btn {
+  width: 100%;
+  border-radius: 4px;
+  padding: 8px 0;
+  font-size: 12px;
   font-weight: 500;
-}
-
-.course-footer {
-  display: flex;
-  gap: 10px;
-}
-
-.course-footer .el-button {
-  flex: 1;
-  border-radius: 6px;
+  background: #4CAF50 !important;
+  border: none !important;
+  color: white !important;
   transition: all 0.3s ease;
+  margin-top: auto;
 }
 
-.course-footer .el-button:hover {
+.continue-btn:hover {
+  background: #45a049 !important;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 
 .empty-courses {
@@ -1299,6 +1361,350 @@ const selectLesson = (lesson) => {
   margin: 0;
   max-width: 400px;
   line-height: 1.5;
+}
+
+/* 功能按钮区域样式 */
+.feature-buttons-container {
+  padding: 30px;
+  margin-top: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.feature-buttons-container:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.feature-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #303133;
+  margin: 0 0 20px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e4e7ed;
+  position: relative;
+}
+
+.feature-title::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, #409eff, #667eea);
+}
+
+.feature-buttons {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.feature-button {
+  flex: 1;
+  min-width: 200px;
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.feature-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.feature-button i {
+  font-size: 18px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  
+  .course-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  
+  .course-actions .el-select,
+  .course-actions .el-input {
+    flex: 1;
+    min-width: 150px;
+  }
+}
+
+@media (max-width: 768px) {
+  .course-header {
+    padding: 30px 20px;
+  }
+  
+  .course-title {
+    font-size: 24px;
+  }
+  
+  .course-subtitle {
+    font-size: 14px;
+  }
+  
+  .course-actions {
+    padding: 12px;
+  }
+  
+  .course-actions .el-select,
+  .course-actions .el-input {
+    width: 100%;
+    margin-bottom: 10px;
+    margin-right: 0;
+  }
+  
+  .course-actions .el-button {
+    width: 100%;
+  }
+  
+  .stats-container {
+    padding: 0 16px;
+    margin-top: -20px;
+  }
+  
+  .stat-card .el-card__body {
+    padding: 16px;
+    gap: 16px;
+  }
+  
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+  
+  .stat-value {
+    font-size: 20px;
+  }
+  
+  .stat-label {
+    font-size: 12px;
+  }
+  
+  .feature-buttons-container {
+    padding: 16px;
+    margin-top: 16px;
+  }
+  
+  .feature-title {
+    font-size: 18px;
+  }
+  
+  .feature-buttons {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .feature-button {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+  
+  .course-grid {
+    padding: 16px;
+    margin-top: 16px;
+  }
+  
+  .el-col {
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin-bottom: 16px;
+  }
+  
+  .course-cover {
+    height: 140px;
+  }
+  
+  .course-content {
+    padding: 16px;
+  }
+  
+  .course-name {
+    font-size: 16px;
+  }
+  
+  .course-teacher {
+    font-size: 13px;
+  }
+  
+  .course-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .course-footer .el-button {
+    width: 100%;
+  }
+  
+  .empty-courses {
+    margin: 16px;
+    padding: 40px 16px;
+  }
+  
+  .empty-icon {
+    font-size: 48px;
+  }
+  
+  .empty-title {
+    font-size: 18px;
+  }
+  
+  .empty-description {
+    font-size: 13px;
+  }
+  
+  .course-detail-dialog {
+    width: 95% !important;
+  }
+  
+  .course-detail-dialog .el-dialog__body {
+    padding: 20px;
+  }
+  
+  .course-detail-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .course-detail-cover {
+    width: 160px !important;
+    height: 120px !important;
+  }
+  
+  .course-learning-dialog {
+    width: 100% !important;
+  }
+  
+  .course-learning-content {
+    flex-direction: column;
+  }
+  
+  .course-video-container {
+    height: 200px;
+  }
+  
+  .course-video-placeholder {
+    padding: 20px;
+  }
+  
+  .course-video-placeholder i {
+    font-size: 48px;
+  }
+  
+  .course-video-placeholder h3 {
+    font-size: 18px;
+  }
+  
+  .course-video-placeholder p {
+    font-size: 14px;
+  }
+  
+  .course-video-controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .course-video-controls .el-slider {
+    width: 100% !important;
+  }
+  
+  .course-chapters-sidebar,
+  .course-notes-sidebar {
+    width: 100%;
+    max-height: 250px;
+    padding: 16px;
+  }
+  
+  .course-chapters-sidebar h3,
+  .course-notes-sidebar h3 {
+    font-size: 16px;
+  }
+  
+  .course-chapter .chapter-header {
+    padding: 12px;
+  }
+  
+  .course-lesson {
+    padding: 8px 0 !important;
+  }
+  
+  .teacher-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .teacher-avatar {
+    width: 80px !important;
+    height: 80px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .course-header {
+    padding: 20px 16px;
+  }
+  
+  .course-title {
+    font-size: 20px;
+  }
+  
+  .stat-card .el-card__body {
+    padding: 12px;
+    gap: 12px;
+  }
+  
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+  
+  .stat-value {
+    font-size: 18px;
+  }
+  
+  .course-cover {
+    height: 120px;
+  }
+  
+  .course-content {
+    padding: 12px;
+  }
+  
+  .course-name {
+    font-size: 15px;
+  }
+  
+  .course-learning-content {
+    height: calc(100vh - 80px);
+  }
+  
+  .course-video-container {
+    height: 180px;
+  }
 }
 
 /* 课程详情弹窗样式 */

@@ -5,12 +5,19 @@
       <div class="header-bg"></div>
       <div class="header-content">
         <div class="header-left">
-          <h2 class="notes-title">学习笔记</h2>
-          <p class="notes-subtitle">记录学习点滴，沉淀知识财富</p>
+
+          <h2 class="notes-title">智记手札</h2>
+          <p class="notes-subtitle">智能笔记管理，构建知识网络</p>
         </div>
         <div class="notes-actions">
           <el-button type="primary" @click="createNewNote">
             <i class="el-icon-plus"></i> 新建笔记
+          </el-button>
+          <el-button type="success" @click="openSmartOrganization">
+            <i class="el-icon-data-analysis"></i> 智能整理
+          </el-button>
+          <el-button type="warning" @click="openKnowledgeNetwork">
+            <i class="el-icon-link"></i> 知识网络
           </el-button>
           <el-button @click="exportNotes">
             <i class="el-icon-download"></i> 导出笔记
@@ -214,12 +221,93 @@
         </div>
       </div>
     </div>
+    
+    <!-- 智能笔记整理弹窗 -->
+    <el-dialog
+      v-model="showSmartOrganizationDialog"
+      title="智能笔记整理"
+      width="800px"
+      class="smart-organization-dialog"
+    >
+      <div class="smart-organization-content">
+        <div class="organization-options">
+          <h4>整理选项：</h4>
+          <el-checkbox-group v-model="organizationOptions">
+            <el-checkbox label="按分类整理">按分类整理</el-checkbox>
+            <el-checkbox label="按时间排序">按时间排序</el-checkbox>
+            <el-checkbox label="提取关键词">提取关键词</el-checkbox>
+            <el-checkbox label="生成知识摘要">生成知识摘要</el-checkbox>
+          </el-checkbox-group>
+        </div>
+        <div class="organization-loading" v-if="organizationLoading">
+          <el-icon class="is-loading"><Loading /></el-icon>
+          <span>AI正在整理笔记...</span>
+        </div>
+        <div class="organization-results" v-else-if="organizationResults.length > 0">
+          <h4>整理结果：</h4>
+          <el-divider />
+          <div v-for="(result, index) in organizationResults" :key="index" class="organization-result-item">
+            <div class="result-title">{{ result.title }}</div>
+            <div class="result-content">{{ result.content }}</div>
+          </div>
+        </div>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="showSmartOrganizationDialog = false">取消</el-button>
+          <el-button type="primary" @click="startSmartOrganization" :loading="organizationLoading">开始整理</el-button>
+        </span>
+      </template>
+    </el-dialog>
+    
+    <!-- 知识关联网络弹窗 -->
+    <el-dialog
+      v-model="showKnowledgeNetworkDialog"
+      title="知识关联网络"
+      width="900px"
+      class="knowledge-network-dialog"
+    >
+      <div class="knowledge-network-content">
+        <div class="network-controls">
+          <el-select v-model="networkFilter" placeholder="选择知识类别" style="width: 200px; margin-bottom: 20px;">
+            <el-option label="全部" value="all"></el-option>
+            <el-option label="科学实验" value="experiment"></el-option>
+            <el-option label="自然观察" value="nature"></el-option>
+            <el-option label="天文观测" value="astronomy"></el-option>
+            <el-option label="气象观测" value="weather"></el-option>
+            <el-option label="环保知识" value="environmental"></el-option>
+          </el-select>
+        </div>
+        <div class="network-visualization" v-if="!networkLoading">
+          <div class="network-placeholder">
+            <i class="el-icon-link"></i>
+            <h3>知识关联网络图</h3>
+            <p>展示知识点之间的关联关系</p>
+          </div>
+        </div>
+        <div class="network-loading" v-if="networkLoading">
+          <el-icon class="is-loading"><Loading /></el-icon>
+          <span>正在生成知识网络...</span>
+        </div>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="showKnowledgeNetworkDialog = false">关闭</el-button>
+          <el-button type="primary" @click="generateKnowledgeNetwork" :loading="networkLoading">生成网络</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, reactive, computed } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Loading } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
 
 const searchKeyword = ref('')
 const noteFilter = ref('all')
@@ -232,6 +320,17 @@ const noteForm = ref({
   content: '',
   category: ''
 })
+
+// 智能笔记整理相关
+const showSmartOrganizationDialog = ref(false)
+const organizationOptions = ref(['按分类整理', '按时间排序', '提取关键词'])
+const organizationLoading = ref(false)
+const organizationResults = ref([])
+
+// 知识关联网络相关
+const showKnowledgeNetworkDialog = ref(false)
+const networkFilter = ref('all')
+const networkLoading = ref(false)
 const notes = ref([
   {
     id: 1,
@@ -444,6 +543,72 @@ const saveNote = () => {
     showNoteDetail.value = true
   }
 }
+
+// 智能笔记整理相关方法
+const openSmartOrganization = () => {
+  showSmartOrganizationDialog.value = true
+  organizationResults.value = []
+}
+
+const startSmartOrganization = async () => {
+  if (organizationOptions.value.length === 0) {
+    ElMessage.warning('请至少选择一项整理选项')
+    return
+  }
+  
+  organizationLoading.value = true
+  
+  try {
+    // 模拟AI整理笔记
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    
+    // 生成模拟结果
+    organizationResults.value = [
+      {
+        title: '按分类整理结果',
+        content: '已将笔记按科学实验、自然观察、天文观测、气象观测和环保知识进行分类整理。'
+      },
+      {
+        title: '按时间排序结果',
+        content: '已将笔记按更新时间从新到旧排序，最新的笔记排在前面。'
+      },
+      {
+        title: '提取关键词',
+        content: '从笔记中提取了水净化、植物观察、星空观测、天气变化、垃圾分类等关键词。'
+      },
+      {
+        title: '知识摘要',
+        content: '整理了5条笔记，涵盖了科学实验、自然观察、天文观测、气象观测和环保知识等多个领域，形成了系统化的知识体系。'
+      }
+    ]
+    
+    ElMessage.success('笔记整理成功')
+  } catch (error) {
+    ElMessage.error('笔记整理失败')
+  } finally {
+    organizationLoading.value = false
+  }
+}
+
+// 知识关联网络相关方法
+const openKnowledgeNetwork = () => {
+  showKnowledgeNetworkDialog.value = true
+}
+
+const generateKnowledgeNetwork = async () => {
+  networkLoading.value = true
+  
+  try {
+    // 模拟生成知识网络
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    
+    ElMessage.success('知识网络生成成功')
+  } catch (error) {
+    ElMessage.error('生成知识网络失败')
+  } finally {
+    networkLoading.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -485,6 +650,20 @@ const saveNote = () => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.back-button {
+  margin-bottom: 15px;
+  border-color: white;
+  color: white;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+}
+
+.back-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: white;
+  color: white;
 }
 
 .notes-title {
@@ -724,34 +903,144 @@ const saveNote = () => {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .notes-page {
+    padding: 15px;
+  }
+  
   .notes-header {
-    padding: 20px;
+    margin-bottom: 20px;
   }
   
   .header-content {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
+    padding: 20px;
+  }
+  
+  .notes-title {
+    font-size: 24px;
+  }
+  
+  .notes-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .notes-actions .el-button {
+    font-size: 12px;
+    padding: 8px 12px;
   }
   
   .notes-stats {
     flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
   }
   
   .stat-card {
     min-width: 100%;
   }
   
+  .stat-item {
+    gap: 12px;
+  }
+  
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+  
+  .stat-value {
+    font-size: 20px;
+  }
+  
   .notes-filters {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
   }
   
   .notes-filters .el-select,
   .notes-filters .el-input {
     width: 100% !important;
     margin-left: 0 !important;
+  }
+  
+  .el-table {
+    font-size: 12px;
+  }
+  
+  .el-table th,
+  .el-table td {
+    padding: 8px;
+  }
+  
+  .el-table-column {
+    min-width: 100px !important;
+  }
+  
+  .note-title-cell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .empty-notes {
+    margin-top: 40px;
+    padding: 30px 15px;
+  }
+  
+  .empty-icon {
+    font-size: 48px;
+  }
+  
+  .empty-title {
+    font-size: 18px;
+  }
+  
+  .note-detail-page,
+  .note-edit-page {
+    padding: 15px;
+    margin-top: 10px;
+  }
+  
+  .note-detail-header h2,
+  .note-edit-header h2 {
+    font-size: 20px;
+  }
+  
+  .note-detail-body p {
+    font-size: 14px;
+  }
+  
+  .note-detail-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .note-detail-actions,
+  .note-edit-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .smart-organization-dialog .el-dialog__body,
+  .knowledge-network-dialog .el-dialog__body {
+    padding: 20px;
+  }
+  
+  .organization-options .el-checkbox {
+    margin-right: 10px;
+    margin-bottom: 8px;
+  }
+  
+  .network-visualization {
+    height: 300px;
   }
 }
 
@@ -906,5 +1195,118 @@ const saveNote = () => {
     flex-wrap: wrap;
     gap: 8px;
   }
+}
+
+/* 智能笔记整理弹窗样式 */
+.smart-organization-dialog .el-dialog__body {
+  padding: 30px;
+}
+
+.smart-organization-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.organization-options {
+  margin-bottom: 20px;
+}
+
+.organization-options h4 {
+  margin-bottom: 15px;
+  color: #303133;
+}
+
+.organization-options .el-checkbox {
+  margin-right: 20px;
+  margin-bottom: 10px;
+}
+
+.organization-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 10px;
+  background-color: #f5f7fa;
+  border-radius: 8px;
+}
+
+.organization-results {
+  margin-top: 20px;
+}
+
+.organization-result-item {
+  background-color: #f5f7fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.organization-result-item .result-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #303133;
+}
+
+.organization-result-item .result-content {
+  color: #606266;
+  line-height: 1.5;
+}
+
+/* 知识关联网络弹窗样式 */
+.knowledge-network-dialog .el-dialog__body {
+  padding: 30px;
+}
+
+.knowledge-network-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.network-controls {
+  margin-bottom: 20px;
+}
+
+.network-visualization {
+  height: 400px;
+  background-color: #f5f7fa;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.network-placeholder {
+  text-align: center;
+  color: #606266;
+}
+
+.network-placeholder i {
+  font-size: 48px;
+  margin-bottom: 20px;
+  color: #909399;
+}
+
+.network-placeholder h3 {
+  margin: 0 0 10px 0;
+  color: #303133;
+}
+
+.network-placeholder p {
+  margin: 0;
+  color: #606266;
+}
+
+.network-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 10px;
+  background-color: #f5f7fa;
+  border-radius: 8px;
+  margin: 20px 0;
 }
 </style>

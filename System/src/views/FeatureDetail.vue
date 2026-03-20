@@ -8,15 +8,25 @@
             <el-avatar :size="40" src="/src/assets/logo.svg" class="nav-logo"></el-avatar>
             <h1 class="platform-name">慧学澄明教育学习平台</h1>
           </div>
+          <!-- 移动端菜单按钮 -->
+          <div class="menu-toggle" @click="toggleMenu">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+          </div>
           <div class="navbar-right">
-            <nav class="nav-menu">
-              <router-link to="/portal" class="nav-link">首页</router-link>
-              <router-link to="/portal#features" class="nav-link active">特色功能</router-link>
-              <router-link to="/portal#courses" class="nav-link">课程中心</router-link>
-              <router-link to="/portal#policy" class="nav-link">乡村教育政策</router-link>
-              <router-link to="/portal#breakthrough" class="nav-link">破茧视界</router-link>
-              <router-link to="/portal#about" class="nav-link">关于我们</router-link>
-              <router-link to="/portal#contact" class="nav-link">联系我们</router-link>
+            <nav class="nav-menu" :class="{ 'active': isMenuOpen }">
+              <router-link to="/portal" class="nav-link" @click="isMenuOpen = false">首页</router-link>
+              <router-link to="/portal#features" class="nav-link active" @click="isMenuOpen = false">特色功能</router-link>
+              <router-link to="/portal#courses" class="nav-link" @click="isMenuOpen = false">课程中心</router-link>
+              <router-link to="/portal#policy" class="nav-link" @click="isMenuOpen = false">乡村教育政策</router-link>
+              <router-link to="/portal#breakthrough" class="nav-link" @click="isMenuOpen = false">破茧视界</router-link>
+              <router-link to="/portal#about" class="nav-link" @click="isMenuOpen = false">关于我们</router-link>
+              <router-link to="/portal#contact" class="nav-link" @click="isMenuOpen = false">联系我们</router-link>
+              <div class="mobile-nav-buttons">
+                <router-link to="/login" class="btn btn-outline" @click="isMenuOpen = false">登录</router-link>
+                <router-link to="/register" class="btn btn-primary" @click="isMenuOpen = false">注册</router-link>
+              </div>
             </nav>
             <div class="nav-buttons">
               <router-link to="/login" class="btn btn-outline">登录</router-link>
@@ -26,11 +36,17 @@
         </div>
       </div>
     </header>
+    
+    <!-- 移动端菜单遮罩 -->
+    <div class="menu-overlay" v-if="isMenuOpen" @click="toggleMenu"></div>
 
     <!-- 功能详情头部 -->
     <section class="feature-header" :style="{ backgroundColor: featureDetail?.color || '#667eea' }">
       <div class="container">
         <div class="feature-header-content">
+          <button class="back-button" @click="goBack">
+            <i class="fas fa-arrow-left"></i> 返回
+          </button>
           <div class="feature-icon-large">
             <i :class="featureDetail?.icon"></i>
           </div>
@@ -233,6 +249,24 @@ const route = useRoute();
 const router = useRouter();
 const chartRef = ref(null);
 let chartInstance = null;
+
+// 移动端菜单状态
+const isMenuOpen = ref(false);
+
+// 切换菜单
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
+  if (isMenuOpen.value) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+};
+
+// 返回上一页
+const goBack = () => {
+  router.back()
+};
 
 // 特色功能数据
 const featuresData = [
@@ -1038,6 +1072,8 @@ watch(() => featureDetail.value, () => {
   initChart();
 }, { deep: true });
 
+
+
 // 页面加载时检查功能是否存在
 onMounted(() => {
   if (!featureDetail.value) {
@@ -1100,6 +1136,34 @@ onMounted(() => {
   margin: 0;
 }
 
+/* 移动端菜单按钮 */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.menu-toggle .bar {
+  width: 25px;
+  height: 3px;
+  background-color: #667eea;
+  margin: 3px 0;
+  transition: all 0.3s;
+}
+
+/* 移动端菜单遮罩 */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  transition: opacity 0.3s;
+}
+
 .navbar-right {
   display: flex;
   align-items: center;
@@ -1130,6 +1194,21 @@ onMounted(() => {
 .nav-buttons {
   display: flex;
   gap: 10px;
+}
+
+/* 移动端导航按钮 */
+.mobile-nav-buttons {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e4e7ed;
+}
+
+.mobile-nav-buttons .btn {
+  width: 100%;
+  text-align: center;
 }
 
 .btn {
@@ -1172,6 +1251,33 @@ onMounted(() => {
   padding: 80px 0;
   position: relative;
   overflow: hidden;
+}
+
+/* 返回按钮 */
+.back-button {
+  position: absolute;
+  top: 40px;
+  left: 20px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.back-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .feature-header::before {
@@ -1383,6 +1489,7 @@ onMounted(() => {
 .feature-desc {
   font-size: 15px;
   color: #606266;
+  margin-bottom: 8px;
 }
 
 /* 功能优势 */
@@ -1571,7 +1678,216 @@ onMounted(() => {
   justify-content: center;
   font-size: 32px;
   margin: 0 auto 20px;
-  transition: transform 0.3s ease;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px;
+  }
+
+  /* 导航栏 */
+  .navbar-content {
+    padding: 10px 0;
+  }
+
+  .platform-name {
+    font-size: 16px;
+  }
+
+  /* 显示移动端菜单按钮 */
+  .menu-toggle {
+    display: flex;
+  }
+
+  /* 隐藏桌面端导航菜单 */
+  .nav-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 80%;
+    max-width: 300px;
+    height: 100vh;
+    background-color: #fff;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    transition: right 0.3s ease;
+    z-index: 1000;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-menu.active {
+    right: 0;
+  }
+
+  .nav-menu .nav-link {
+    font-size: 18px;
+    font-weight: bold;
+    padding: 12px 24px;
+  }
+
+  /* 显示移动端导航按钮 */
+  .mobile-nav-buttons {
+    display: flex;
+  }
+
+  /* 隐藏桌面端导航按钮 */
+  .nav-buttons {
+    display: none;
+  }
+
+  /* 功能详情头部 */
+  .feature-header {
+    padding: 60px 0;
+  }
+
+  .feature-icon-large {
+    font-size: 48px;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 20px;
+  }
+
+  .feature-header .feature-title {
+    font-size: 28px;
+  }
+
+  .feature-header .feature-description {
+    font-size: 16px;
+    padding: 0 15px;
+  }
+
+  /* 功能详情内容 */
+  .feature-content {
+    padding: 40px 0;
+  }
+
+  .section-card {
+    padding: 30px 20px;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-size: 20px;
+  }
+
+  .title-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .problem-description,
+  .solution-description,
+  .effect-description {
+    font-size: 15px;
+  }
+
+  .problem-item,
+  .solution-feature,
+  .scenario-item {
+    padding: 15px;
+  }
+
+  /* 功能优势 */
+  .advantages-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .advantage-item {
+    padding: 20px 15px;
+  }
+
+  .advantage-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  /* 效果展示 */
+  .effect-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .stat-item {
+    padding: 20px 15px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .chart-container {
+    height: 300px !important;
+  }
+
+  /* 相关功能 */
+  .related-features {
+    margin-top: 40px;
+  }
+
+  .related-features-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .related-feature-card {
+    padding: 25px 20px;
+  }
+
+  /* 页脚 */
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .footer-column h3 {
+    font-size: 16px;
+  }
+
+  .footer-links li {
+    margin-bottom: 8px;
+  }
+
+  .footer-links a {
+    font-size: 13px;
+  }
+
+  .footer-bottom {
+    padding-top: 20px;
+    font-size: 13px;
+  }
+}
+
+/* 小屏幕设备 */
+@media (max-width: 480px) {
+  .platform-name {
+    display: none;
+  }
+
+  .feature-header .feature-title {
+    font-size: 24px;
+  }
+
+  .section-card {
+    padding: 20px 15px;
+  }
+
+  .effect-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+
+  .chart-container {
+    height: 250px !important;
+  }
 }
 
 .related-feature-card:hover .feature-icon {

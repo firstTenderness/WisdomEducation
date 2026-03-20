@@ -19,10 +19,10 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
+    minify: 'esbuild',
     // 生成相对路径
     rollupOptions: {
       output: {
-        manualChunks: undefined,
         // 确保所有资源都使用相对路径
         assetFileNames: 'assets/[name]-[hash].[ext]',
         chunkFileNames: 'assets/[name]-[hash].js',

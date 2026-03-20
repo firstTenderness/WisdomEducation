@@ -20,12 +20,35 @@
           <router-link to="/login" class="btn btn-secondary login-btn">登录</router-link>
           <router-link to="/login" class="btn btn-primary">注册</router-link>
         </div>
+        <!-- 移动端菜单按钮 -->
+        <div class="mobile-menu-btn" @click="toggleMobileMenu">
+          <div class="menu-icon" :class="{ active: mobileMenuOpen }"></div>
+        </div>
+      </div>
+      <!-- 移动端菜单 -->
+      <div class="mobile-menu" :class="{ active: mobileMenuOpen }">
+        <ul class="mobile-nav-menu">
+          <li><router-link to="/portal" @click="toggleMobileMenu()">首页</router-link></li>
+          <li><router-link to="/portal#features" @click="toggleMobileMenu()">特色功能</router-link></li>
+          <li><router-link to="/portal#courses" @click="toggleMobileMenu()">课程中心</router-link></li>
+          <li><router-link to="/portal#policy" @click="toggleMobileMenu()">乡村教育政策</router-link></li>
+          <li><router-link to="/portal#breakthrough" @click="toggleMobileMenu()">破茧视界</router-link></li>
+          <li><router-link to="/portal#about" @click="toggleMobileMenu()">关于我们</router-link></li>
+          <li><router-link to="/portal#contact" @click="toggleMobileMenu()">联系我们</router-link></li>
+          <li><router-link to="/login" @click="toggleMobileMenu()">登录</router-link></li>
+          <li><router-link to="/login" @click="toggleMobileMenu()">注册</router-link></li>
+        </ul>
       </div>
     </nav>
 
     <!-- 课程详情区 -->
     <section class="course-detail-section">
       <div class="course-detail-container-inner">
+        <!-- 返回按钮 -->
+        <button class="back-btn" @click="goBack">
+          <i class="fas fa-arrow-left"></i>
+          返回上一页
+        </button>
         <!-- 课程基本信息 -->
         <div class="course-header">
           <div class="course-cover">
@@ -194,10 +217,23 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
 const courseId = route.params.id
+
+// 移动端菜单
+const mobileMenuOpen = ref(false)
+
+const toggleMobileMenu = () => {
+  mobileMenuOpen.value = !mobileMenuOpen.value
+}
+
+// 返回上一页
+const goBack = () => {
+  router.back()
+}
 
 // 课程数据
 const courses = ref([
@@ -739,6 +775,105 @@ onMounted(() => {
   padding: 15px 30px;
 }
 
+/* 移动端菜单按钮 */
+.mobile-menu-btn {
+  display: none;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.menu-icon {
+  width: 30px;
+  height: 24px;
+  position: relative;
+  cursor: pointer;
+}
+
+.menu-icon::before,
+.menu-icon::after,
+.menu-icon span {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  background-color: #409eff;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.menu-icon span {
+  top: 10.5px;
+}
+
+.menu-icon::before {
+  top: 0;
+}
+
+.menu-icon::after {
+  bottom: 0;
+}
+
+.menu-icon.active span {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.menu-icon.active::before {
+  transform: rotate(45deg);
+  top: 10.5px;
+}
+
+.menu-icon.active::after {
+  transform: rotate(-45deg);
+  bottom: 10.5px;
+}
+
+/* 移动端菜单 */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 80%;
+  max-width: 300px;
+  height: 100vh;
+  background: linear-gradient(135deg, #409eff 0%, #69c0ff 100%);
+  z-index: 1000;
+  transition: right 0.3s ease;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+}
+
+.mobile-menu.active {
+  right: 0;
+}
+
+.mobile-nav-menu {
+  list-style: none;
+  width: 100%;
+  padding: 0 30px;
+}
+
+.mobile-nav-menu li {
+  margin-bottom: 20px;
+}
+
+.mobile-nav-menu a {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 12px 0;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.mobile-nav-menu a:hover {
+  transform: translateX(10px);
+  color: #f0f9ff;
+}
+
 .logo {
   display: flex;
   align-items: center;
@@ -803,154 +938,360 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 40px;
-  background-color: #fff;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 12px;
   padding: 40px;
   margin-bottom: 40px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.course-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #409eff, #66b1ff, #91caff, #c3d8ff);
 }
 
 .course-cover {
   flex: 0 0 300px;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.course-cover:hover {
+  transform: scale(1.02);
 }
 
 .course-cover img {
   width: 100%;
   height: auto;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+.course-cover:hover img {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 }
 
 .course-info {
   flex: 1;
   min-width: 300px;
+  position: relative;
+  z-index: 1;
 }
 
 .course-title {
-  font-size: 32px;
+  font-size: 36px;
   font-weight: bold;
-  margin-bottom: 15px;
-  color: #303133;
+  margin-bottom: 20px;
+  color: #1a1a1a;
+  line-height: 1.2;
+  transition: color 0.3s ease;
+}
+
+.course-title:hover {
+  color: #409eff;
 }
 
 .course-teacher {
-  font-size: 16px;
+  font-size: 18px;
   color: #606266;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  font-weight: 500;
 }
 
 .course-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 12px;
   margin-bottom: 30px;
 }
 
 .course-meta span {
-  padding: 6px 12px;
+  padding: 8px 16px;
   background-color: #ecf5ff;
   color: #409eff;
-  border-radius: 4px;
+  border-radius: 20px;
   font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.course-meta span:hover {
+  background-color: #409eff;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
 }
 
 .course-progress {
   margin-bottom: 30px;
+  position: relative;
 }
 
 .progress-bar {
   width: 100%;
-  height: 10px;
-  background-color: #ebeef5;
-  border-radius: 5px;
+  height: 12px;
+  background-color: #f1f5f9;
+  border-radius: 6px;
   overflow: hidden;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .progress-fill {
   height: 100%;
-  background-color: #409eff;
-  border-radius: 5px;
-  transition: width 0.3s;
+  background: linear-gradient(90deg, #409eff, #66b1ff);
+  border-radius: 6px;
+  transition: width 0.6s ease;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: progress-shine 2s infinite;
+}
+
+@keyframes progress-shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 .progress-text {
-  font-size: 14px;
-  color: #606266;
+  font-size: 16px;
+  color: #303133;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .course-actions {
   display: flex;
   gap: 20px;
+  flex-wrap: wrap;
+}
+
+.course-actions .btn {
+  flex: 1;
+  min-width: 150px;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.course-actions .btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.course-actions .btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.course-actions .btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(64, 158, 255, 0.4);
 }
 
 /* 课程大纲 */
 .course-outline {
-  background-color: #fff;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 12px;
   padding: 40px;
   margin-bottom: 40px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.course-outline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #67c23a, #85ce61, #a3d980, #c2e7a0);
 }
 
 .section-title {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
   margin-bottom: 30px;
-  color: #303133;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #409eff;
+  color: #1a1a1a;
+  padding-bottom: 15px;
+  border-bottom: 3px solid #67c23a;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, #67c23a, #85ce61);
 }
 
 .chapter {
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.chapter::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, #e4e7ed, #67c23a, #e4e7ed);
 }
 
 .chapter-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #ebeef5;
+  margin-bottom: 20px;
+  padding: 15px 20px;
+  background: rgba(103, 194, 58, 0.05);
+  border-radius: 8px;
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+  border-left: 4px solid #67c23a;
+}
+
+.chapter-header:hover {
+  background: rgba(103, 194, 58, 0.1);
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px rgba(103, 194, 58, 0.2);
 }
 
 .chapter-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
   color: #303133;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chapter-title::before {
+  content: '📚';
+  font-size: 18px;
 }
 
 .chapter-duration {
   font-size: 14px;
-  color: #909399;
+  color: #67c23a;
+  font-weight: 500;
+  background: rgba(103, 194, 58, 0.1);
+  padding: 6px 12px;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.chapter-duration:hover {
+  background: rgba(103, 194, 58, 0.2);
+  transform: translateY(-2px);
+}
+
+.chapter-lessons {
+  padding-left: 40px;
+  position: relative;
+  z-index: 1;
 }
 
 .lesson {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  margin-bottom: 10px;
-  background-color: #f5f7fa;
-  border-radius: 4px;
-  transition: background-color 0.3s;
+  padding: 20px;
+  margin-bottom: 15px;
+  background: white;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.lesson::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #409eff;
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.3s ease;
 }
 
 .lesson:hover {
-  background-color: #ecf5ff;
+  background: #f8fafc;
+  transform: translateX(10px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.lesson:hover::before {
+  transform: scaleY(1);
 }
 
 .lesson-content {
   display: flex;
   align-items: center;
   flex: 1;
+  gap: 15px;
 }
 
 .lesson-icon {
-  margin-right: 15px;
-  font-size: 20px;
-  color: #409eff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #409eff, #66b1ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.lesson:hover .lesson-icon {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
 }
 
 .lesson-info {
@@ -959,31 +1300,51 @@ onMounted(() => {
 
 .lesson-title {
   font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 5px;
+  font-weight: 600;
+  margin-bottom: 8px;
   color: #303133;
+  transition: color 0.3s ease;
+}
+
+.lesson:hover .lesson-title {
+  color: #409eff;
 }
 
 .lesson-description {
   font-size: 14px;
   color: #606266;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+.lesson:hover .lesson-description {
+  color: #303133;
 }
 
 .lesson-meta {
   display: flex;
   align-items: center;
   gap: 15px;
+  flex-shrink: 0;
 }
 
 .lesson-duration {
   font-size: 14px;
   color: #909399;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.lesson:hover .lesson-duration {
+  color: #409eff;
 }
 
 .lesson-status {
-  padding: 4px 10px;
-  border-radius: 4px;
+  padding: 6px 14px;
+  border-radius: 16px;
   font-size: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .lesson-status.completed {
@@ -991,14 +1352,35 @@ onMounted(() => {
   color: #67c23a;
 }
 
+.lesson-status.completed:hover {
+  background-color: #67c23a;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
+}
+
 .lesson-status.in-progress {
   background-color: #ecf5ff;
   color: #409eff;
 }
 
+.lesson-status.in-progress:hover {
+  background-color: #409eff;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+}
+
 .lesson-status.not-started {
   background-color: #fafafa;
   color: #909399;
+}
+
+.lesson-status.not-started:hover {
+  background-color: #909399;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(144, 147, 153, 0.3);
 }
 
 /* 课程介绍 */
@@ -1278,25 +1660,167 @@ onMounted(() => {
     display: none;
   }
 
+  .nav-buttons {
+    display: none;
+  }
+
+  .mobile-menu-btn {
+    display: block;
+  }
+
+  .logo h1 {
+    font-size: 16px;
+  }
+
+  .logo img {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+  }
+
+  .nav-container {
+    padding: 10px 20px;
+  }
+
+  .course-detail-section {
+    padding: 40px 0;
+  }
+
+  .course-detail-container-inner {
+    padding: 0 20px;
+  }
+
   .course-header {
     flex-direction: column;
+    padding: 30px 20px;
+    gap: 20px;
   }
 
   .course-cover {
     flex: 1;
+    width: 100%;
+  }
+
+  .course-cover img {
+    width: 100%;
+    height: auto;
+  }
+
+  .course-title {
+    font-size: 24px;
   }
 
   .course-actions {
     flex-direction: column;
+    gap: 15px;
+  }
+
+  .course-actions .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .course-outline,
+  .course-intro,
+  .teacher-info,
+  .course-reviews {
+    padding: 30px 20px;
+  }
+
+  .section-title {
+    font-size: 20px;
+  }
+
+  .lesson {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 15px;
+  }
+
+  .lesson-content {
+    flex: 1;
+    width: 100%;
+  }
+
+  .lesson-meta {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .teacher-content {
     flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
   }
 
   .teacher-avatar {
     flex: 1;
-    max-width: 150px;
+    max-width: 120px;
+  }
+
+  .review-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .reviewer-info {
+    width: 100%;
+  }
+
+  .footer-container {
+    padding: 0 20px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  /* 改进触摸交互 */
+  .btn,
+  .lesson,
+  .review {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* 改进表单元素 */
+  .btn {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+}
+
+/* 小屏幕设备优化 */
+@media (max-width: 480px) {
+  .course-title {
+    font-size: 20px;
+  }
+
+  .course-header {
+    padding: 20px 15px;
+  }
+
+  .course-outline,
+  .course-intro,
+  .teacher-info,
+  .course-reviews {
+    padding: 20px 15px;
+  }
+
+  .section-title {
+    font-size: 18px;
+  }
+
+  .lesson {
+    padding: 12px;
+  }
+
+  .teacher-avatar {
+    max-width: 100px;
   }
 }
 </style>

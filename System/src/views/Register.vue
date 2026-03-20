@@ -145,13 +145,13 @@
               @blur="validateField('code')"
             />
             <button 
-              type="button" 
-              class="send-code-btn"
-              :disabled="isSending || countdown > 0"
-              @click="sendCode"
-            >
-              {{ countdown > 0 ? `${countdown}秒后重试` : isSending ? '发送中...' : '获取验证码' }}
-            </button>
+          type="button" 
+          class="btn btn-outline btn-md"
+          :disabled="isSending || countdown > 0"
+          @click="sendCode"
+        >
+          {{ countdown > 0 ? `${countdown}秒后重试` : isSending ? '发送中...' : '获取验证码' }}
+        </button>
           </div>
           <span class="error-message" v-if="errors.code">{{ errors.code }}</span>
         </div>
@@ -165,7 +165,7 @@
         
         <button 
           type="submit" 
-          class="register-button"
+          class="btn btn-primary btn-lg"
           :disabled="isLoading || !formData.agreeTerms"
         >
           <span v-if="isLoading">
@@ -677,27 +677,10 @@ const showPrivacy = () => {
   color: #667eea;
 }
 
-.send-code-btn {
-  height: 46px;
-  padding: 0 15px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 13px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.3s ease;
-}
-
-.send-code-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
-}
-
-.send-code-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.input-wrapper.code-input .btn {
+  flex-shrink: 0;
+  margin-top: 0;
+  min-width: 120px;
 }
 
 .error-message {
@@ -782,35 +765,9 @@ const showPrivacy = () => {
   text-decoration: underline;
 }
 
-.register-button {
+.btn.btn-lg {
   width: 100%;
-  height: 50px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.register-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-}
-
-.register-button:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.register-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  margin-top: 20px;
 }
 
 .register-footer {
@@ -884,9 +841,104 @@ const showPrivacy = () => {
   }
 }
 
+@media (max-width: 768px) {
+  .register-container {
+    padding: 20px;
+  }
+  
+  .register-box {
+    padding: 40px 30px;
+    max-width: 100%;
+    margin: 20px 0;
+  }
+  
+  .register-title {
+    font-size: 24px;
+  }
+  
+  .register-subtitle {
+    font-size: 14px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group input {
+    height: 46px;
+    font-size: 16px;
+  }
+  
+  .identity-options {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .identity-card {
+    padding: 25px 20px;
+  }
+  
+  .identity-icon {
+    font-size: 36px;
+  }
+  
+  .input-wrapper.code-input {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .input-wrapper.code-input input {
+    width: 100%;
+  }
+  
+  .send-code-btn {
+    width: 100%;
+    height: 46px;
+    font-size: 14px;
+  }
+  
+  .register-button {
+    height: 48px;
+    font-size: 16px;
+  }
+  
+  .agree-terms {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  
+  /* 改进触摸交互 */
+  .form-group input,
+  .register-button,
+  .send-code-btn,
+  .toggle-password,
+  .identity-option,
+  .agree-terms a {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* 改进表单元素 */
+  .input-icon {
+    font-size: 18px;
+  }
+  
+  .toggle-password {
+    font-size: 18px;
+  }
+  
+  .error-message {
+    font-size: 12px;
+  }
+  
+  .strength-text {
+    font-size: 12px;
+  }
+}
+
 @media (max-width: 480px) {
   .register-box {
-    padding: 30px 20px;
+    padding: 35px 25px;
     margin: 10px 0;
   }
   
@@ -894,17 +946,37 @@ const showPrivacy = () => {
     font-size: 22px;
   }
   
+  .register-subtitle {
+    font-size: 13px;
+  }
+  
   .form-group input {
     height: 44px;
+    font-size: 15px;
   }
   
   .register-button {
     height: 46px;
+    font-size: 15px;
+  }
+  
+  .identity-card {
+    padding: 20px 15px;
+  }
+  
+  .identity-icon {
+    font-size: 32px;
   }
   
   .send-code-btn {
-    font-size: 12px;
-    padding: 0 12px;
+    height: 44px;
+    font-size: 13px;
+  }
+  
+  .error-alert,
+  .success-alert {
+    font-size: 13px;
+    padding: 10px 12px;
   }
 }
 </style>

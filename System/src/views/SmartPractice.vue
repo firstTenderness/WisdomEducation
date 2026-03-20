@@ -5,6 +5,7 @@
       <div class="header-bg"></div>
       <div class="header-content">
         <div class="header-left">
+
           <h2 class="practice-title">趣味练习中心</h2>
           <p class="practice-subtitle">快乐学习，趣味挑战，轻松提升</p>
         </div>
@@ -116,6 +117,13 @@
       </el-card>
     </div>
     
+    <!-- 测试按钮 -->
+    <div v-if="!isPracticing" style="text-align: center; margin: 20px;">
+      <el-button type="primary" @click="testStartPractice">测试开始练习</el-button>
+      <el-button type="success" @click="testIsPracticing">测试直接设置isPracticing</el-button>
+      <el-button type="warning" @click="isPracticing = true; currentPractice.value = { name: '单题练习', questions: [{ id: 1, type: 'single', title: '以下哪个是童话故事中的角色？', options: [{ label: 'A', content: '孙悟空' }, { label: 'B', content: '小红帽' }, { label: 'C', content: '哪吒' }, { label: 'D', content: '葫芦娃' }], correctAnswer: 'B', explanation: '小红帽是经典童话故事《小红帽》中的角色，其他选项都是中国神话或动画中的角色。' }], timeLimit: 5, difficulty: 'medium' }; answers[1] = ''">直接设置所有值</el-button>
+    </div>
+    
     <!-- 练习内容 -->
     <div v-else class="practice-content">
       <div class="practice-info">
@@ -150,35 +158,43 @@
             
             <!-- 选择题 -->
             <div v-if="question.type === 'single' || question.type === 'multiple'" class="question-options">
-              <el-radio-group 
-                v-if="question.type === 'single'" 
-                v-model="answers[question.id]"
-                @change="handleAnswerChange(question.id)"
-              >
-                <el-radio 
+              <div v-if="question.type === 'single'">
+                <div 
                   v-for="(option, optIndex) in question.options" 
                   :key="optIndex" 
-                  :label="option.label"
                   class="option-item"
+                  @click="answers[question.id] = option.label; handleAnswerChange(question.id)"
+                  :class="{ 'selected': answers[question.id] === option.label }"
                 >
+                  <input 
+                    type="radio" 
+                    :name="'question-' + question.id" 
+                    :value="option.label" 
+                    :checked="answers[question.id] === option.label"
+                    @change="answers[question.id] = option.label; handleAnswerChange(question.id)"
+                  />
                   {{ option.label }}. {{ option.content }}
-                </el-radio>
-              </el-radio-group>
+                </div>
+              </div>
               
-              <el-checkbox-group 
-                v-else 
-                v-model="answers[question.id]"
-                @change="handleAnswerChange(question.id)"
-              >
-                <el-checkbox 
+              <div v-else>
+                <div 
                   v-for="(option, optIndex) in question.options" 
                   :key="optIndex" 
-                  :label="option.label"
                   class="option-item"
+                  @click="toggleCheckbox(question.id, option.label)"
+                  :class="{ 'selected': answers[question.id] && answers[question.id].includes(option.label) }"
                 >
+                  <input 
+                    type="checkbox" 
+                    :name="'question-' + question.id" 
+                    :value="option.label" 
+                    :checked="answers[question.id] && answers[question.id].includes(option.label)"
+                    @change="toggleCheckbox(question.id, option.label)"
+                  />
                   {{ option.label }}. {{ option.content }}
-                </el-checkbox>
-              </el-checkbox-group>
+                </div>
+              </div>
             </div>
             
             <!-- 填空题 -->
@@ -466,6 +482,10 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
 
 const selectedSubject = ref('all')
 const selectedDifficulty = ref('all')
@@ -473,6 +493,12 @@ const isPracticing = ref(false)
 const showResult = ref(false)
 const selectedMode = ref('')
 const answers = reactive({})
+
+// 练习统计数据
+const practiceCount = ref(0)
+const correctRate = ref(0)
+const totalPracticeTime = ref(0)
+const practiceLevel = ref('新手')
 
 // 解析相关状态
 const showExplanation = ref(false)
@@ -661,13 +687,61 @@ const progress = computed(() => {
 
 // 选择练习模式
 const selectMode = (mode) => {
+  console.log('selectMode called with mode:', mode)
   selectedMode.value = mode
+  console.log('selectedMode.value:', selectedMode.value)
   startPractice()
+}
+
+// 测试开始练习
+const testStartPractice = () => {
+  console.log('testStartPractice called')
+  selectedMode.value = 'single'
+  console.log('selectedMode.value:', selectedMode.value)
+  startPractice()
+}
+
+// 测试直接设置isPracticing
+const testIsPracticing = () => {
+  // 直接设置isPracticing为true
+  isPracticing.value = true
+  
+  // 设置一个简单的测试题目
+  currentPractice.value = {
+    name: '单题练习',
+    questions: [
+      {
+        id: 1,
+        type: 'single',
+        title: '以下哪个是童话故事中的角色？',
+        options: [
+          { label: 'A', content: '孙悟空' },
+          { label: 'B', content: '小红帽' },
+          { label: 'C', content: '哪吒' },
+          { label: 'D', content: '葫芦娃' }
+        ],
+        correctAnswer: 'B',
+        explanation: '小红帽是经典童话故事《小红帽》中的角色，其他选项都是中国神话或动画中的角色。'
+      }
+    ],
+    timeLimit: 5,
+    difficulty: 'medium'
+  }
+  
+  // 初始化答案
+  answers[1] = ''
+  
+  ElMessage.success('测试模式已启动！')
+  console.log('testIsPracticing called')
+  console.log('isPracticing.value:', isPracticing.value)
+  console.log('currentPractice.value:', currentPractice.value)
+  console.log('answers:', answers)
 }
 
 // 开始练习
 const startPractice = () => {
-  const mode = practiceModes[selectedMode.value]
+  // 使用选择的模式或默认模式 'single'
+  const mode = practiceModes[selectedMode.value] || practiceModes['single']
   if (!mode) return
   
   // 生成练习题目
@@ -681,18 +755,42 @@ const startPractice = () => {
   }
   
   // 重置答案
+  const newAnswers = {}
+  practiceQuestions.forEach(question => {
+    newAnswers[question.id] = question.type === 'multiple' ? [] : ''
+  })
+  
+  // 清空并重新赋值，确保响应性
   Object.keys(answers).forEach(key => {
     delete answers[key]
   })
+  Object.assign(answers, newAnswers)
   
   isPracticing.value = true
   showResult.value = false
   ElMessage.success(`开始${mode.name}！`)
+  console.log('startPractice called with mode:', selectedMode.value)
+  console.log('practiceQuestions:', practiceQuestions)
+  console.log('answers:', answers)
 }
 
 // 处理答案变化
 const handleAnswerChange = (questionId) => {
   ElMessage.success('答案已保存')
+}
+
+// 切换多选题选项
+const toggleCheckbox = (questionId, label) => {
+  if (!answers[questionId]) {
+    answers[questionId] = []
+  }
+  const index = answers[questionId].indexOf(label)
+  if (index > -1) {
+    answers[questionId].splice(index, 1)
+  } else {
+    answers[questionId].push(label)
+  }
+  handleAnswerChange(questionId)
 }
 
 // 取消练习
@@ -1175,6 +1273,26 @@ const getKnowledgePoints = (question) => {
 .option-item {
   margin-bottom: 10px;
   display: block;
+  padding: 10px 15px;
+  border: 1px solid #e4e7ed;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.option-item:hover {
+  background-color: #f5f7fa;
+  border-color: #c0c4cc;
+}
+
+.option-item.selected {
+  background-color: #ecf5ff;
+  border-color: #409eff;
+  color: #409eff;
+}
+
+.option-item input {
+  margin-right: 10px;
 }
 
 .fill-input {

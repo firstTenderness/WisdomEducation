@@ -7,6 +7,13 @@
         <div class="nav-left">
           <el-avatar :size="40" src="/src/assets/logo.svg" class="nav-logo"></el-avatar>
           <h1 class="platform-name">慧学澄明学习教育平台-学生端</h1>
+          <el-button 
+            type="text" 
+            class="mobile-menu-btn" 
+            @click="toggleMobileMenu"
+          >
+            <i class="el-icon-menu"></i>
+          </el-button>
         </div>
         <div class="nav-right">
           <div class="nav-stats">
@@ -41,17 +48,20 @@
       </div>
     </div>
 
+    <!-- 移动端菜单遮罩 -->
+    <div v-if="isMobileMenuOpen" class="mobile-menu-overlay" @click="toggleMobileMenu"></div>
+
     <!-- 主体布局 -->
     <div class="main-layout">
       <!-- 左侧折叠菜单 -->
-      <div class="sidebar" :class="{ 'is-collapse': isCollapse }">
+      <div class="sidebar" :class="{ 'is-collapse': isCollapse, 'mobile-menu': isMobileMenuOpen }">
         <el-menu
           :default-active="currentMenu"
           class="sidebar-menu"
           background-color="#f5f7fa"
           text-color="#303133"
           active-text-color="#409eff"
-          :collapse="isCollapse"
+          :collapse="isCollapse && !isMobileMenuOpen"
           @select="handleMenuSelect"
         >
           <div class="logo-container" @click="toggleCollapse">
@@ -155,10 +165,27 @@ const userInfo = ref(JSON.parse(localStorage.getItem('userInfo') || '{"name":"�
 const currentView = ref(Course) // 默认显示课程页面
 const currentMenu = ref('1') // 当前选中菜单
 const isCollapse = ref(false) // 侧边栏折叠状态
+const isMobileMenuOpen = ref(false) // 移动端菜单打开状态
 const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png' // 默认头像
 // 新增：页面装饰性数据
 const todayStudyTime = ref(Math.floor(Math.random() * 120) + 10) // 今日学习时间
 const unreadMessages = ref(Math.floor(Math.random() * 5)) // 未读消息数
+
+// 切换移动端菜单
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+  // 移动端菜单打开时，强制展开侧边栏
+  if (isMobileMenuOpen.value) {
+    isCollapse.value = false
+  }
+}
+
+// 菜单切换时关闭移动端菜单
+const handleMenuSelect = (index) => {
+  currentMenu.value = index
+  currentView.value = menuMap[index]
+  isMobileMenuOpen.value = false
+}
 
 // 菜单与组件映射
 const menuMap = {
@@ -593,19 +620,76 @@ const handleLogout = () => {
   background: rgba(0, 0, 0, 0.3);
 }
 
+/* 移动端菜单按钮 */
+.mobile-menu-btn {
+  display: none;
+  font-size: 20px;
+  color: var(--text-light);
+}
+
+/* 移动端菜单遮罩 */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+  display: none;
+}
+
+/* 移动端菜单 */
+.sidebar.mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  z-index: 100;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+}
+
 /* 响应式设计 */
+@media (max-width: 1024px) {
+  .platform-name {
+    font-size: 18px;
+  }
+  
+  .nav-stats {
+    gap: 15px;
+  }
+  
+  .nav-right {
+    gap: 15px;
+  }
+}
+
 @media (max-width: 768px) {
   .navbar {
     padding: 0 16px;
-    height: 50px;
+    height: 60px;
+  }
+  
+  .nav-content {
+    padding: 0 16px;
   }
   
   .platform-name {
     font-size: 16px;
+    display: none;
+  }
+  
+  .mobile-menu-btn {
+    display: block;
   }
   
   .nav-right {
-    gap: 12px;
+    gap: 8px;
+  }
+  
+  .nav-stats {
+    display: none;
   }
   
   .user-info {
@@ -613,15 +697,35 @@ const handleLogout = () => {
   }
   
   .user-name {
-    font-size: 13px;
+    display: none;
+  }
+  
+  .interactive-btn {
+    font-size: 12px;
+    padding: 6px 12px;
   }
   
   .sidebar {
-    width: 200px;
+    position: fixed;
+    top: 0;
+    left: -280px;
+    bottom: 0;
+    width: 280px;
+    z-index: 100;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+    transition: left 0.3s ease;
   }
   
   .sidebar.is-collapse {
-    width: 60px;
+    left: -60px;
+  }
+  
+  .sidebar.mobile-menu {
+    left: 0;
+  }
+  
+  .mobile-menu-overlay {
+    display: block;
   }
   
   .logo-container {
@@ -629,12 +733,12 @@ const handleLogout = () => {
   }
   
   .sidebar-menu .el-menu-item {
-    height: 45px;
-    line-height: 45px;
+    height: 50px;
+    line-height: 50px;
   }
   
   .sidebar-menu .el-menu-item i {
-    font-size: 16px;
+    font-size: 18px;
   }
   
   .page-header {
@@ -647,6 +751,58 @@ const handleLogout = () => {
   
   .main-content {
     padding: 16px;
+  }
+  
+  .breadcrumb {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    height: 56px;
+  }
+  
+  .nav-content {
+    padding: 0 12px;
+  }
+  
+  .nav-logo {
+    size: 32px;
+  }
+  
+  .mobile-menu-btn {
+    font-size: 18px;
+  }
+  
+  .interactive-btn {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+  
+  .sidebar {
+    width: 240px;
+    left: -240px;
+  }
+  
+  .sidebar.is-collapse {
+    left: -60px;
+  }
+  
+  .sidebar.mobile-menu {
+    left: 0;
+  }
+  
+  .page-header {
+    padding: 12px;
+  }
+  
+  .page-title {
+    font-size: 16px;
+  }
+  
+  .main-content {
+    padding: 12px;
   }
 }
 </style>

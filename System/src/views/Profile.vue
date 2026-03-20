@@ -110,11 +110,7 @@ const router = useRouter()
 
 // 返回上一页
 const goBack = () => {
-  if (window.history.length > 1) {
-    router.go(-1)
-  } else {
-    router.push('/home')
-  }
+  router.back()
 }
 
 // 状态管理
@@ -263,5 +259,75 @@ onMounted(() => getBaseInfo())
 }
 .back-btn .el-icon {
   margin-right: 6px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 10px;
+  }
+  
+  .back-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+  
+  .page-header h2 {
+    font-size: 18px;
+  }
+  
+  .page-header p {
+    font-size: 13px;
+  }
+  
+  .base-info-form, .pwd-form {
+    padding: 0 15px 15px;
+  }
+  
+  .el-form-item {
+    margin-bottom: 15px;
+  }
+  
+  .el-form-item label {
+    font-size: 14px;
+  }
+  
+  .el-input__wrapper {
+    height: 44px;
+  }
+  
+  .el-input__inner {
+    font-size: 14px;
+    padding: 0 12px;
+  }
+  
+  .el-button {
+    width: 100%;
+    padding: 10px 0;
+    font-size: 14px;
+  }
+  
+  /* 调整标签页样式 */
+  .profile-tabs .el-tabs__nav {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 10px;
+  }
+  
+  .profile-tabs .el-tabs__item {
+    font-size: 14px;
+    padding: 0 15px;
+  }
+  
+  /* 确保表单在移动端显示正常 */
+  .el-form {
+    width: 100%;
+  }
+  
+  .el-form-item__content {
+    width: 100%;
+  }
 }
 </style>
